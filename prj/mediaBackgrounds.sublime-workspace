@@ -1,0 +1,462 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"out",
+				"output_restaurant_table"
+			],
+			[
+				"save",
+				"saved_restaurants"
+			],
+			[
+				"rest",
+				"restaurants"
+			],
+			[
+				"resta",
+				"restaurants"
+			],
+			[
+				"pr",
+				"precise_decimal"
+			],
+			[
+				"pre",
+				"precision"
+			],
+			[
+				"prec",
+				"precise_decimal"
+			],
+			[
+				"res",
+				"restaurants"
+			],
+			[
+				"file",
+				"filepath"
+			],
+			[
+				"file_",
+				"file_usable"
+			],
+			[
+				"Gui",
+				"Guide"
+			],
+			[
+				"user",
+				"user_response"
+			],
+			[
+				"Rest",
+				"Restaurant"
+			],
+			[
+				"fil",
+				"filepath"
+			],
+			[
+				"app",
+				"APP_ROOT"
+			],
+			[
+				"ani",
+				"animal1"
+			],
+			[
+				"n",
+				"n1"
+			],
+			[
+				"over",
+				"over_five"
+			],
+			[
+				"ov",
+				"over_five"
+			],
+			[
+				"jq",
+				"jqplugin	jQuery plugin template"
+			],
+			[
+				"vide",
+				"videos"
+			],
+			[
+				"video",
+				"videoId"
+			],
+			[
+				"for",
+				"for	for (…) {…}"
+			],
+			[
+				"createServer",
+				"http.createServer(requestListener);"
+			],
+			[
+				"conseo",
+				"console.log();"
+			],
+			[
+				"populate",
+				"populateObject"
+			],
+			[
+				"open",
+				"fs.open(path, flags, mode, callback);"
+			],
+			[
+				"text",
+				"text"
+			],
+			[
+				"p",
+				"p"
+			],
+			[
+				"font",
+				"font"
+			],
+			[
+				"ba",
+				"background: background-color: hex"
+			],
+			[
+				"body",
+				"body"
+			],
+			[
+				"mar",
+				"margin: margin: all"
+			],
+			[
+				"sty",
+				"stylesheet"
+			],
+			[
+				"rel",
+				"rel"
+			],
+			[
+				"hr",
+				"href"
+			],
+			[
+				"di",
+				"div"
+			],
+			[
+				"d",
+				"div"
+			],
+			[
+				"ae",
+				"makehugrid"
+			]
+		]
+	},
+	"buffers":
+	[
+	],
+	"build_system": "",
+	"command_palette":
+	{
+		"height": 107.0,
+		"selected_items":
+		[
+			[
+				"pack",
+				"Package Control: Install Package"
+			],
+			[
+				"pac",
+				"Package Control: Install Package"
+			],
+			[
+				"packages",
+				"Package Control: List Packages"
+			],
+			[
+				"package ",
+				"Package Control: Install Package"
+			],
+			[
+				"package",
+				"Package Control: Install Package"
+			],
+			[
+				"Package Control: ",
+				"Package Control: List Packages"
+			],
+			[
+				"packa ",
+				"Package Control: Install Package"
+			],
+			[
+				"package in",
+				"Package Control: Install Package"
+			],
+			[
+				"package ins",
+				"Package Control: Install Package"
+			],
+			[
+				"lor",
+				"Snippet: Lorem ipsum"
+			],
+			[
+				"sni",
+				"Snippet: html"
+			],
+			[
+				"html",
+				"Set Syntax: HTML"
+			],
+			[
+				"ja",
+				"Set Syntax: JavaScript"
+			],
+			[
+				"save",
+				"Project: Save As"
+			]
+		],
+		"width": 516.0
+	},
+	"console":
+	{
+		"height": 115.0
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/Users/tyrone/Sites/mediaBackgrounds/js/jquery.mediaBackgrounds.js",
+		"/Users/tyrone/Sites/ruby/demo/lynda_files/ch9/restaurants.txt",
+		"/Users/tyrone/Library/Application Support/Sublime Text 2/Packages/User/Base File.sublime-settings",
+		"/Users/tyrone/Library/Application Support/Sublime Text 2/Packages/Alignment/Base File.sublime-settings",
+		"/Users/tyrone/Library/Application Support/Sublime Text 2/Packages/Default/Preferences.sublime-settings",
+		"/Users/tyrone/Sites/ruby/demo/lynda_files/ch8/dir.rb",
+		"/Users/tyrone/Sites/ruby/demo/lynda_files/ch8/input_output.rb",
+		"/Users/tyrone/Sites/ruby/demo/lynda_files/ch8/accessing_files.rb",
+		"/Users/tyrone/Sites/ruby/demo/lynda_files/ch8/accessing_files05.rb",
+		"/Users/tyrone/Sites/ruby/demo/lynda_files/ch8/accessing_files06.rb",
+		"/Users/tyrone/Sites/ruby/demo/lynda_files/ch8/copying_files.rb",
+		"/Users/tyrone/Sites/ruby/demo/lynda_files/ch8/file.rb",
+		"/Users/tyrone/Sites/ruby/demo/lynda_files/ch8/file_to_rename.txt",
+		"/Users/tyrone/Sites/ruby/demo/lynda_files/ch8/irb_testfile.txt",
+		"/Users/tyrone/Sites/ruby/demo/lynda_files/ch8/file1.txt",
+		"/Users/tyrone/Library/Application Support/Sublime Text 2/Packages/User/Preferences.sublime-settings",
+		"/Users/tyrone/Sites/ruby/demo/lynda_files/ch8/file_location.rb",
+		"/Users/tyrone/Sites/ruby/demo/lynda_files/ch8",
+		"/Users/tyrone/Sites/ruby/demo/lynda_files/ch7/person.rb",
+		"/Users/tyrone/Sites/ruby/demo/lynda_files/ch7/contact_info.rb",
+		"/Users/tyrone/Sites/ruby/demo/lynda_files/ch7/to_do_list.rb",
+		"/Users/tyrone/Sites/ruby/demo/lynda_files/ch6/classes10.rb",
+		"/Users/tyrone/Sites/ruby/demo/lynda_files/ch6/classes11.rb",
+		"/Users/tyrone/Sites/ruby/demo/lynda_files/ch6/classes12.rb",
+		"/Users/tyrone/Sites/ruby/.gitignore",
+		"/Users/tyrone/Sites/ruby/demo/lynda_files/arguments_defaults.rb",
+		"/Users/tyrone/Sites/ruby/demo/lynda_files/return_values.rb",
+		"/Users/tyrone/Sites/ruby/demo/lynda_files/ch6/classes.rb",
+		"/Users/tyrone/Sites/ruby/demo/lynda_files/ch6/classes04.rb",
+		"/Users/tyrone/Sites/ruby/demo/lynda_files/ch6/classes05.rb",
+		"/Users/tyrone/Sites/ruby/demo/lynda_files/ch6/classes06.rb",
+		"/Users/tyrone/Sites/ruby/demo/lynda_files/ch6/classes07.rb",
+		"/Users/tyrone/Sites/ruby/demo/lynda_files/ch6/classes08.rb",
+		"/Users/tyrone/Sites/ruby/demo/lynda_files/ch6/classes09.rb",
+		"/Users/tyrone/Sites/ruby/demo/lynda_files/sugar.rb",
+		"/Users/tyrone/Sites/ruby/demo/prj/rb_demo.sublime-project",
+		"/Users/tyrone/Sites/ruby/README.md",
+		"/Users/tyrone/Sites/ruby/demo/lynda_files/arguments.rb",
+		"/Users/tyrone/Sites/ruby/demo/test.rb",
+		"/Users/tyrone/Sites/ruby/demo/lynda_files/methods_scopes.rb",
+		"/Users/tyrone/Sites/ruby/demo/lynda_files/methods.rb",
+		"/Users/tyrone/Sites/Any-video/README",
+		"/Users/tyrone/Sites/mochascript/prj/server2.js",
+		"/Users/tyrone/Sites/Any-video/index.js",
+		"/Users/tyrone/Sites/Any-video/lib/video/cf.js",
+		"/Users/tyrone/Sites/Any-video/node_modules/express/node_modules/qs/examples.js",
+		"/Users/tyrone/Sites/Any-video/node_modules/express/node_modules/qs/index.js",
+		"/Users/tyrone/Sites/Any-video/node_modules/express/node_modules/qs/benchmark.js",
+		"/Users/tyrone/Sites/Any-video/lib/video/commonFunctions.js",
+		"/Users/tyrone/Sites/Any-video/lib/common/commonFunctions.js",
+		"/Users/tyrone/Sites/Any-video/lib/common/common_functions.js",
+		"/Users/tyrone/Sites/Any-video/lib/common/common_functions.jd",
+		"/Users/tyrone/Sites/Any-video/lib/video/video_html_source.js",
+		"/Users/tyrone/Library/Application Support/Sublime Text 2/Packages/User/javascript-switch.sublime-snippet",
+		"/Users/tyrone/Library/Application Support/Sublime Text 2/Packages/User/javascript-switch",
+		"/Users/tyrone/Library/Application Support/Sublime Text 2/Packages/Terminal/Terminal.sublime-settings",
+		"/Users/tyrone/Library/Application Support/Sublime Text 2/Packages/Default/Base File.sublime-settings",
+		"/Users/tyrone/Library/Application Support/Sublime Text 2/Packages/Default/Global.sublime-settings",
+		"/Users/tyrone/Library/Application Support/Sublime Text 2/Packages/User/Global.sublime-settings",
+		"/Users/tyrone/Library/Application Support/Sublime Text 2/Packages/Alignment/Default (OSX).sublime-keymap",
+		"/Users/tyrone/Library/Application Support/Sublime Text 2/Packages/User/JavaScript.sublime-settings",
+		"/Users/tyrone/Sites/WatchaWatching/lib/config.js",
+		"/Users/tyrone/Sites/WatchaWatching/public/index.html",
+		"/Users/tyrone/Sites/WatchaWatching/public/html_templates/index.html",
+		"/Users/tyrone/Sites/WatchaWatching/node_modules/express/History.md",
+		"/Users/tyrone/Sites/WatchaWatching/node_modules/express/lib/https.js",
+		"/Users/tyrone/Library/Application Support/Sublime Text 2/Packages/Package Control/Package Control.sublime-settings",
+		"/Users/tyrone/Library/Application Support/Sublime Text 2/Packages/User/Package Control.sublime-settings",
+		"/Users/tyrone/Sites/WatchaWatching/node_modules/express/package.json",
+		"/Users/tyrone/Library/Application Support/Sublime Text 2/Packages/User/Default (OSX).sublime-keymap",
+		"/Users/tyrone/Library/Application Support/Sublime Text 2/Packages/Default/Default (OSX).sublime-keymap",
+		"/Users/tyrone/Sites/WatchaWatching/node_modules/express/lib/view.js",
+		"/Users/tyrone/Sites/WatchaWatching/server.js",
+		"/Users/tyrone/Sites/WatchaWatching/index.js",
+		"/Users/tyrone/Sites/WatchaWatching/lib/video/video.json",
+		"/Users/tyrone/Sites/WatchaWatching/lib/video.js",
+		"/Users/tyrone/Sites/WatchaWatching/public/css/normalize.css",
+		"/Users/tyrone/Sites/WatchaWatching/design/HeadsUpGrid_download/example.html",
+		"/Users/tyrone/Sites/WatchaWatching/design/HeadsUpGrid_download/headsupgrid/responsive.js",
+		"/Users/tyrone/Sites/WatchaWatching/design/HeadsUpGrid_download/example_responsive.html",
+		"/Users/tyrone/Sites/WatchaWatching/design/HeadsUpGrid_download/headsupgrid/fixed.js",
+		"/Users/tyrone/Sites/WatchaWatching/prj/watchawatching.sublime-project",
+		"/Users/tyrone/Library/Application Support/Sublime Text 2/Packages/User/css"
+	],
+	"find":
+	{
+		"height": 33.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"found",
+			"shared_method",
+			"inspect",
+			"attr_reader",
+			"function Person(){\n    // private\n    var name = 'Tahir';\n    var sex = 'male';\n\n    function getName() {\n        console.log(name);\n    }\n\n    // public\n    return {\n        getSex: function() {\n            console.log(sex);\n        }\n    }\n\n    // privileged\n    this.details = function() {\n        console.log(name + ' ' + sex);\n    }\n}",
+			"clear",
+			"getHead",
+			"new",
+			"vid",
+			"selected_vid",
+			"console",
+			"mp4",
+			"+\",",
+			"('./",
+			"lib",
+			"vid_id",
+			";",
+			"this.",
+			"videos",
+			"(){",
+			"loadCollection",
+			"load",
+			"the",
+			"data",
+			"colo",
+			"ver"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"loadHead",
+			"v",
+			"curr_vid",
+			",",
+			""
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": true,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"sheets":
+			[
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 0.0
+	},
+	"input":
+	{
+		"height": 35.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"replace":
+	{
+		"height": 64.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+			[
+				"packages",
+				"node_modules/express/package.json"
+			]
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 500.0,
+		"selected_items":
+		[
+		],
+		"width": 380.0
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 219.0,
+	"status_bar_visible": true
+}
