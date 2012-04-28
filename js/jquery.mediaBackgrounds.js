@@ -144,7 +144,7 @@
                 search_term: methods.parse_search_term('smash magazine wallpaper'),
                 media_type: 'img',                                                      // or colour, video
                 media_collection: ['#000000', '#ffffff', '#f0f'],
-                media_manipulation_func: function (bmc) { },                             // pass in media coll
+                media_manipulation_func: function (bmc) { },                            // pass in media coll
                 interval: 5000,                                                         // 5 secs
                 rest_url: ''
             }, custom_options);
