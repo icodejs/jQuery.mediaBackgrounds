@@ -12,6 +12,6 @@ This is a work in progress and is nowhere near finished!
     <script src="js/jquery.mediaBackgrounds.js"></script>
     <script>
         $(function(){
-            $('body').background();
+            $('body').mediaBackgrounds();
         });
     </script>

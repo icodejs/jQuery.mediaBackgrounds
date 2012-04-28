@@ -38,7 +38,7 @@
 
 (function($, window, document, undefined) {
 
-    $.fn.background = function (custom_options) {
+    $.fn.mediaBackgrounds = function (custom_options) {
 
         var base    = this,
             methods = {
