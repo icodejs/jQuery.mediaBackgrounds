@@ -69,11 +69,11 @@
                             + '/ajax/services/search/images'
                             + '?v=1.0'
                             + '&q=' + options.search_term
-                            + '&callback=?'                     // for jsonp
-                            + '&imgsz=xxlarge|huge'                  // |huge
+                            + '&callback=?'                                 // for jsonp
+                            + '&imgsz=xxlarge|huge'                         // |huge
                             + '&as_filetype=png|jpg'
                             + '&imgtype=photo'
-                            + '&rsz=8'                          // max results per page
+                            + '&rsz=8'                                      // max results per page
                             + '&start=' + methods.get_random_int(1, 50);
 
                         $.getJSON(url, function (data, textStatus) {
