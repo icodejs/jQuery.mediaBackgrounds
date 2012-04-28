@@ -1,0 +1,12 @@
+body {
+    position: relative;
+    background-color:#fff;
+}
+img.loader {
+    margin-left: -12px;
+    margin-top: -12px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    visibility: visible
+}

@@ -121,26 +121,33 @@
                   return Math.floor(Math.random() * (max - min + 1)) + min;
                 },
                 pre_load_img: function (src_url, elem, callback, delay) {
-                    var image = new Image();
-                    $(image).hide().load(function () {
-                        // filter out small images
-                        if (this.width >= 1024 && this.height >= 1024) {
-                            console.log(this.width + 'x' + this.height);
-                            setTimeout(function () {
-                                callback();
-                            }, delay);
-                         } else {
-                             methods.get_bg(elem);
-                         }
-                    })
-                    .attr('src', src_url).appendTo('body')
-                    .error(function () {
-                        console.log('error occured while trying to load this image');
-                        methods.get_bg(elem);
-                    });
+                    $('<img />')
+                        .attr('src', options.loading_image)
+                        .addClass('loader')
+                        .appendTo(elem);
+
+                    $(new Image())
+                        .hide().load(function () {
+                            if (this.width >= 1024 && this.height >= 1024) { // filter out small image
+                                console.log(this.width + 'x' + this.height);
+                                setTimeout(function () {
+                                    elem.find('img').fadeOut(500, function () { // remove loader image
+                                        callback();
+                                    }).remove();
+                                }, delay);
+                             } else {
+                                 methods.get_bg(elem);
+                             }
+                        })
+                        .attr('src', src_url).appendTo('body')
+                        .error(function () {
+                            console.log('error occured while trying to load this image');
+                            methods.get_bg(elem);
+                        });
                 }
             },
             options = $.extend({
+                loading_image: 'img/loader.gif',
                 search_term: methods.parse_search_term('smash magazine wallpaper'),
                 media_type: 'img',                                                      // or colour, video
                 media_collection: ['#000000', '#ffffff', '#f0f'],
