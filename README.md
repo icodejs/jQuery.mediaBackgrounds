@@ -15,3 +15,5 @@ This is a work in progress and is nowhere near finished!
             $('body').mediaBackgrounds();
         });
     </script>
+
+<a href="http://www.icodejs.com/playpen/javascript/jquery/mediaBackgrounds/" target="_blank">Demo</a>
