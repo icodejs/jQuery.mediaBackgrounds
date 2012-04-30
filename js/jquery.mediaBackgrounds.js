@@ -41,6 +41,7 @@
     $.fn.mediaBackgrounds = function (custom_options) {
 
         var base    = this,
+            props   = {},
             methods = {
                 init: function (options) {
                     $(window).on('resize', methods.resize_window);
@@ -49,12 +50,20 @@
                     });
                 },
                 destroy: function () {
-                    return this.each(function () {
+                    return base.each(function () {
 
                     })
                 },
                 resize_window: function () {
-                    console.log($(this).width() + ' x ' + $(this).height());
+                    var $this  = $(this),
+                        width  = $this.width(),
+                        height = $this.height();
+
+                    console.log(width + ' x ' + height);
+
+                    return base.each(function () {
+                        $(this).css({'height': height});
+                    });
                 },
                 get_bg: function (elem) {
                     var url = '',
@@ -85,6 +94,7 @@
                                     if (data.responseData.results.length > 0) {
                                         console.log('estimatedResultCount: ', data.responseData.cursor.estimatedResultCount);
                                         console.log('results count: ', data.responseData.results.length);
+
                                         index = methods.get_random_int(0, data.responseData.results.length -1);
                                         img   = data.responseData.results[index];
                                         methods.set_bg({bg_url: img.url}, elem);
@@ -104,12 +114,13 @@
 
                     } else { // media_type === img
                         if (data && data.bg_url) {
-                            methods.pre_load_img(data.bg_url, elem, function () {
+                            methods.pre_load_img(data.bg_url, elem, 0, function () {
                                 elem.css({
                                     'background-image': 'url("' + data.bg_url + '")',
                                     'background-position': 'top',
-                                    'background-repeat': 'repeat'
-                                }, 0);
+                                    'background-repeat': 'repeat',
+                                    'height': $(window).height()
+                                });
                             });
                         }
                     }
@@ -120,14 +131,18 @@
                 get_random_int: function (min, max)  {
                   return Math.floor(Math.random() * (max - min + 1)) + min;
                 },
-                pre_load_img: function (src_url, elem, callback, delay) {
+                pre_load_img: function (src_url, elem, delay, callback) {
                     $('<img />')
                         .attr('src', options.loading_image)
                         .addClass('loader')
                         .appendTo(elem);
 
+                    // load the background image, hide it, append to the body.
+                    // that way the images is loaded and cached, ready for use.
+
                     $(new Image())
-                        .hide().load(function () {
+                        .hide()
+                        .load(function () {
                             if (this.width >= 1024 && this.height >= 1024) { // filter out small image
                                 console.log(this.width + 'x' + this.height);
                                 setTimeout(function () {
@@ -139,7 +154,8 @@
                                  methods.get_bg(elem);
                              }
                         })
-                        .attr('src', src_url).appendTo('body')
+                        .attr('src', src_url)
+                        .appendTo('body')
                         .error(function () {
                             console.log('error occured while trying to load this image');
                             methods.get_bg(elem);
