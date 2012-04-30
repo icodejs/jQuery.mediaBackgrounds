@@ -66,8 +66,8 @@
                 resize_window: function () {
                     var $this  = $(this);
 
-                        win_width  = $this.width(),
-                        win_height = $this.height();
+                    win_width  = $this.width(),
+                    win_height = $this.height();
 
                     console.log(win_width + ' x ' + win_height);
 

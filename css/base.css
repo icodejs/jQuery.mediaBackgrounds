@@ -1,6 +1,7 @@
 body {
     position: relative;
     background-color:#fff;
+    height:100%;
 }
 img.loader {
     margin-left: -12px;
