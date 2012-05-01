@@ -24,6 +24,7 @@
 
                     return base.each(function () {
                         $body = $(this)
+                            .height(win_height)
                             .on('click', function (e) {
                                 e.preventDefault();
                                 $keypress_detector.focus()
@@ -44,6 +45,7 @@
                         $bg_container = $('<div />')
                             .addClass('bg_container')
                             .height(win_height)
+                            .hide()
                             .prependTo($body);
 
                         methods.get_bg($bg_container);
@@ -116,7 +118,7 @@
                                     'background-position': 'top',
                                     'background-repeat': 'repeat',
                                     'height': win_height
-                                });
+                                }).fadeIn(500);
                             });
                             $keypress_detector.focus();
                         }
@@ -127,7 +129,10 @@
                     // add some kind of transition effect that will fade out the div
                     // update the image and then fade it back in
 
-                    methods.get_bg(elem);
+                    elem.fadeOut(500, function () {
+                        methods.get_bg(elem);
+                    });
+
                 },
                 parse_search_term: function (term) {
                     return term.split(' ').join('+');
@@ -139,7 +144,7 @@
                     $('<img />')
                         .attr('src', options.loading_image)
                         .addClass('loader')
-                        .appendTo(elem);
+                        .appendTo($body);
 
                     // load the background image, hide it, append to the body.
                     // that way the images is loaded and cached, ready for use.
@@ -150,7 +155,7 @@
                             if (this.width >= win_width && this.height >= win_height) { // filter out small image
                                 console.log(this.width + 'x' + this.height);
                                 setTimeout(function () {
-                                    elem.find('img').fadeOut(500, function () { // remove loader image
+                                    $body.find('img.loader').fadeOut(500, function () { // remove loader image
                                         callback();
                                     }).remove();
                                 }, delay);
