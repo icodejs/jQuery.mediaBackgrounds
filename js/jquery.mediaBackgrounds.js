@@ -1,51 +1,18 @@
 /**
  *
- * Demo URL: http://seo-stats-demo.datadial.net/test/tj/background/
+ *  Media Backgrounds by Jay Esco 2012
  *
- *  This plugin will take a media type (colour, img, video).
- *  - Images: collection of URLs
- *  - Colour: hex values
- *  - Video: object with video type (youtube, vimeo) and url
- *
- *  The plugin will allow the user to pass in a REST url so that media can be
- *  pulled in via ajax.
- *
- *  e.g.: https://developers.google.com/image-search/v1/jsondevguide#json_reference
- *
- *  The media manipulation will allow you to load in tweak the returned html for
- *  for the videos like, remove chrome.
- *
- *  Must also detect the resizing of the browser.
- *
- *  The background may have to be an absolutely positioned div with a z-index
- *  that allows it to sit behind everything else on the page.
- *
- *  It will be possible to pass in a function that will take the returned
- *  JSON and return JSON that the plugin can use.
- *
- *  Also consider using an absolutly positioned div with 100% height and width
- *  The set the background of that and set z-index so that is sits at the back
- *
- *  Notes
- *  ----------------------------
- *  1. setInterval based on interval
- *  2. use animation to fade out images / adjust opacity (use inserted div)
- *  3. ajax / REST Api to get media from external source
- *  4. add ability to save favourite images to counchdb (use REST) (add mouseover hover button).
-       saved images will appear in a list running down the side of the page.
- *  5. put the images from this page into couch: http://thepaperwall.com/wallpapers/cityscape/big/
- *  6. add more user feedback similar to what you see in the chrome network consle. users need to
-       know what is going on while they are waiting
  */
 
 (function($, window, document, undefined) {
 
     $.fn.mediaBackgrounds = function (custom_options) {
 
-        var base    = this,
+        var base = this,
+            $body = null,
             $bg_container = null,
             $keypress_detector = null,
-            win_width  = 1024,
+            win_width = 1024,
             win_height = 1024,
             methods = {
                 init: function (options) {
@@ -56,26 +23,28 @@
                     $window.on('resize', methods.resize_window);
 
                     return base.each(function () {
+                        $body = $(this)
+                            .on('click', function (e) {
+                                e.preventDefault();
+                                $keypress_detector.focus()
+                            });
+
                         $keypress_detector = $('<input />')
                             .attr({id: 'txtInput', type: 'text'})
                             .addClass('keypress_detector')
                             .focus()
                             .on('keypress', function (e) {
                                 e.preventDefault();
-
-                                if (e.keyCode === 32) {
+                                console.log(e.which);
+                                if (e.which === 32) {
                                     methods.update_ui($bg_container);
                                 }
-                            }).appendTo($(this));
+                            }).appendTo($body);
 
                         $bg_container = $('<div />')
                             .addClass('bg_container')
                             .height(win_height)
-                            .on('click', function (e) {
-                                e.preventDefault();
-                                $keypress_detector.focus()
-                            })
-                            .prependTo($(this));
+                            .prependTo($body);
 
                         methods.get_bg($bg_container);
                     });
@@ -90,6 +59,7 @@
                     console.log($bg_container);
 
                     $bg_container.css({'height': win_height});
+                    $body.css({'height': win_height});
                 },
                 get_bg: function (elem) {
                     var url = '',
