@@ -1,7 +1,9 @@
 body {
     position: relative;
     background-color:#fff;
-    height:100%;
+}
+.bg_container {
+    position: relative;
 }
 img.loader {
     margin-left: -12px;
@@ -10,4 +12,10 @@ img.loader {
     top: 50%;
     left: 50%;
     visibility: visible
+}
+.keypress_detector {
+    width: 0;
+    height: 0;
+    position: absolute ;
+    left: -9999px
 }

@@ -43,6 +43,8 @@
     $.fn.mediaBackgrounds = function (custom_options) {
 
         var base    = this,
+            $bg_container = null,
+            $keypress_detector = null,
             win_width  = 1024,
             win_height = 1024,
             methods = {
@@ -51,17 +53,32 @@
 
                     win_width  = $window.width(),
                     win_height = $window.height();
-
                     $window.on('resize', methods.resize_window);
 
                     return base.each(function () {
-                        methods.get_bg($(this));
+                        $keypress_detector = $('<input />')
+                            .attr({id: 'txtInput', type: 'text'})
+                            .addClass('keypress_detector')
+                            .focus()
+                            .on('keypress', function (e) {
+                                e.preventDefault();
+
+                                if (e.keyCode === 32) {
+                                    methods.update_ui($bg_container);
+                                }
+                            }).appendTo($(this));
+
+                        $bg_container = $('<div />')
+                            .addClass('bg_container')
+                            .height(win_height)
+                            .on('click', function (e) {
+                                e.preventDefault();
+                                $keypress_detector.focus()
+                            })
+                            .prependTo($(this));
+
+                        methods.get_bg($bg_container);
                     });
-                },
-                destroy: function () {
-                    return base.each(function () {
-                        // ...
-                    })
                 },
                 resize_window: function () {
                     var $this  = $(this);
@@ -70,10 +87,9 @@
                     win_height = $this.height();
 
                     console.log(win_width + ' x ' + win_height);
+                    console.log($bg_container);
 
-                    return base.each(function () {
-                        $(this).css({'height': win_height});
-                    });
+                    $bg_container.css({'height': win_height});
                 },
                 get_bg: function (elem) {
                     var url = '',
@@ -129,11 +145,19 @@
                                     'background-image': 'url("' + data.bg_url + '")',
                                     'background-position': 'top',
                                     'background-repeat': 'repeat',
-                                    'height': $(window).height()
+                                    'height': win_height
                                 });
                             });
+                            $keypress_detector.focus();
                         }
                     }
+                },
+                update_ui: function (elem) {
+
+                    // add some kind of transition effect that will fade out the div
+                    // update the image and then fade it back in
+
+                    methods.get_bg(elem);
                 },
                 parse_search_term: function (term) {
                     return term.split(' ').join('+');
@@ -165,7 +189,7 @@
                              }
                         })
                         .attr('src', src_url)
-                        .appendTo('body')
+                        .prependTo('body')
                         .error(function () {
                             console.log('error occured while trying to load this image');
                             methods.get_bg(elem);
@@ -184,6 +208,11 @@
                         console.log('term: ', term);
                         return term;
                     }
+                },
+                destroy: function () {
+                    return base.each(function () {
+                        // ...
+                    })
                 }
             },
             options = $.extend({
