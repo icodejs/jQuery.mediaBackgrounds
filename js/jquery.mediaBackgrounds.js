@@ -190,7 +190,14 @@
             },
             options = $.extend({
                 loading_image: 'img/loader.gif',
-                search_terms: ['cityscape wallpaper', 'forest waterfall', 'sky airplane photo', 'space wallpaper', 'rivers lakes', 'thepaperwall cityscape wallpapers'],
+                search_terms: [
+                    'cityscape wallpaper',
+                    'forest waterfall',
+                    'sky airplane photo',
+                    'space wallpaper',
+                    'rivers lakes',
+                    'thepaperwall cityscape wallpapers'
+                    ],
                 media_type: 'img',                                                      // or colour, video
                 media_collection: ['#000000', '#ffffff', '#f0f'],
                 media_manipulation_func: function (bmc) { },                            // pass in media coll

@@ -1,9 +1,66 @@
+html {
+    font-size: 100%;
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+}
 body {
     position: relative;
-    background-color:#fff;
+    background: url("../img/bg-grey.jpg") repeat scroll 0 0 transparent;
+    background-color:#56565B;
     padding:0;
     margin:0;
     height:100%;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 13px;
+    line-height: 18px;
+    color: #333;
+}
+input, button, select, textarea {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    vertical-align: middle;
+    height: 18px;
+    padding: 4px;
+    margin: 0;
+    font: -webkit-small-control;
+    font-size: 13px;
+    font-weight: normal;
+    line-height: 18px;
+    color: #555;
+    background-color: white;
+    border: 1px solid #CCC;
+    vertical-align: middle;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    cursor: auto;
+    letter-spacing: normal;
+    word-spacing: normal;
+    width: 260px;
+}
+input, textarea {
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+    -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+    -webkit-transition: border linear 0.2s, box-shadow linear 0.2s;
+    -moz-transition: border linear 0.2s, box-shadow linear 0.2s;
+    -ms-transition: border linear 0.2s, box-shadow linear 0.2s;
+    -o-transition: border linear 0.2s, box-shadow linear 0.2s;
+    transition: border linear 0.2s, box-shadow linear 0.2s;
+}
+h1 {
+    font-size: 24px;
+    margin-bottom: 5px;
+    text-align: center;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: Consolas,Monaco,"Andale Mono","DejaVu Sans Mono",monospace;
+    color: #eee;
+    text-shadow: 0 1px rgba(255, 255, 255, 0.5);
+    font-weight: 700;
+    font-style: normal;
+    word-spacing: 1px;
+    line-height: 1.3em;
 }
 .bg_container {
     position: absolute;
@@ -16,8 +73,18 @@ body {
     position: absolute;
     top:0;
     padding:20px;
-
-
+}
+#controls {
+    background: -webkit-radial-gradient(rgba(127, 127, 127, 0.1), rgba(127, 127, 127, 0.1) 35%, rgba(0, 0, 0, 0.3));
+    border: 1px solid #666;
+    vertical-align: middle;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    -webkit-box-shadow: 0 1px 2px rgba(0,0,0,.15);
+    -moz-box-shadow: 0 1px 2px rgba(0,0,0,.15);
+    box-shadow: 0 1px 2px rgba(0,0,0,.15);
+    padding:20px;
 }
 img.loader {
     margin-left: -12px;
