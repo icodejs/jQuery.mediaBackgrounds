@@ -126,8 +126,6 @@
                 },
                 update_ui: function (elem) {
 
-                    // add some kind of transition effect that will fade out the div
-                    // update the image and then fade it back in
 
                     elem.fadeOut(500, function () {
                         methods.get_bg(elem);
