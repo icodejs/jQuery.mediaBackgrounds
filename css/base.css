@@ -75,6 +75,7 @@ h1, h2, h3, h4, h5, h6 {
     padding:20px;
 }
 #controls {
+    display:none;
     background: -webkit-radial-gradient(rgba(127, 127, 127, 0.1), rgba(127, 127, 127, 0.1) 35%, rgba(0, 0, 0, 0.3));
     border: 1px solid #666;
     vertical-align: middle;
