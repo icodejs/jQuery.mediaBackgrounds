@@ -1,6 +1,7 @@
 /**
  *
  *  Media Backgrounds by Jay Esco 2012
+ *  file:///C:/Non%20Work/gitHub/jQuery.mediaBackgrounds/index.html
  *
  */
 
@@ -54,119 +55,122 @@
                 resize_window: function () {
                     var $this  = $(this);
 
-                    win_width  = $this.width(),
+                    win_width  = $this.width();
                     win_height = $this.height();
-
-                    console.log(win_width + ' x ' + win_height);
-                    console.log($bg_container);
 
                     $bg_container.css({'height': win_height});
                     $body.css({'height': win_height});
+
+                    console.log(win_width + ' x ' + win_height);
                 },
                 get_bg: function (elem) {
                     var url = '',
                         more_results_url = '';
 
-                    if (options.media_type === 'colour') {
+                    url = 'http://ajax.googleapis.com'
+                        + '/ajax/services/search/images'
+                        + '?v=1.0'
+                        + '&q=' + methods.get_random_search_term()
+                        + '&callback=?'                                                             // for jsonp
+                        + '&imgsz=xxlarge|huge'                                                     // |huge (make this optional)
+                        + '&as_filetype=png|jpg'
+                        + '&imgtype=photo'
+                        + '&rsz=8'                                                                  // max results per page
+                        + '&start=' + methods.get_random_int(1, 50);
 
-                    } else if (options.media_type === 'video') {
+                    // loading start here
+                    var $loader = $('<img />')
+                        .attr('src', options.loading_image)
+                        .addClass('loader')
+                        .appendTo($body);
 
-                    } else if (options.media_type === 'img') {
-                        url = 'http://ajax.googleapis.com'
-                            + '/ajax/services/search/images'
-                            + '?v=1.0'
-                            + '&q=' + methods.get_random_search_term()
-                            + '&callback=?'                                 // for jsonp
-                            + '&imgsz=xxlarge|huge'                         // |huge (make this optional)
-                            + '&as_filetype=png|jpg'
-                            + '&imgtype=photo'
-                            + '&rsz=8'                                      // max results per page
-                            + '&start=' + methods.get_random_int(1, 50);
+                    $.getJSON(url, function (data, textStatus) {
+                        var img   = '',
+                            index = 0,
+                            bg    = {};
 
-                        $.getJSON(url, function (data, textStatus) {
-                            var img = '',
-                                index,
-                                bg = {};
-
-                            if (textStatus === 'success') {
-                                try {
-                                    if (data.responseData.results.length > 0) {
-                                        index = methods.get_random_int(0, data.responseData.results.length -1);
-                                        img   = data.responseData.results[index];
-
-                                        bg = {bg_url: img.url};
-                                        methods.set_bg(bg, elem);
-                                    }
-                                } catch (e) {
-                                    console.log(e.toString(), e);
-                                    methods.get_bg(elem);
+                        if (textStatus === 'success') {
+                            try {
+                                if (data.responseData.results && data.responseData.results.length > 0) {
+                                    index = methods.get_random_int(0, data.responseData.results.length -1);
+                                    img   = data.responseData.results[index];
+                                    bg    = {bg_url: img.url};
+                                    methods.set_bg(bg, elem);
                                 }
+                            } catch (e) {
+                                console.log(e.toString(), e);
+                                //$loader.fadeOut().remove();
+                                //methods.get_bg(elem);
                             }
-                        });
-                    }
+                        }
+                    });
+                },
+                pre_load_img: function (src_url, elem, delay, callback) {
+                    // load the background image, hide it, append to the body.
+                    // that way the images is loaded and cached, ready for use.
+
+                    $body.find('img.preloaded').remove();                                           // remove this for now but in future we might keep them
+
+                    $(new Image())
+                        .hide()
+                        .load(function () {
+                            console.log(this.width + 'x' + this.height);
+
+                            if (this.width < win_width || this.height < win_height) {               // filter out small image
+                                return callback({err: 'image returned is too small'});
+                            }
+
+                            setTimeout(function () {
+                                $body.find('img.loader').fadeOut(500, function () {                 // remove loader image
+                                    callback(null);
+                                }).remove();
+                            }, delay);
+
+                        })
+                        .addClass('preloaded')
+                        .attr('src', src_url)
+                        .prependTo('body')
+                        .error(function () {
+                            console.log('error occured while trying to load this image');
+                            return callback({err: 'error occured while trying to load this image'});
+                        }); // end JQ new Image
                 },
                 set_bg: function (data, elem) {
-                    if (options.media_type === 'colour') {
+                    if (data && data.bg_url) {
+                        methods.pre_load_img(data.bg_url, elem, 0, function (err) {
+                            if (err) {
+                                return methods.get_bg(elem);
+                            }
 
-                    } else if (options.media_type === 'video') {
+                            var old_bg_containers = $('.bg_container');                         // create a new bg_container div and remove the old one
 
-                    } else { // media_type === img
-                        if (data && data.bg_url) {
-                            methods.pre_load_img(data.bg_url, elem, 0, function () {
-                                elem.css({
+                            elem = $('<div />')
+                                .addClass('bg_container')
+                                .height(win_height)
+                                .css({
                                     'background-image': 'url("' + data.bg_url + '")',
                                     'background-position': 'top',
                                     'background-repeat': 'repeat',
                                     'height': win_height
-                                }).fadeIn(500);
+                                })
+                                .prependTo($body);
+
+                            old_bg_containers.fadeOut(1000, function () {
+                                $(this).remove();
                             });
-                            $keypress_detector.focus();
-                        }
+                        }); // end pre_load_img
+
+                        $keypress_detector.focus();
                     }
                 },
                 update_ui: function (elem) {
-
-
-                    elem.fadeOut(500, function () {
                         methods.get_bg(elem);
-                    });
-
                 },
                 parse_search_term: function (term) {
                     return term.split(' ').join('+');
                 },
                 get_random_int: function (min, max)  {
                   return Math.floor(Math.random() * (max - min + 1)) + min;
-                },
-                pre_load_img: function (src_url, elem, delay, callback) {
-                    $('<img />')
-                        .attr('src', options.loading_image)
-                        .addClass('loader')
-                        .appendTo($body);
-
-                    // load the background image, hide it, append to the body.
-                    // that way the images is loaded and cached, ready for use.
-
-                    $(new Image())
-                        .hide()
-                        .load(function () {
-                            if (this.width >= win_width && this.height >= win_height) { // filter out small image
-                                console.log(this.width + 'x' + this.height);
-                                setTimeout(function () {
-                                    $body.find('img.loader').fadeOut(500, function () { // remove loader image
-                                        callback();
-                                    }).remove();
-                                }, delay);
-                             } else {
-                                 methods.get_bg(elem);
-                             }
-                        })
-                        .attr('src', src_url)
-                        .prependTo('body')
-                        .error(function () {
-                            console.log('error occured while trying to load this image');
-                            methods.get_bg(elem);
-                        });
                 },
                 get_random_search_term: function () {
                     var index = 0,
@@ -198,10 +202,10 @@
                     'rivers lakes',
                     'thepaperwall cityscape wallpapers'
                     ],
-                media_type: 'img',                                                      // or colour, video
+                media_type: 'img',                                                                  // or colour, video
                 media_collection: ['#000000', '#ffffff', '#f0f'],
-                media_manipulation_func: function (bmc) { },                            // pass in media coll
-                interval: 5000,                                                         // 5 secs
+                media_manipulation_func: function (bmc) { },                                        // pass in media coll
+                interval: 5000,                                                                     // 5 secs
                 rest_url: ''
             }, custom_options);
 
