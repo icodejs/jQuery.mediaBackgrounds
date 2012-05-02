@@ -72,8 +72,7 @@
                         + '?v=1.0'
                         + '&q=' + methods.get_random_search_term()
                         + '&callback=?'                                                             // for jsonp
-                        + '&imgsz=xxlarge|huge'                                                     // |huge (make this optional)
-                        + '&as_filetype=png|jpg'
+                        + '&imgsz=xlarge|xxlarge|huge'                                              // |huge (make this optional)
                         + '&imgtype=photo'
                         + '&rsz=8'                                                                  // max results per page
                         + '&start=' + methods.get_random_int(1, 50);
@@ -99,8 +98,6 @@
                                 }
                             } catch (e) {
                                 console.log(e.toString(), e);
-                                //$loader.fadeOut().remove();
-                                //methods.get_bg(elem);
                             }
                         }
                     });
@@ -138,13 +135,14 @@
                 set_bg: function (data, elem) {
                     if (data && data.bg_url) {
                         methods.pre_load_img(data.bg_url, elem, 0, function (err) {
+
                             if (err) {
                                 return methods.get_bg(elem);
                             }
 
-                            var old_bg_containers = $('.bg_container');                         // create a new bg_container div and remove the old one
+                            var old_bg_containers = $('.bg_container');                             // create a new bg_container div and remove the old one
 
-                            elem = $('<div />')
+                            $bg_container = $('<div />')
                                 .addClass('bg_container')
                                 .height(win_height)
                                 .css({
@@ -164,7 +162,7 @@
                     }
                 },
                 update_ui: function (elem) {
-                        methods.get_bg(elem);
+                    elem && methods.get_bg(elem);
                 },
                 parse_search_term: function (term) {
                     return term.split(' ').join('+');
@@ -196,11 +194,19 @@
                 loading_image: 'img/loader.gif',
                 search_terms: [
                     'cityscape wallpaper',
-                    'forest waterfall',
-                    'sky airplane photo',
+                    'marvel comics',
+                    'dc commics',
                     'space wallpaper',
-                    'rivers lakes',
-                    'thepaperwall cityscape wallpapers'
+                    'space stars wallpaper',
+                    'space planets wallpaper',
+                    'muscle cars',
+                    'bmx',
+                    'tokyo japan city',
+                    'adult swim wallpaper',
+                    'thepaperwall cityscape wallpapers',
+                    'akira wallpaper',
+                    'high res background textures',
+                    'high res background wallpapers'
                     ],
                 media_type: 'img',                                                                  // or colour, video
                 media_collection: ['#000000', '#ffffff', '#f0f'],
