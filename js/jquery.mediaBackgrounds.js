@@ -77,10 +77,9 @@
                         + '&rsz=8'                                                                  // max results per page
                         + '&start=' + methods.get_random_int(1, 50);
 
-                    // loading start here
-                    var $loader = $('<img />')
-                        .attr('src', options.loading_image)
+                    $('.loader').length === 0 && $('<div />')
                         .addClass('loader')
+                        .append($('<img />').attr('src', options.loading_image))
                         .appendTo($body);
 
                     $.getJSON(url, function (data, textStatus) {
@@ -118,7 +117,7 @@
                             }
 
                             setTimeout(function () {
-                                $body.find('img.loader').fadeOut(500, function () {                 // remove loader image
+                                $body.find('.loader').fadeOut(1000, function () {                 // remove loader image
                                     callback(null);
                                 }).remove();
                             }, delay);
