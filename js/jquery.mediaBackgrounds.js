@@ -48,6 +48,7 @@
             $body = null,
             $bg_container = null,
             $keypress_detector = null,
+            $pic_info = null,
             win_width = 1024,
             win_height = 1024,
             bg_history = [],                                                                        // history of every successfull image
@@ -58,6 +59,8 @@
                     win_width  = $window.width(),
                     win_height = $window.height();
                     $window.on('resize', methods.resize_window);
+
+                    $pic_info = $('.pic_info');
 
                     return base.each(function () {
                         $body = $(this)
@@ -149,7 +152,8 @@
                         .load(function () {                                                         // images are loaded and cached ready for use
                             var img = this;
 
-                            debug('pre_load_img', ['loaded image dims: ' + img.width + ' x ' + img.height]);
+                            methods.set_pic_info('pre_load_img',
+                                ['loaded image dims: ' + img.width + ' x ' + img.height]);
 
                             if (img.width < win_width || img.height < win_height) {                 // filter out small image
                                 return callback({err: 'image returned is too small'});
@@ -171,7 +175,7 @@
                         .attr('src', src_url)
                         .prependTo('body')
                         .error(function () {
-                            debug('pre_load_img', ['error occured while trying to load this image']);
+                            methods.set_pic_info('pre_load_img', ['error occured while trying to load this image']);
                             return callback({err: 'error occured while trying to load this image'});
                         }); // end JQ new Image
                 },
@@ -225,7 +229,7 @@
                         index = methods.get_random_int(0, st.length -1);
                         term = methods.parse_search_term(st[index]);
 
-                        debug('get_random_search_term', ['term: ' + term]);
+                        methods.set_pic_info('get_random_search_term', ['term: ' + term]);
                         return term;
                     }
                 },
@@ -234,7 +238,8 @@
 
                     if (!bg_history.contains(url, 'url')) {
                         bg_history.push(elem.data('img_dims'));
-                        debug('save', ['image history has been updated!'], bg_history);                                    // everytime this changes the view needs to be updated
+                        debug('save', ['image history has been updated!'], bg_history);             // everytime this changes the view needs to be updated
+
                     }
                 },
                 destroy: function () {
@@ -242,9 +247,19 @@
                         // ...
                     })
                 },
-                ajax_requests: function () {
-                    // Stop all active ajax requests in jQuery
+                set_pic_info: function (context, lines, data) {
+                    if ($pic_info.find('li').length === 0) {
+                         $pic_info.fadeIn(500);
+                    } else if ($pic_info.find('li').length >= 20) {
+                        $pic_info.fadeOut(500, function () {
+                            $(this).html('').fadeIn(500);
+                        });
+                    }
 
+                    for (var i = 0; i < lines.length; i += 1) {
+                        $pic_info.append('<li>' + lines[i] + '</li>')
+                    }
+                    $pic_info.append('<li><hr /></li>');
                 },
             },
             options = $.extend({
@@ -257,7 +272,6 @@
                     'space stars wallpaper',
                     'space planets wallpaper',
                     'muscle cars',
-                    'bmx',
                     'tokyo japan city',
                     'adult swim wallpaper',
                     'thepaperwall cityscape wallpapers',
@@ -269,7 +283,8 @@
                     'macro photography wallpapers',
                     'Aerial photography wallpapers',
                     'Black and White photography wallpapers',
-                    'Night photography wallpapers'
+                    'Night photography wallpapers',
+                    'dream-wallpaper.com'
                     ],
                 media_type: 'img',                                                                  // or colour, video
                 media_collection: ['#000000', '#ffffff', '#f0f'],
@@ -283,6 +298,7 @@
         function debug(context, lines, data) {
             console.log('');
             console.log('+++++++ ' + context + ' +++++++');
+
             for (var i = 0; i < lines.length; i += 1) {
                 console.log(lines[i]);
                 data && console.log(data);

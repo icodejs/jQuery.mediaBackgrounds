@@ -3,9 +3,11 @@ html {
     -webkit-text-size-adjust: 100%;
     -ms-text-size-adjust: 100%;
 }
+body, .loader, .pic_info {
+    background: url("../img/bg-grey.jpg") repeat scroll 0 0 transparent;
+}
 body {
     position: relative;
-    background: url("../img/bg-grey.jpg") repeat scroll 0 0 transparent;
     background-color:#56565B;
     padding:0;
     margin:0;
@@ -62,6 +64,10 @@ h1, h2, h3, h4, h5, h6 {
     word-spacing: 1px;
     line-height: 1.3em;
 }
+hr {
+    border:none;
+    border-bottom:1px solid #333;
+}
 .bg_container {
     position: absolute;
     left:0;
@@ -88,7 +94,6 @@ h1, h2, h3, h4, h5, h6 {
     padding:20px;
 }
 .loader {
-    background: url("../img/bg-grey.jpg") repeat scroll 0 0 transparent;
     -webkit-border-radius: 5px;
     -moz-border-radius: 5px;
     -webkit-box-shadow: 0 2px 3px rgba(0,0,0,.15);
@@ -108,4 +113,15 @@ h1, h2, h3, h4, h5, h6 {
     height: 0;
     position: absolute ;
     left: -9999px
+}
+.pic_info {
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    border:1px solid #666;
+    margin-top:20px;
+    padding:10px;
+}
+.pic_info li{
+    margin-bottom:5px;
 }
