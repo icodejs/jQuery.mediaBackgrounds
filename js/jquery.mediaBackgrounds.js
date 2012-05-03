@@ -10,14 +10,15 @@
     var helpers = (function () {
         if (typeof Array.prototype.contains  !== 'function') {                                      // stops the same image from being saved twice
             Array.prototype.contains = function (needle, prop) {
-               for (i in this) {
+                var i = this.length;
+                while (i--) {
                     if (prop) {
                         if (this[i][prop] === needle) return true;
                     } else {
                         if (this[i] === needle) return true;
                     }
-               }
-               return false;
+                }
+                return false;
             }
         }
 
