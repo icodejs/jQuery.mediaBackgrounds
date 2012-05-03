@@ -132,9 +132,11 @@
 
                         if (textStatus === 'success') {
                             try {
-                                if (data.responseData.results && data.responseData.results.length > 0) {
-                                    index = methods.get_random_int(0, data.responseData.results.length -1);
-                                    img   = data.responseData.results[index];
+                                var res = data.responseData.results;
+
+                                if (res && res.length > 0) {
+                                    index = methods.get_random_int(0, res.length -1);
+                                    img   = res[index];
                                     bg    = {bg_url: img.url};
                                     methods.set_bg(bg, elem);
                                 }
@@ -169,7 +171,6 @@
                                         });
                                 }).remove();
                             }, delay);
-
                         })
                         .addClass('preloaded')
                         .attr('src', src_url)
@@ -216,7 +217,7 @@
                     return term.split(' ').join('+');
                 },
                 get_random_int: function (min, max)  {
-                  return Math.floor(Math.random() * (max - min + 1)) + min;
+                    return Math.floor(Math.random() * (max - min + 1)) + min;
                 },
                 get_random_search_term: function () {
                     var index = 0,
@@ -230,6 +231,7 @@
                         term = methods.parse_search_term(st[index]);
 
                         methods.set_pic_info('get_random_search_term', ['term: ' + term]);
+
                         return term;
                     }
                 },
@@ -239,7 +241,6 @@
                     if (!bg_history.contains(url, 'url')) {
                         bg_history.push(elem.data('img_dims'));
                         debug('save', ['image history has been updated!'], bg_history);             // everytime this changes the view needs to be updated
-
                     }
                 },
                 destroy: function () {
@@ -287,9 +288,10 @@
                     'dream-wallpaper.com'
                     ],
                 media_type: 'img',                                                                  // or colour, video
-                media_collection: ['#000000', '#ffffff', '#f0f'],
+                media_collection: [],
                 media_manipulation_func: function (bmc) { },                                        // pass in media coll
                 interval: 5000,                                                                     // 5 secs
+                user_id: -1,
                 rest_url: ''
             }, custom_options);
 
