@@ -107,17 +107,9 @@
                 },
                 get_bg: function (elem) {
                     var url = '',
-                        more_results_url = '';
-
-                    url = 'http://ajax.googleapis.com'
-                        + '/ajax/services/search/images'
-                        + '?v=1.0'
-                        + '&q=' + methods.get_random_search_term()
-                        + '&callback=?'                                                             // for jsonp
-                        + '&imgsz=xlarge|xxlarge|huge'                                              // |huge (make this optional)
-                        + '&imgtype=photo'
-                        + '&rsz=8'                                                                  // max results per page
-                        + '&start=' + methods.get_random_int(1, 50);
+                        more_results_url = '',
+                        query = $('#terms').val(),
+                        is_url = $('#url').attr('checked');
 
                     $('.loader').length === 0 && $('<div />')
                         .addClass('loader')
@@ -126,6 +118,27 @@
 
                     $.xhrPool.abortAll();
 
+                    console.log(is_url);
+
+                    if (options.api === 'icodejs_image_scrape' && is_url) {
+                        url  = 'http://icodejs.no.de/mb/'
+                        url += '?callback=?'
+                        url += '&url='
+                        url += (query.length > 0 ? query : 'http://thepaperwall.com/wallpapers/cityscape/big/');
+                    } else {
+                        url  = 'http://ajax.googleapis.com'
+                        url += '/ajax/services/search/images'
+                        url += '?v=1.0'
+                        url += '&q=' + (query.length > 0 ? methods.parse_search_term(query) : methods.get_rnd_term())
+                        url += '&callback=?'                                                        // for jsonp
+                        url += '&imgsz=xlarge|xxlarge|huge'                                         // |huge (make this optional)
+                        url += '&imgtype=photo'
+                        url += '&rsz=8'                                                             // max results per page
+                        url += '&start=' + methods.get_rnd_int(1, 50);
+                    }
+
+                    debug('get_bg', [url]);
+
                     $.getJSON(url, function (data, textStatus) {
                         var img   = '',
                             index = 0,
@@ -133,12 +146,18 @@
 
                         if (textStatus === 'success') {
                             try {
-                                var res = data.responseData.results;
+                                var res;
+
+                                if (options.api === 'icodejs_image_scrape' && is_url) { // replace this logic with a custom function that can be passed in for each api
+                                    res = data;
+                                } else {
+                                    res = data.responseData.results;
+                                }
 
                                 if (res && res.length > 0) {
-                                    index = methods.get_random_int(0, res.length -1);
+                                    index = methods.get_rnd_int(0, res.length -1);
                                     img   = res[index];
-                                    bg    = {bg_url: img.url};
+                                    bg    = {url: img.url};
                                     methods.set_bg(bg, elem);
                                 }
                             } catch (e) {
@@ -182,8 +201,8 @@
                         }); // end JQ new Image
                 },
                 set_bg: function (data, elem) {
-                    if (data && data.bg_url) {
-                        methods.pre_load_img(data.bg_url, elem, 0, function (err, img_dims) {
+                    if (data && data.url) {
+                        methods.pre_load_img(data.url, elem, 0, function (err, img_dims) {
 
                             if (err) {
                                 return methods.get_bg(elem);
@@ -195,7 +214,7 @@
                                 .addClass('bg_container')
                                 .height(win_height)
                                 .css({
-                                    'background-image': 'url("' + data.bg_url + '")',
+                                    'background-image': 'url("' + data.url + '")',
                                     'background-position': 'top',
                                     'background-repeat': 'repeat',
                                     'height': win_height
@@ -217,10 +236,10 @@
                 parse_search_term: function (term) {
                     return term.split(' ').join('+');
                 },
-                get_random_int: function (min, max)  {
+                get_rnd_int: function (min, max)  {
                     return Math.floor(Math.random() * (max - min + 1)) + min;
                 },
-                get_random_search_term: function () {
+                get_rnd_term: function () {
                     var index = 0,
                         st    = options.search_terms,
                         term  = '';
@@ -228,10 +247,10 @@
                     if (st.length === 1) {
                         return methods.parse_search_term(st[index]);
                     } else {
-                        index = methods.get_random_int(0, st.length -1);
+                        index = methods.get_rnd_int(0, st.length -1);
                         term = methods.parse_search_term(st[index]);
 
-                        methods.set_pic_info('get_random_search_term', ['term: ' + term]);
+                        methods.set_pic_info('get_rnd_term', ['term: ' + term]);
 
                         return term;
                     }
@@ -265,6 +284,7 @@
                 },
             },
             options = $.extend({
+                api: 'google_image_search',
                 loading_image: 'img/loader.gif',
                 search_terms: [
                     'cityscape wallpaper',
@@ -286,11 +306,13 @@
                     'Aerial photography wallpapers',
                     'Black and White photography wallpapers',
                     'Night photography wallpapers',
-                    'dream-wallpaper.com'
+                    'dream-wallpaper.com',
+                    'flowers'
                     ],
                 media_type: 'img',                                                                  // or colour, video
                 media_collection: [],
-                media_manipulation_func: function (bmc) { },                                        // pass in media coll
+                url_builder_func: null,                                                             // build url
+                json_res_func: null,                                                                // pass in media coll
                 interval: 5000,                                                                     // 5 secs
                 user_id: -1,
                 rest_url: ''

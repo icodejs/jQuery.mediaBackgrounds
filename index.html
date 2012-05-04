@@ -8,17 +8,23 @@
 <body>
     <div id="content">
         <h1>Media Backgrounds </h1>
-        <div id="controls">
-            <input type="text" class="text" id="terms">
-            <ul style="display:none;" class="pic_info"></ul>
-        </div>
+        <form>
+            <div id="controls">
+                <input type="text" class="text" id="terms">
+                <label class="checkbox">
+                    <input type="checkbox" class="checkbox" id="url"> url
+                </label>
+                <ul style="display:none;" class="pic_info"></ul>
+            </div>
+        </form>
     </div>
 
     <script src="http://code.jquery.com/jquery.min.js"></script>
     <script src="js/jquery.mediaBackgrounds.js"></script>
     <script>
         $(function () {
-            $('body').mediaBackgrounds();
+            //$('body').mediaBackgrounds();
+            $('body').mediaBackgrounds({api: 'icodejs_image_scrape'});
         });
     </script>
 </body>
