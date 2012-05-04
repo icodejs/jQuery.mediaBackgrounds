@@ -68,6 +68,9 @@ hr {
     border:none;
     border-bottom:1px solid #333;
 }
+.checkbox {
+    width:20px;
+}
 .bg_container {
     position: absolute;
     left:0;
@@ -77,6 +80,7 @@ hr {
 }
 #content {
     position: absolute;
+    right:0;
     top:0;
     padding:20px;
 }
