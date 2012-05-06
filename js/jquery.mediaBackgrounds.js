@@ -100,8 +100,12 @@
                                             debug('init keypress time check', ['please wait', vars.elaps]);
                                             return;
                                         }
-                                        methods.update_ui($bg_container);
                                     }
+                                    methods.update_ui($bg_container);
+
+                                    // debug('init keypress now ms', [now]);
+                                    // debug('init keypress diff milli', [vars.diff_ms]);
+                                    // debug('init keypress diff', [vars.elaps]);
                                 }
                             }).appendTo($body);
 
