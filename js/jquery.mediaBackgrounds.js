@@ -45,6 +45,12 @@
 
     $.fn.mediaBackgrounds = function (custom_options) {
 
+        var vars = {
+            prev_req: 0,
+            diff_ms: 0,
+            elaps: 0
+        };
+
         var base = this,
             $body = null,
             $bg_container = null,
@@ -79,9 +85,23 @@
                             .focus()
                             .on('keypress', function (e) {
                                 e.preventDefault();
+                                if (e.which === 32) {                           // stop user from sending too many http requests
+                                    var now = new Date().getTime();
 
-                                if (e.which === 32) {
-                                    methods.update_ui($bg_container);
+                                    if (vars.prev_req === 0) {
+                                        vars.prev_req = now;
+                                    } else {
+                                        vars.diff_ms = now - vars.prev_req;
+                                        vars.elaps   = vars.diff_ms / 1000;
+
+                                        if (vars.elaps >= 2) {
+                                            vars.prev_req = now;
+                                        } else {
+                                            debug('init keypress time check', ['please wait', vars.elaps]);
+                                            return;
+                                        }
+                                        methods.update_ui($bg_container);
+                                    }
                                 }
                             }).appendTo($body);
 
@@ -118,8 +138,6 @@
 
                     $.xhrPool.abortAll();
 
-                    console.log(is_url);
-
                     if (options.api === 'icodejs_image_scrape' && is_url) {
                         url  = 'http://icodejs.no.de/mb/'
                         url += '?callback=?'
@@ -137,7 +155,7 @@
                         url += '&start=' + methods.get_rnd_int(1, 50);
                     }
 
-                    debug('get_bg', [url]);
+                    //debug('get_bg', [url]);
 
                     $.getJSON(url, function (data, textStatus) {
                         var img   = '',
@@ -146,6 +164,13 @@
 
                         if (textStatus === 'success') {
                             try {
+
+                                if (data.error) {
+                                    debug('get_bg', data.error);
+                                    //throw new Error(data.error);
+                                    return;
+                                }
+
                                 var res;
 
                                 if (options.api === 'icodejs_image_scrape' && is_url) { // replace this logic with a custom function that can be passed in for each api
@@ -161,7 +186,7 @@
                                     methods.set_bg(bg, elem);
                                 }
                             } catch (e) {
-                                console.log(e.toString(), e);
+                                debug('get_bg', e.toString(), e);
                             }
                         }
                     });
@@ -256,11 +281,13 @@
                     }
                 },
                 save: function (elem) {
-                    var url = elem.data('img_dims').url;
+                    if (elem) {
+                        var url = elem.data('img_dims').url;
 
-                    if (!bg_history.contains(url, 'url')) {
-                        bg_history.push(elem.data('img_dims'));
-                        debug('save', ['image history has been updated!'], bg_history);             // everytime this changes the view needs to be updated
+                        if (!bg_history.contains(url, 'url')) {
+                            bg_history.push(elem.data('img_dims'));
+                            debug('save', ['image history has been updated!'], bg_history);             // everytime this changes the view needs to be updated
+                        }
                     }
                 },
                 destroy: function () {
@@ -307,7 +334,8 @@
                     'Black and White photography wallpapers',
                     'Night photography wallpapers',
                     'dream-wallpaper.com',
-                    'flowers'
+                    'flowers',
+                    'graffiti'
                     ],
                 media_type: 'img',                                                                  // or colour, video
                 media_collection: [],
