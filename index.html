@@ -21,11 +21,35 @@
     <script src="js/jquery.mediaBackgrounds.js"></script>
     <script>
         $(function () {
-            //$('body').mediaBackgrounds();
+            var search_terms = [
+                'cityscape wallpaper',
+                'marvel comics',
+                'dc commics',
+                'space wallpaper',
+                'space stars wallpaper',
+                'space planets wallpaper',
+                'muscle cars',
+                'tokyo japan city',
+                'adult swim wallpaper',
+                'thepaperwall cityscape wallpapers',
+                'akira wallpaper',
+                'high res background textures',
+                'high res background wallpapers',
+                'architectural photography wallpapers',
+                'Street photography wallpapers',
+                'macro photography wallpapers',
+                'Aerial photography wallpapers',
+                'Black and White photography wallpapers',
+                'Night photography wallpapers',
+                'dream-wallpaper.com',
+                'flowers',
+                'graffiti'
+                ];
             $('body').mediaBackgrounds(
                 {
                     api: 'icodejs_image_scrape',
-                    api_url: 'http://icodejs.no.de/mb/?callback=?&url='
+                    api_url: 'http://icodejs.no.de/mb/?callback=?&url=',
+                    search_terms: search_terms
                 });
         });
     </script>

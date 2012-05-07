@@ -103,7 +103,7 @@
                                         if (vars.timer.elaps >= 2) {
                                             vars.timer.prev_req = now;
                                         } else {
-                                            debug('init keypress time check', ['please wait', vars.timer.elaps]);
+                                            //debug('init keypress time check', ['please wait', vars.timer.elaps]);
                                             return;
                                         }
                                     }
@@ -144,18 +144,18 @@
                             bg  = {url: images[idx].url};
 
                             methods.set_bg(bg, elem);
-                            console.log('using cache');
+                            //console.log('using cache');
                         } else {
                             methods.get_json(is_url, input, function (err, images) {
                                 if (err) {
-                                    return debug('get_bg2', [err]);
+                                    return methods.set_status('get_bg2', err);
                                 }
                                 if (images && images.length > 0) {
                                     idx = methods.get_rnd_int(0, images.length -1);
                                     bg  = {url: images[idx].url};
                                     methods.set_bg(bg, elem);
                                 }
-                                console.log('using get json');
+                                //console.log('using get json');
                             }); // end get_json
                         }
                     }); // end check_cache
@@ -213,7 +213,12 @@
                                     !vars.cache.items.contains(input, 'id') && vars.cache.items.push({id: input, images: data});
                                     return callback(null, data);
                                 } else {
-                                    return callback(null, data.responseData.results);
+                                    var results = data.responseData.results;
+                                    if (results.length) {
+                                        return callback(null, results);
+                                    } else {
+                                        return callback('no results');
+                                    }
                                 }
                             } catch (e) {
                                 return callback(e.toString());
@@ -230,7 +235,7 @@
                             var img = this;
 
                             methods.set_status('pre_load_img',
-                                ['loaded image dims: ' + img.width + ' x ' + img.height]);
+                                'loaded image dimensions: ' + img.width + ' x ' + img.height);
 
                             if (img.width  < vars.win_width ||
                                 img.height < vars.win_height) {                 // filter out small image
@@ -253,7 +258,7 @@
                         .attr('src', src_url)
                         .prependTo('body')
                         .error(function () {
-                            methods.set_status('pre_load_img', ['error occured while trying to load this image']);
+                            methods.set_status('pre_load_img', 'error occured while trying to load this image');
                             return callback({err: 'error occured while trying to load this image'});
                         }); // end JQ new Image
                 },
@@ -265,7 +270,7 @@
                     $bg_container.css({'height': vars.win_height});
                     $body.css({'height': vars.win_height});
 
-                    debug('resize_window', ['window dimensions: ' + vars.win_width + ' x ' + vars.win_height]);
+                    //debug('resize_window', ['window dimensions: ' + vars.win_width + ' x ' + vars.win_height]);
                 },
                 update_ui: function (elem) {
                     elem && methods.get_bg(elem);
@@ -276,7 +281,7 @@
 
                         if (!vars.favorites.contains(url, 'url')) {
                             vars.favorites.push(elem.data('img_dims'));
-                            debug('save', ['image history has been updated!'], vars.favorites);             // everytime this changes the view needs to be updated
+                            methods.set_status('save', 'Current image save to favorites!', vars.favorites.length);             // everytime this changes the view needs to be updated
                         }
                     }
                 },
@@ -294,24 +299,18 @@
                     }
                     return callback(-1);
                 },
-                set_status: function (context, lines, data) {
-                    var i,
-                        len,
-                        html = '',
-                        speed = 1000,
-                        $coll = $status.find('li');
-
-                    for (i = 0, len = lines.length; i < len; i += 1) {
-                        html += '<li>' + lines[i] + '</li>';
-                    }
-
-                    if ($coll.length === 0 || $status.is(':hidden')) {
-                        $(html).hide().appendTo($status.fadeIn(speed)).fadeIn(speed);
-                    } else {
-                        $status.children().fadeOut(speed, function () {
-                            $(html).hide().appendTo($status).fadeIn(speed);
-                        });
-                    }
+                set_status: function (func_name, status, data) {
+                    $status
+                        .find('li')
+                            .fadeOut()
+                            .end()
+                        .html('')
+                        .append($('<li>'
+                                    + status
+                                    + (func_name === 'save' ? ' <a class="button" href="#">view ' + data + ' image(s)</a>' : '')
+                                + '</li>')
+                        .fadeIn(1000))
+                        .fadeIn();
                 },
                 get_rnd_term: function () {
                     var idx  = 0,
@@ -324,7 +323,7 @@
                         idx = methods.get_rnd_int(0, st.length -1);
                         term = methods.parse_search_term(st[idx]);
 
-                        methods.set_status('get_rnd_term', ['term: ' + term]);
+                        methods.set_status('get_rnd_term', 'search term: ' + term);
 
                         return term;
                     }
@@ -345,30 +344,7 @@
                 api: 'google_image_search',
                 api_url: '',
                 loading_image: 'img/loader.gif',
-                search_terms: [
-                    'cityscape wallpaper',
-                    'marvel comics',
-                    'dc commics',
-                    'space wallpaper',
-                    'space stars wallpaper',
-                    'space planets wallpaper',
-                    'muscle cars',
-                    'tokyo japan city',
-                    'adult swim wallpaper',
-                    'thepaperwall cityscape wallpapers',
-                    'akira wallpaper',
-                    'high res background textures',
-                    'high res background wallpapers',
-                    'architectural photography wallpapers',
-                    'Street photography wallpapers',
-                    'macro photography wallpapers',
-                    'Aerial photography wallpapers',
-                    'Black and White photography wallpapers',
-                    'Night photography wallpapers',
-                    'dream-wallpaper.com',
-                    'flowers',
-                    'graffiti'
-                    ],
+                search_terms: ['graffiti'],
                 media_type: 'img',                                              // or colour, video
                 media_collection: [],
                 url_builder_func: null,                                         // build url

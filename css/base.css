@@ -82,7 +82,7 @@ hr {
     position: absolute;
     right:0;
     top: 0;
-    /*padding:20px;*/
+    width:310px;
 }
 #controls {
     /*display:none;*/
@@ -136,10 +136,18 @@ hr {
     right:0;
     overflow: hidden;
     height:15px;
-    width:300px;
+    width:310px;
 }
-.status li{
+.status li {
+    color: #666;
     margin-bottom:5px;
     float: left;
+    font-size:12px;
+    letter-spacing:1px;
+    height:15px;
+    overflow: hidden;
     padding-right:10px;
+}
+.status li a.button {
+    text-decoration:none;
 }
