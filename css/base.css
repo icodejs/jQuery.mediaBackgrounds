@@ -3,7 +3,7 @@ html {
     -webkit-text-size-adjust: 100%;
     -ms-text-size-adjust: 100%;
 }
-body, .loader, .pic_info {
+body, .loader, .status, #controls {
     background: url("../img/bg-grey.jpg") repeat scroll 0 0 transparent;
 }
 body {
@@ -68,9 +68,9 @@ hr {
     border:none;
     border-bottom:1px solid #333;
 }
-.checkbox {
+/*.checkbox {
     width:20px;
-}
+}*/
 .bg_container {
     position: absolute;
     left:0;
@@ -81,21 +81,27 @@ hr {
 #content {
     position: absolute;
     right:0;
-    top:0;
-    padding:20px;
+    top: 0;
+    /*padding:20px;*/
 }
 #controls {
     /*display:none;*/
-    background: -webkit-radial-gradient(rgba(127, 127, 127, 0.1), rgba(127, 127, 127, 0.1) 35%, rgba(0, 0, 0, 0.3));
-    border: 1px solid #666;
+    /*background: -webkit-radial-gradient(rgba(127, 127, 127, 0.1), rgba(127, 127, 127, 0.1) 35%, rgba(0, 0, 0, 0.3));*/
+    border: 1px solid #ddd;
     vertical-align: middle;
-    -webkit-border-radius: 5px;
-    -moz-border-radius: 5px;
-    border-radius: 5px;
+    -webkit-border-radius: 0 0 0 5px;
+    -moz-border-radius:  0 0 0 5px;
+    border-radius:  0 0 0 5px;
     -webkit-box-shadow: 0 1px 2px rgba(0,0,0,.15);
     -moz-box-shadow: 0 1px 2px rgba(0,0,0,.15);
     box-shadow: 0 1px 2px rgba(0,0,0,.15);
     padding:20px;
+}
+#controls p {
+    color: #666;
+    margin-bottom:5px;
+    font-size:12px;
+    letter-spacing:1px;
 }
 .loader {
     -webkit-border-radius: 5px;
@@ -118,14 +124,22 @@ hr {
     position: absolute ;
     left: -9999px
 }
-.pic_info {
-    -webkit-border-radius: 3px;
-    -moz-border-radius: 3px;
-    border-radius: 3px;
-    border:1px solid #666;
+.status {
+    -webkit-border-radius: 3px 0 0 0;
+    -moz-border-radius: 3px 0 0 0;
+    border-radius: 3px 0 0 0;
+    border:1px solid #ddd;
     margin-top:20px;
     padding:10px;
+    position: absolute;
+    bottom:0;
+    right:0;
+    overflow: hidden;
+    height:15px;
+    width:300px;
 }
-.pic_info li{
+.status li{
     margin-bottom:5px;
+    float: left;
+    padding-right:10px;
 }

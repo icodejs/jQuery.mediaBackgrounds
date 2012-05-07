@@ -7,24 +7,26 @@
 </head>
 <body>
     <div id="content">
-        <h1>Media Backgrounds </h1>
         <form>
             <div id="controls">
-                <input type="text" class="text" id="terms">
-                <label class="checkbox">
-                    <input type="checkbox" class="checkbox" id="url"> url
-                </label>
-                <ul style="display:none;" class="pic_info"></ul>
+                <!-- <h1>Media Backgrounds </h1> -->
+                <p>Enter a url or list keywords:</p>
+                <input type="text" class="text" id="terms" value="http://thepaperwall.com/wallpapers/cityscape/big/">
             </div>
         </form>
     </div>
+    <ul style="display:none;" class="status"></ul>
 
     <script src="http://code.jquery.com/jquery.min.js"></script>
     <script src="js/jquery.mediaBackgrounds.js"></script>
     <script>
         $(function () {
             //$('body').mediaBackgrounds();
-            $('body').mediaBackgrounds({api: 'icodejs_image_scrape'});
+            $('body').mediaBackgrounds(
+                {
+                    api: 'icodejs_image_scrape',
+                    api_url: 'http://icodejs.no.de/mb/?callback=?&url='
+                });
         });
     </script>
 </body>
