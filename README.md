@@ -16,4 +16,4 @@ This is a work in progress and is nowhere near finished!
         });
     </script>
 
-<a href="http://www.icodejs.com/playpen/javascript/jquery/jquery.mediaBackgrounds/" target="_blank">Demo</a>
+<a href="http://www.icodejs.com/playpen/javascript/jquery.mediaBackgrounds/" target="_blank">Demo</a>
