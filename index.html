@@ -4,18 +4,52 @@
     <title>Media Backgrounds - jQuery Plugin</title>
     <link rel="stylesheet" type="text/css" href="css/reset.css">
     <link rel="stylesheet" type="text/css" href="css/base.css">
+    <!--[if IE]>
+    <link rel="stylesheet" type="text/css" href="css/ie.css">
+    <![endif]-->
 </head>
 <body>
     <div id="content">
         <form>
             <div id="controls">
-                <!-- <h1>Media Backgrounds </h1> -->
                 <p>Enter a url or list keywords:</p>
-                <input type="text" class="text" id="terms" value="http://thepaperwall.com/wallpapers/cityscape/big/">
+                <input type="text" class="textbox" id="terms" value="http://thepaperwall.com/wallpapers/cityscape/big/">
+                <select id="img_size" class="textbox">
+                    <option>Minimum size</option>
+                    <option>320x480</option>
+                    <option>640x480</option>
+                    <option>800x480</option>
+                    <option>800x600</option>
+                    <option>1024x768</option>
+                    <option>1024x1024</option>
+                    <option>1152x864</option>
+                    <option>1280x720</option>
+                    <option>1280x800</option>
+                    <option>1280x960</option>
+                    <option>1280x1024</option>
+                    <option>1360x768</option>
+                    <option>1366x768</option>
+                    <option>1440x900</option>
+                    <option>1440x1050</option>
+                    <option>1600x1200</option>
+                    <option>1680x1050</option>
+                    <option>1680x1200</option>
+                    <option>1920x1080</option>
+                </select>
+
+                <div class="button_container">
+                    <ul id="buttons" class="clearfix">
+                        <li><button id="fav" class="button"><i class="icon icon_fav"></i> Favorite</button></li>
+                        <li><button id="save" class="button"><i class="icon icon_save"></i> Save</button></li>
+                        <li><button id="tweet" class="button"><i class="icon icon_tweet"></i> Tweet</button></li>
+                        <li><button id="email" class="button"><i class="icon icon_email"></i> Email</button></li>
+                        <li><button id="help" class="button"><i class="icon icon_help"></i> Help</button></li>
+                    </ul>
+                </div>
             </div>
         </form>
     </div>
-    <ul style="display:none;" class="status"></ul>
+    <div style="display:none;" class="status"></div>
 
     <script src="http://code.jquery.com/jquery.min.js"></script>
     <script src="js/jquery.mediaBackgrounds.js"></script>
@@ -48,7 +82,7 @@
             $('body').mediaBackgrounds(
                 {
                     api: 'icodejs_image_scrape',
-                    api_url: 'http://icodejs.no.de/mb/?callback=?&url=',
+                    api_url: 'http://icodejs.no.de/mb/?url=',
                     search_terms: search_terms
                 });
         });

@@ -1,7 +1,11 @@
 /**
  *
  *  Media Backgrounds by Jay Esco 2012
- *  file:///C:/Non%20Work/gitHub/jQuery.mediaBackgrounds/index.html
+ *  ----------------------------------
+ *  PC:   file:///C:/Non%20Work/gitHub/jQuery.mediaBackgrounds/index.html
+ *  Mac:  file:///Users/tyrone/Sites/mediaBackgrounds/index.html
+ *  Dev:  http://localhost:4000/playpen/javascript/jquery/mediabackgrounds/
+ *  Live: http://www.icodejs.com/playpen/javascript/jquery/mediaBackgrounds/
  *
  */
 
@@ -60,6 +64,37 @@
             win_height: 1024
         };
 
+        var func = {
+            favorite: function (elem) {
+                if (elem && elem.data('img_dims')) {
+                    var url = elem.data('img_dims').url;
+
+                    if (!vars.favorites.contains(url, 'url')) {
+                        vars.favorites.push(elem.data('img_dims'));
+                        methods.set_status('save', vars.favorites.length + ' image(s) saved in your favorites!', vars.favorites.length);             // everytime this changes the view needs to be updated
+                    }
+                }
+            },
+            email: function () {
+                console.log(emailed);
+            },
+            tweet: function () {
+                console.log(tweeted);
+            },
+            save: function () {
+                // $.ajax({
+                //   type: 'POST',
+                //   url: url,
+                //   data: data,
+                //   success: success,
+                //   dataType: dataType
+                // });
+            },
+            help: function () {
+                methods.set_status('help', 'Use the spacebar to load new images');
+            }
+        };
+
         var base = this,
             $body = null,
             $bg_container = null,
@@ -81,7 +116,19 @@
                             .on('click', function (e) {
                                 if (e.target.id !== 'controls' && e.target.parentElement.id !== 'controls') {
                                     $keypress_detector.focus();
-                                    methods.save($(this).find('.bg_container')); // change this to a button
+                                }
+                            });
+
+                        $('.button')
+                            .on('click', function (e) {
+                                e.preventDefault();
+                                $keypress_detector.focus();
+                                switch ($(this).attr('id').toLowerCase()) {
+                                    case 'fav':   func.favorite($body.find('.bg_container')); break;
+                                    case 'save':  func.save($body.find('.bg_container')); break;
+                                    case 'email': func.email($body.find('.bg_container')); break;
+                                    case 'tweet': func.tweet($body.find('.bg_container')); break;
+                                    case 'help': func.help($body.find('.bg_container')); break;
                                 }
                             });
 
@@ -122,6 +169,15 @@
                     });
                 },
                 get_bg: function (elem) {
+                    if (vars.errors.length > 10) {                              // monitor the error being brought back for a url or keyword
+                        $body.find('.loader').fadeOut(1000, function () {
+                            $(this).remove();
+                        });
+                        return methods.set_status('get_bg',
+                                'Insuffient images for the current URL. Please enter another URL or keyword(s)',
+                                vars.errors);
+                    }
+
                     var idx    = 0,
                         bg     = {},
                         input  = $('#terms').val().toLowerCase(),
@@ -146,9 +202,11 @@
                             methods.set_bg(bg, elem);
                             //console.log('using cache');
                         } else {
+                            vars.errors = [];                                   // clear error for this url
+
                             methods.get_json(is_url, input, function (err, images) {
                                 if (err) {
-                                    return methods.set_status('get_bg2', err);
+                                    return methods.set_status('get_bg', err);
                                 }
                                 if (images && images.length > 0) {
                                     idx = methods.get_rnd_int(0, images.length -1);
@@ -156,13 +214,13 @@
                                     methods.set_bg(bg, elem);
                                 }
                                 //console.log('using get json');
-                            }); // end get_json
+                            });
                         }
                     }); // end check_cache
                 },
                 set_bg: function (data, elem) {
                     if (data && data.url) {
-                        methods.pre_load_img(data.url, 0, function (err, img_dims) {
+                        methods.preload_img(data.url, 0, function (err, img_dims) {
                             var old_bg_containers = $('.bg_container');         // create a new bg_container div and remove the old one
 
                             if (err) {
@@ -184,7 +242,7 @@
                             old_bg_containers.fadeOut(1000, function () {
                                 $(this).remove();
                             });
-                        }); // end pre_load_img
+                        });
 
                         $keypress_detector.focus();
                     }
@@ -193,7 +251,7 @@
                     if (options.api_url.length > 0 && is_url) {
                         url  = options.api_url + input;
                     } else {
-                        url  = 'http://ajax.googleapis.com/ajax/services/search/images?v=1.0&callback=?&q='
+                        url  = 'http://ajax.googleapis.com/ajax/services/search/images?v=1.0&q='
                         url += (input.length > 0 ? methods.parse_search_term(input) : methods.get_rnd_term())
                         url += '&imgsz=xlarge|xxlarge|huge'                     // |huge (make this optional)
                         url += '&imgtype=photo'
@@ -203,10 +261,25 @@
 
                     $.xhrPool.length > 0 && $.xhrPool.abortAll();               // abort all ajax requests if any
 
-                    $.getJSON(url, function (data, textStatus) {
-                        if (textStatus === 'success') {
+                    $.ajax({
+                        url: url,
+                        dataType: 'jsonp',
+                        error: function (jqXHR, textStatus, errorThrown) {
+                             return vars.errors.push({
+                                func_name: 'get_json',
+                                desc: textStatus,
+                                data: errorThrown
+                            });
+                        }
+                    }).done(function (data, status) {
+                        if (status === 'success') {
                             try {
                                 if (data.error) {
+                                    vars.errors.push({
+                                        func_name: 'get_json',
+                                        desc: data.error,
+                                        data: data
+                                    });
                                     return callback(data.error);
                                 }
                                 if (options.api_url.length > 0 && is_url) {     // replace this logic with a custom function that can be passed in for each api
@@ -221,12 +294,19 @@
                                     }
                                 }
                             } catch (e) {
-                                return callback(e.toString());
+                                var error = {
+                                    func_name: 'get_json',
+                                    desc: e.toString(),
+                                    data: e
+                                };
+                                vars.errors.push(error);
+                                return callback(error);
                             }
                         }
                     });
                 },
-                pre_load_img: function (src_url, delay, callback) {
+                preload_img: function (src_url, delay, callback) {
+                    var err;
                     $body.find('img.preloaded').remove();                       // remove this for now but in future we might keep them
 
                     $(new Image())                                              // load image, hide it, append to the body.
@@ -234,12 +314,27 @@
                         .load(function () {                                     // images are loaded and cached ready for use
                             var img = this;
 
-                            methods.set_status('pre_load_img',
-                                'loaded image dimensions: ' + img.width + ' x ' + img.height);
+                            methods.set_status('preload_img',
+                                'Loaded image dimensions: ' +
+                                img.width + ' x ' + img.height);
 
-                            if (img.width  < vars.win_width ||
-                                img.height < vars.win_height) {                 // filter out small image
-                                return callback({err: 'image returned is too small'});
+                            var img_size = $('#img_size').val(),
+                                w = vars.win_width,
+                                h = vars.win_height;
+
+                            if (img_size.indexOf('x') > 0) {
+                                w = img_size.split('x')[0];
+                                h = img_size.split('x')[1];
+                            }
+
+                            if (img.width  < w || img.height < h) { // filter out small image
+                                error = {
+                                    func_name: 'preload_img',
+                                    desc: 'image returned is too small'
+                                };
+
+                                vars.errors.push(error);
+                                return callback(error);
                             }
 
                             setTimeout(function () {
@@ -257,9 +352,16 @@
                         .addClass('preloaded')
                         .attr('src', src_url)
                         .prependTo('body')
-                        .error(function () {
-                            methods.set_status('pre_load_img', 'error occured while trying to load this image');
-                            return callback({err: 'error occured while trying to load this image'});
+                        .error(function (e) {
+                            error = {
+                                func_name: 'preload_img',
+                                desc: '404 (Not Found)',
+                                data: e
+                            };
+                            vars.errors.push(error);
+
+                            methods.set_status('preload_img', error.desc);
+                            return callback(error);
                         }); // end JQ new Image
                 },
                 resize_window: function () {
@@ -275,16 +377,6 @@
                 update_ui: function (elem) {
                     elem && methods.get_bg(elem);
                 },
-                save: function (elem) {
-                    if (elem && elem.data('img_dims')) {
-                        var url = elem.data('img_dims').url;
-
-                        if (!vars.favorites.contains(url, 'url')) {
-                            vars.favorites.push(elem.data('img_dims'));
-                            methods.set_status('save', 'Current image save to favorites!', vars.favorites.length);             // everytime this changes the view needs to be updated
-                        }
-                    }
-                },
                 check_cache: function (url, callback) {
                     var i,
                         items = vars.cache.items,
@@ -299,16 +391,17 @@
                     }
                     return callback(-1);
                 },
-                set_status: function (func_name, status, data) {
+                set_status: function (type, status, data) {
                     $status
-                        .find('li')
+                        .find('div')
                             .fadeOut()
                             .end()
                         .html('')
-                        .append($('<li>'
+                        .append($('<div>'
                                     + status
-                                    + (func_name === 'save' ? ' <a class="button" href="#">view ' + data + ' image(s)</a>' : '')
-                                + '</li>')
+                                    + (type === 'save' ? ' <a href="#" id="view" class="button">view</a>' : '')
+                                    + ' ...'
+                                + '</div>')
                         .fadeIn(1000))
                         .fadeIn();
                 },
