@@ -61,7 +61,9 @@
             },
             favorites: [],                                                      // save favorite background images
             win_width: 1024,
-            win_height: 1024
+            win_height: 1024,
+            interval_id: undefined,
+            loading: false
         };
 
         var func = {
@@ -100,6 +102,7 @@
             $bg_container = null,
             $keypress_detector = null,
             $status = null,
+            $slideshow = false,
             methods = {
                 init: function (options) {
                     var $window = $(window);
@@ -119,6 +122,12 @@
                                 }
                             });
 
+                        $bg_container = $('<div />')
+                            .addClass('bg_container')
+                            .height(vars.win_height)
+                            .hide()
+                            .prependTo($body);
+
                         $('.button')
                             .on('click', function (e) {
                                 e.preventDefault();
@@ -129,6 +138,28 @@
                                     case 'email': func.email($body.find('.bg_container')); break;
                                     case 'tweet': func.tweet($body.find('.bg_container')); break;
                                     case 'help': func.help($body.find('.bg_container')); break;
+                                }
+                            });
+
+                        $('#example')
+                            .on('change', function () {
+                                var url = $(this).val();
+                                $('#terms').val(url)
+                                $keypress_detector.focus();
+                            });
+
+                        $('#slideshow')
+                            .on('change', function () {
+                                $slideshow = $(this).attr('checked') ? true : false;
+                                console.log('$slideshow: ', $slideshow);
+                                if ($slideshow) {
+                                     vars.interval_id = setInterval(function () {
+                                        console.log($.xhrPool.length);
+                                        console.log(loading);
+                                        ($.xhrPool.length === 0 && !loading) && methods.update_ui($bg_container)
+                                     }, 7000);
+                                } else {
+                                    clearInterval(vars.interval_id);
                                 }
                             });
 
@@ -158,12 +189,6 @@
                                 }
                             })
                             .appendTo($body);
-
-                        $bg_container = $('<div />')
-                            .addClass('bg_container')
-                            .height(vars.win_height)
-                            .hide()
-                            .prependTo($body);
 
                         methods.get_bg($bg_container);
                     });
@@ -307,6 +332,8 @@
                 },
                 preload_img: function (src_url, delay, callback) {
                     var err;
+                    loading = true;
+
                     $body.find('img.preloaded').remove();                       // remove this for now but in future we might keep them
 
                     $(new Image())                                              // load image, hide it, append to the body.
@@ -340,6 +367,7 @@
                             setTimeout(function () {
                                 $body.find('.loader').fadeOut(1000, function () {
                                     $(this).remove();
+                                    loading = false;
                                     callback(null,
                                         {
                                             width: img.width,

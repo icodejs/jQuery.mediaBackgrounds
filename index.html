@@ -14,7 +14,7 @@
             <div id="controls">
                 <p>Enter a url or list keywords:</p>
                 <input type="text" class="textbox" id="terms" value="http://thepaperwall.com/wallpapers/cityscape/big/">
-                <select id="img_size" class="textbox">
+                <select id="img_size" class="textbox dropdownlist">
                     <option>Minimum size</option>
                     <option>320x480</option>
                     <option>640x480</option>
@@ -36,6 +36,40 @@
                     <option>1680x1200</option>
                     <option>1920x1080</option>
                 </select>
+
+                <select id="example" class="textbox dropdownlist">
+                    <option>Example URLs</option>
+                    <option value="http://thepaperwall.com/wallpapers/sci-fi/big/">Sci-fi</option>
+                    <option value="http://thepaperwall.com/wallpapers/industrial/big/">Industrial</option>
+                    <option value="http://thepaperwall.com/wallpapers/architecture/big/">Architecture</option>
+                    <option value="http://thepaperwall.com/wallpapers/nature/big/">Nature</option>
+                    <option value="http://thepaperwall.com/wallpapers/cartoon_comic/big/">Cartoon / Comic</option>
+                    <option value="http://thepaperwall.com/wallpapers/cars/big/">Cars</option>
+                    <option value="http://thepaperwall.com/wallpapers/computer_tech/big/">Computer</option>
+                    <option value="http://thepaperwall.com/wallpapers/humor/big/">Humor</option>
+                    <option value="http://thepaperwall.com/wallpapers/sports/big/">Sports</option>
+                    <option value="http://thepaperwall.com/wallpapers/vintage_historical/big/">Vintage</option>
+                    <option value="http://thepaperwall.com/wallpapers/war_military/big/">War / Military</option>
+                    <option value="http://thepaperwall.com/wallpapers/animals/big/">Animals</option>
+                    <option value="http://thepaperwall.com/wallpapers/movies/big/">Movies</option>
+                    <option value="http://thepaperwall.com/wallpapers/television/big/">Television</option>
+                    <option value="http://thepaperwall.com/wallpapers/video_games/big/">Video Games</option>
+                    <option value="http://thepaperwall.com/wallpapers/big/">Big</option>
+                    <option value="http://thepaperwall.com/wallpapers/misc/big/">Misc</option>
+                    <option value="http://thepaperwall.com/wallpapers/digital_artwork/big/">Digital Artwork</option>
+                    <option value="http://thepaperwall.com/wallpapers/duel_monitor/big/">Dual Monitor</option>
+                    <option value="http://thepaperwall.com/wallpapers/fantasy/big/">Fantasy</option>
+                    <option value="http://thepaperwall.com/wallpapers/food_drink/big/">Food Drink</option>
+                    <option value="http://thepaperwall.com/wallpapers/informational/big/">Informational</option>
+                    <option value="http://thepaperwall.com/wallpapers/iphone_mobile/big/">iphone Mobile</option>
+                    <option value="http://thepaperwall.com/wallpapers/music/big/">Music</option>
+                    <option value="http://thepaperwall.com/wallpapers/people/big/">People</option>
+                    <option value="http://thepaperwall.com/wallpapers/quotes_worded/big/">Quotes Worded</option>
+                </select>
+
+                <label class="checkbox">
+                    <input type="checkbox" id="slideshow" value="slideshow"> Slideshow?
+                </label>
 
                 <div class="button_container">
                     <ul id="buttons" class="clearfix">
@@ -77,7 +111,8 @@
                 'Night photography wallpapers',
                 'dream-wallpaper.com',
                 'flowers',
-                'graffiti'
+                'graffiti',
+                'national geographic wallpaper'
                 ];
             $('body').mediaBackgrounds(
                 {

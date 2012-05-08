@@ -106,7 +106,7 @@ hr {
     line-height:12px;
     letter-spacing:1px;
 }
-#controls #img_size {
+#controls .dropdownlist {
     width:auto;
     height:26px;
 }
@@ -124,6 +124,10 @@ hr {
     top: 50%;
     left: 50%;
     visibility: visible
+}
+#slideshow {
+    display:inline;
+    width:auto;
 }
 .keypress_detector {
     width: 0;
