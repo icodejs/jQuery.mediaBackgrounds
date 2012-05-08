@@ -151,13 +151,16 @@
                         $('#slideshow')
                             .on('change', function () {
                                 $slideshow = $(this).attr('checked') ? true : false;
-                                console.log('$slideshow: ', $slideshow);
+
                                 if ($slideshow) {
                                      vars.interval_id = setInterval(function () {
-                                        console.log($.xhrPool.length);
-                                        console.log(loading);
+
+                                        console.log('$slideshow: ', $slideshow);
+                                        console.log('$.xhrPool.length: ', $.xhrPool.length);
+                                        console.log('loading: ', loading);
+
                                         ($.xhrPool.length === 0 && !loading) && methods.update_ui($bg_container)
-                                     }, 7000);
+                                     }, 10000);
                                 } else {
                                     clearInterval(vars.interval_id);
                                 }
@@ -208,12 +211,15 @@
                         input  = $('#terms').val().toLowerCase(),
                         is_url = (input.indexOf('http://') >= 0 || input.indexOf('www') >= 0);
 
-                    $('.loader').length === 0 && $('<div />')
-                        .hide()
-                        .addClass('loader')
-                        .append($('<img />').attr('src', options.loading_image))
-                        .appendTo($body)
-                        .fadeIn();
+                    if ($('.loader').length === 0 && !$slideshow) {
+                        $('<div />')
+                            .hide()
+                            .addClass('loader')
+                            .append($('<img />').attr('src', options.loading_image))
+                            .appendTo($body)
+                            .fadeIn();
+                    }
+
 
                     methods.check_cache(input, function (i) {                   // check cache. if callback returns cached item index? Do stuff!
                         var items = vars.cache.items;
@@ -359,22 +365,23 @@
                                     func_name: 'preload_img',
                                     desc: 'image returned is too small'
                                 };
-
                                 vars.errors.push(error);
                                 return callback(error);
                             }
 
                             setTimeout(function () {
-                                $body.find('.loader').fadeOut(1000, function () {
-                                    $(this).remove();
+                                var o = {width: img.width, height: img.height, url: src_url};
+
+                                if (!$slideshow) {
+                                    $body.find('.loader').fadeOut(1000, function () {
+                                        $(this).remove();
+                                        loading = false;
+                                        callback(null, o);
+                                    });
+                                } else {
                                     loading = false;
-                                    callback(null,
-                                        {
-                                            width: img.width,
-                                            height: img.height,
-                                            url: src_url
-                                        });
-                                });
+                                    callback(null, o);
+                                }
                             }, delay);
                         })
                         .addClass('preloaded')
