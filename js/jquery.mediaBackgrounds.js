@@ -9,7 +9,7 @@
  *
  */
 
-(function($, window, document, undefined) {
+;(function($, window, document, undefined) {
 
     (function () {
         if (typeof Array.prototype.contains  !== 'function') {                  // monkey path contains Array method (may need check if string and use toLowerCase())
@@ -91,10 +91,12 @@
                 //   success: success,
                 //   dataType: dataType
                 // });
-                methods.set_status('save', 'Your favorites list has been saved. (To do)');
+                methods.set_status('save',
+                    'Your favorites list has been saved. (To do)');
             },
             help: function () {
-                methods.set_status('help', 'Use the spacebar to load new images. (To do)');
+                methods.set_status('help',
+                    'Use the spacebar to load new images. (To do)');
             },
             get_rnd_term: function () {
                 var idx  = 0,
@@ -381,7 +383,7 @@
                                 w = img_size.split('x')[0];
                                 h = img_size.split('x')[1];
                             }
-                            if (img.width  < w || img.height < h) { // filter out small image
+                            if (img.width  < w || img.height < h) {             // filter out small image
                                 error = {
                                     func_name: 'preload_img',
                                     desc: 'image returned is too small'
