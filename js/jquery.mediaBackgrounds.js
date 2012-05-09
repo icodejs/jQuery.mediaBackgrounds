@@ -1,13 +1,3 @@
-/*
-                      _
- _                   ( )           _
-(_)   ___    _      _| |   __     (_)  ___
-| | /'___) /'_`\  /'_` | /'__`\   | |/',__)
-| |( (___ ( (_) )( (_| |(  ___/   | |\__, \
-(_)`\____)`\___/'`\__,_)`\____)_  | |(____/
-                              ( )_| |
-                              `\___/'
-*/
 /**
  *
  *  Media Backgrounds by Jay Esco 2012
@@ -114,10 +104,10 @@
                     term = '';
 
                 if (st.length === 1) {
-                    return methods.parse_search_term(st[idx]);
+                    return helpers.parse_search_term(st[idx]);
                 } else {
-                    idx = methods.get_rnd_int(0, st.length -1);
-                    term = methods.parse_search_term(st[idx]);
+                    idx = helpers.get_rnd_int(0, st.length -1);
+                    term = helpers.parse_search_term(st[idx]);
                     methods.set_status('get_rnd_term', 'search term: ' + term);
                     return term;
                 }
@@ -127,6 +117,28 @@
             },
             get_rnd_int: function (min, max)  {
                 return Math.floor(Math.random() * (max - min + 1)) + min;
+            }
+        };
+
+        var interaction = {
+            view_favorites: function (event, elem, target_elem) {
+                var state = elem.data('state') || 'open';
+
+                if (state === 'open') {
+                    elem.data({state: 'closed'});
+                    target_elem.animate({
+                        height: 10
+                    }, 2000, 'easeOutQuad', function() {
+                        $(this).css({overflow: 'hidden'});
+                    });
+                } else {
+                    elem.data({state: 'open'});
+                    target_elem.animate({
+                        height: 410
+                    }, 2000, 'easeInQuad', function() {
+                        $(this).css({overflow: 'auto'});
+                    });
+                }
             }
         };
 
@@ -147,7 +159,7 @@
 
                     return base.each(function () {
 
-                        $('*').bind('contextmenu', function () { return false });
+                        //$('*').bind('contextmenu', function () { return false });
 
                         $body = $(this)
                             .height(vars.win_height)
@@ -199,6 +211,12 @@
                                 } else {
                                     clearInterval(vars.interval_id);
                                 }
+                            });
+
+                        $('#favorite_controls a')
+                            .on('click', function (e) {
+                                e.preventDefault();
+                                interaction.view_favorites(e, $(this), $('#favorites'))
                             });
 
                         $keypress_detector = $('<input />')                     // hack (fix asap)
