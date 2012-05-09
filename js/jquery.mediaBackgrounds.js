@@ -147,6 +147,8 @@
 
                     return base.each(function () {
 
+                        $('*').bind('contextmenu', function () { return false });
+
                         $body = $(this)
                             .height(vars.win_height)
                             .on('click', function (e) {
