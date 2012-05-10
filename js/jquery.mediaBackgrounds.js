@@ -10,9 +10,12 @@
  */
 
 ;(function($, window, document, undefined) {
-
+    /**
+     * Monkey patch Array object with a custom contains method
+     * (may need check if string and use toLowerCase()).
+     */
     (function () {
-        if (typeof Array.prototype.contains  !== 'function') {                  // monkey path contains Array method (may need check if string and use toLowerCase())
+        if (typeof Array.prototype.contains  !== 'function') {
             Array.prototype.contains = function (needle, prop) {
                 var i = this.length;
                 while (i--) {
@@ -25,9 +28,15 @@
                 return false;
             }
         }
+    }());
 
+    /**
+     * jQuery global function that keep a record of all ajax requests and
+     * provide a handly way of aborting them all at any given time.
+     */
+    (function () {
         $.xhrPool = [];
-        $.xhrPool.abortAll = function () {                                      // stop multilpe ajax requests from running
+        $.xhrPool.abortAll = function () {
             $(this).each(function (idx, jqXHR) {
                 jqXHR.abort();
             });
@@ -47,8 +56,15 @@
         });
     }());
 
+    /**
+     * jQuery mediaBackgrounds plugin that ajax load images from external web
+     * pages via a custom node.js REST API.
+     *
+     * This is currently in development and nowhere near finished.
+     */
     $.fn.mediaBackgrounds = function (custom_options) {
 
+        // Global variables.
         var vars = {
             timer: {
                 prev_req: 0,
@@ -59,13 +75,15 @@
             cache: {
                 items: []
             },
-            favorites: [],                                                      // save favorite background images
+            favorites: [],
             win_width: 1024,
             win_height: 1024,
             interval_id: undefined,
-            loading: false
+            loading: false,
+            slideshow: false
         };
 
+        // Global helper methods.
         var helpers = {
             favorite: function (elem) {
                 if (elem && elem.data('img_dims')) {
@@ -74,6 +92,7 @@
                     if (!vars.favorites.contains(url, 'url')) {
                         vars.favorites.push(elem.data('img_dims'));
                         methods.set_status('save', vars.favorites.length + ' image(s) saved in your favorites!', vars.favorites.length);             // everytime this changes the view needs to be updated
+                        $pe.favorites_container.fadeIn();
                     }
                 }
             },
@@ -120,115 +139,150 @@
             }
         };
 
+        // Global interaction methods that work with jQuery elements.
         var interaction = {
             view_favorites: function (event, elem, target_elem) {
-                var state = elem.data('state') || 'closed';
+                var state = elem.data('state') || 'closed'
+                    $icon = elem.find('i'),
+                    speed = 750,
+                    close = 'icon_state_close',
+                    open  = 'icon_state_open';
+
+                target_elem.stop(true, true);
 
                 if (state === 'open') {
                     elem.data({state: 'closed'});
                     target_elem.animate({
                         height: 10
-                    }, 2000, 'easeOutQuad', function() {
+                    }, speed, 'easeOutQuad', function() {
                         $(this).css({overflow: 'hidden'});
                     });
                 } else {
                     elem.data({state: 'open'});
                     target_elem.animate({
-                        height: 410
-                    }, 2000, 'easeInQuad', function() {
+                        height: 435
+                    }, speed, 'easeInQuad', function() {
                         $(this).css({overflow: 'auto'});
                     });
                 }
+                $icon.toggleClass(close, open);
             }
         };
 
-        var base = this,
-            $body = null,
-            $bg_container = null,
-            $keypress_detector = null,
-            $status = null,
-            $slideshow = false,
-            methods = {
-                init: function (options) {
-                    var $window = $(window);
-                    vars.win_width  = $window.width(),
-                    vars.win_height = $window.height();
+        // Global jQuery page elements.
+        var $pe = {
+            window: null,
+            body: null,
+            bg_container: null,
+            keypress_detector: null,
+            status: null,
+            favorites_container: null
+        };
 
-                    $window.on('resize', methods.resize_window);
-                    $status = $('.status');
+        // Base plugin methods.
+        var base = this,
+            methods = {
+
+                /**
+                 * Initialisation function that does most of the heavy lifting.
+                 */
+                init: function () {
+                    $pe.window = $(window);
+                    vars.win_width  = $pe.window.width(),
+                    vars.win_height = $pe.window.height();
+
+                    $pe.window.on('resize', methods.resize_window);
+                    $pe.status = $('.status');
 
                     return base.each(function () {
 
-                        //$('*').bind('contextmenu', function () { return false });
+                        // disable right click
+                        $('*').bind('contextmenu', function () { return false });
 
-                        $body = $(this)
+                        // Bind and listen to bodyonclick events. Set focus to
+                        // $pe.keypress_detector. This will allow me to listen
+                        // to keyboard events.
+                        $pe.body = $(this)
                             .height(vars.win_height)
                             .on('click', function (e) {
                                 if (e.target.id !== 'controls' && e.target.parentElement.id !== 'controls') {
-                                    $keypress_detector.focus();
+                                    $pe.keypress_detector.focus();
                                 }
                             });
 
-                        $bg_container = $('<div />')
+                        // Add background image container div.
+                        $pe.bg_container = $('<div />')
                             .addClass('bg_container')
                             .height(vars.win_height)
                             .hide()
-                            .prependTo($body);
+                            .prependTo($pe.body);
 
+                        // Bind and listen to all button click events and handle
+                        // them accordingly.
                         $('.button')
                             .on('click', function (e) {
                                 e.preventDefault();
-                                $keypress_detector.focus();
+                                $pe.keypress_detector.focus();
+
                                 switch ($(this).attr('id').toLowerCase()) {
-                                    case 'fav':   helpers.favorite($body.find('.bg_container')); break;
-                                    case 'save':  helpers.save($body.find('.bg_container')); break;
-                                    case 'email': helpers.email($body.find('.bg_container')); break;
-                                    case 'tweet': helpers.tweet($body.find('.bg_container')); break;
-                                    case 'help':  helpers.help($body.find('.bg_container')); break;
+                                    case 'fav':   helpers.favorite($pe.bg_container); break;
+                                    case 'save':  helpers.save($pe.bg_container); break;
+                                    case 'email': helpers.email($pe.bg_container); break;
+                                    case 'tweet': helpers.tweet($pe.bg_container); break;
+                                    case 'help':  helpers.help($pe.bg_container); break;
                                 }
                             });
 
+                        // Bind and listen to the change event of the #example
+                        // drp and update the search textbox.
                         $('#example')
                             .on('change', function () {
                                 var url = $(this).val();
                                 $('#terms').val(url)
-                                $keypress_detector.focus();
+                                $pe.keypress_detector.focus();
                             });
 
+                        // Bind and listen to the change event of the slideshow checkbox
+                        // and initialise the image slide show based on the current
+                        // cache or search terms.
                         $('#slideshow')
                             .on('change', function () {
-                                $slideshow = $(this).attr('checked') ? true : false;
+                                vars.slideshow = $(this).attr('checked') ? true : false;
 
-                                if ($slideshow) {
+                                if (vars.slideshow) {
                                      vars.interval_id = setInterval(function () {
-
-                                        // console.log('$slideshow: ', $slideshow);
-                                        // console.log('$.xhrPool.length: ', $.xhrPool.length);
-                                        // console.log('loading: ', vars.loading);
-
-                                        ($.xhrPool.length === 0 && !vars.loading) && methods.update_ui($bg_container)
-                                     }, 15000);
+                                        ($.xhrPool.length === 0 && !vars.loading) && methods.update_ui($pe.bg_container)
+                                     }, options.interval);
+                                    methods.set_status('init', 'Slideshow mode. A new image will load in shortly');
                                 } else {
                                     clearInterval(vars.interval_id);
+                                    methods.set_status('init', 'Slideshow cancelled. Press spacebar to load new images');
                                 }
                             });
 
+                        $pe.favorites_container = $('#favorites_container');
+
+                        // Bind and listen to click event of favorite_controls.
                         $('#favorite_controls a')
                             .on('click', function (e) {
                                 e.preventDefault();
                                 interaction.view_favorites(e, $(this), $('#favorites'))
                             });
 
-                        $keypress_detector = $('<input />')                     // hack (fix asap)
+                        // Hack (fix asap). Create and input element and bind
+                        // a keypress event handler. Perform certain actions
+                        // base on which key is pressed.
+                        $pe.keypress_detector = $('<input />')
                             .attr({id: 'txtInput', type: 'text'})
                             .addClass('keypress_detector')
                             .focus()
                             .on('keypress', function (e) {
                                 e.preventDefault();
-                                if (e.which === 32 && !$slideshow) {
+                                if (e.which === 32 && !vars.slideshow) {
                                     var now = new Date().getTime();
 
-                                    if (vars.timer.prev_req === 0) {            // stop user from sending too many http requests
+                                    // stop user from sending too many http requests
+                                    if (vars.timer.prev_req === 0) {
                                         vars.timer.prev_req = now;
                                     } else {
                                         vars.timer.diff_ms = now - vars.timer.prev_req;
@@ -241,17 +295,24 @@
                                             return;
                                         }
                                     }
-                                    methods.update_ui($bg_container);
+                                    methods.update_ui($pe.bg_container);
                                 }
                             })
-                            .appendTo($body);
+                            .appendTo($pe.body);
 
-                        methods.get_bg($bg_container);
+                        methods.get_bg($pe.bg_container);
                     });
                 },
+
+                /**
+                 * Base function from which new background images are retrieved
+                 * ready to be appended to the background container div.
+                 * @param {jQuery} elem
+                 */
                 get_bg: function (elem) {
-                    if (vars.errors.length > 10) {                              // monitor the error being brought back for a url or keyword
-                        !$slideshow && $body.find('.loader').fadeOut(1000, function () {
+                    // Monitor the error being brought back for a url or keyword.
+                    if (vars.errors.length > 10) {
+                        !$slideshow && $pe.body.find('.loader').fadeOut(1000, function () {
                             $(this).remove();
                             vars.errors = [];
                         });
@@ -265,16 +326,17 @@
                         input  = $('#terms').val().toLowerCase(),
                         is_url = (input.indexOf('http://') >= 0 || input.indexOf('www') >= 0);
 
-                    if ($('.loader').length === 0 && !$slideshow) {
+                    if ($('.loader').length === 0 && !vars.slideshow) {
                         $('<div />')
                             .hide()
                             .addClass('loader')
                             .append($('<img />').attr('src', options.loading_image))
-                            .appendTo($body)
+                            .appendTo($pe.body)
                             .fadeIn();
                     }
 
-                    methods.check_cache(input, function (i) {                   // check cache. if callback returns cached item index? Do stuff!
+                    // Check cache. If callback returns cached item index? Do stuff!
+                    methods.check_cache(input, function (i) {
                         var items = vars.cache.items;
 
                         if (is_url && i >= 0 && items[i] && items[i].images.length > 0) {
@@ -284,9 +346,9 @@
                             bg  = {url: images[idx].url};
 
                             methods.set_bg(bg, elem);
-                            //console.log('using cache');
                         } else {
-                            vars.errors = [];                                   // clear error for this new url
+                            // Clear error if accessing an uncached URL.
+                            vars.errors = [];
 
                             methods.get_json(is_url, input, function (err, images) {
                                 if (err) {
@@ -297,21 +359,29 @@
                                     bg  = {url: images[idx].url};
                                     methods.set_bg(bg, elem);
                                 }
-                                //console.log('using get json');
                             });
                         }
-                    }); // end check_cache
+                    });
                 },
+
+                /**
+                 * Responsible for calling the preload function and updating the
+                 * UI with the results.
+                 *
+                 * @param {object} data - Object literal containing image data
+                 * @param {jQuery} elem
+                 */
                 set_bg: function (data, elem) {
                     if (data && data.url) {
                         methods.preload_img(data.url, 0, function (err, img_dims) {
-                            var old_bg_containers = $('.bg_container');         // create a new bg_container div and remove the old one
+                            // create a new bg_container div which will replace the old on
+                            var old_bg_containers = $('.bg_container');
 
                             if (err) {
                                 return methods.get_bg(elem);
                             }
 
-                            $bg_container = $('<div />')
+                            $pe.bg_container = $('<div />')
                                 .addClass('bg_container')
                                 .height(vars.win_height)
                                 .css({
@@ -321,16 +391,25 @@
                                     'height': vars.win_height
                                 })
                                 .data('img_dims', img_dims)
-                                .prependTo($body);
+                                .prependTo($pe.body);
 
                             old_bg_containers.fadeOut(1000, function () {
                                 $(this).remove();
                             });
                         });
 
-                        $keypress_detector.focus();
+                        $pe.keypress_detector.focus();
                     }
                 },
+
+                /**
+                 * Responsible for performing ajax calls and returning the relevant
+                 * information to the callback.
+                 *
+                 * @param {boolean} is_url - Has the user entered a URL or a keyword.
+                 * @param {string} input - User input.
+                 * @param {function} callback - Callback method for results.
+                 */
                 get_json: function (is_url, input, callback) {
                     if (options.api_url.length > 0 && is_url) {
                         url  = options.api_url + input;
@@ -343,7 +422,8 @@
                         url += '&start=' + helpers.get_rnd_int(1, 50);
                     }
 
-                    $.xhrPool.length > 0 && $.xhrPool.abortAll();               // abort all ajax requests if any
+                    // Abort all ajax requests if any.
+                    $.xhrPool.length > 0 && $.xhrPool.abortAll();
 
                     $.ajax({
                         url: url,
@@ -366,7 +446,9 @@
                                     });
                                     return callback(data.error);
                                 }
-                                if (options.api_url.length > 0 && is_url) {     // replace this logic with a custom function that can be passed in for each api
+
+                                // replace this logic with a custom function that can be passed in for each api
+                                if (options.api_url.length > 0 && is_url) {
                                     !vars.cache.items.contains(input, 'id') && vars.cache.items.push({id: input, images: data});
                                     return callback(null, data);
                                 } else {
@@ -390,19 +472,28 @@
                         }
                     });
                 },
+
+                /**
+                 * Preload images so that large images are fully loaded ready to
+                 * be faded in.
+                 *
+                 * @param {string} src_url - Image URL.
+                 * @param {integer} delay - Option to call the callback with a delay
+                 * @param {function} callback - Callback method for results.
+                 */
                 preload_img: function (src_url, delay, callback) {
                     var err;
                     vars.loading = true;
+                    $pe.body.find('img.preloaded').remove();                    // remove this for now but in future we might hide it
 
-                    $body.find('img.preloaded').remove();                       // remove this for now but in future we might keep them
-
-                    $(new Image())                                              // load image, hide it, append to the body.
+                    // Load image, hide it, add to the pages.
+                    $(new Image())
                         .hide()
-                        .load(function () {                                     // images are loaded and cached ready for use
+                        .load(function () {
                             var img = this;
 
                             methods.set_status('preload_img',
-                                'Loaded image dimensions: ' +
+                                'Loaded image with dimensions: ' +
                                 img.width + ' x ' + img.height);
 
                             var img_size = $('#img_size').val(),
@@ -413,7 +504,11 @@
                                 w = img_size.split('x')[0];
                                 h = img_size.split('x')[1];
                             }
-                            if (img.width  < w || img.height < h) {             // filter out small image
+
+                            // Filter out images that are too small for the current
+                            // window size or that are smaller than the minimum
+                            // size specified by the user.
+                            if (img.width  < w || img.height < h) {
                                 error = {
                                     func_name: 'preload_img',
                                     desc: 'image returned is too small'
@@ -425,8 +520,8 @@
                             setTimeout(function () {
                                 var obj = {width: img.width, height: img.height, url: src_url};
 
-                                if (!$slideshow) {
-                                    $body.find('.loader').fadeOut(1000, function () {
+                                if (!vars.slideshow) {
+                                    $pe.body.find('.loader').fadeOut(1000, function () {
                                         $(this).remove();
                                         vars.loading = false;
                                         callback(null, obj);
@@ -452,35 +547,60 @@
                             return callback(error);
                         }); // end JQ new Image
                 },
+
+                /**
+                 * This function is bound to the window resize event. Each time
+                 * it is called it updates the body and image container elements.
+                 */
                 resize_window: function () {
                     var $this  = $(this);
                     vars.win_width  = $this.width();
                     vars.win_height = $this.height();
 
-                    $bg_container.css({'height': vars.win_height});
-                    $body.css({'height': vars.win_height});
+                    $pe.bg_container.css({'height': vars.win_height});
+                    $pe.body.css({'height': vars.win_height});
 
-                    //debug('resize_window', ['window dimensions: ' + vars.win_width + ' x ' + vars.win_height]);
+                    // debug('resize_window', [
+                    //     'window dimensions: ' +
+                    //     vars.win_width + ' x ' +
+                    //     vars.win_height
+                    // ]);
                 },
                 update_ui: function (elem) {
                     elem && methods.get_bg(elem);
                 },
-                check_cache: function (url, callback) {
+
+                /**
+                 * Check to see with if we have previously loaded this URL before.
+                 * If we have then return its position in the global cache.
+                 *
+                 * @param {string} id - URL id of the cached item.
+                 * @param {function} callback - Callback method for results.
+                 */
+                check_cache: function (id, callback) {
                     var i,
                         items = vars.cache.items,
                         len = items.length;
 
                     if (items.length > 0) {
                         for (i = 0; i < len; i += 1) {
-                            if (url.toLowerCase() === items[i].id.toLowerCase()) {
+                            if (id.toLowerCase() === items[i].id.toLowerCase()) {
                                 return callback(i);
                             }
                         }
                     }
                     return callback(-1);
                 },
+
+                /**
+                 * Updates the status bar with the results of called functions.
+                 *
+                 * @param {string} type - Name of function.
+                 * @param {string} status - Text to be added to the status.
+                 * @param {object} data - Extra data that may be of use at a later date.
+                 */
                 set_status: function (type, status, data) {
-                    $status
+                    $pe.status
                         .find('div')
                             .fadeOut()
                             .end()
@@ -504,16 +624,14 @@
                 api_url: '',
                 loading_image: 'img/loader.gif',
                 search_terms: ['graffiti'],
-                media_type: 'img',                                              // or colour, video
-                media_collection: [],
-                url_builder_func: null,                                         // build url
-                json_res_func: null,                                            // pass in media coll
-                interval: 5000,                                                 // 5 secs
+                media_type: 'img',
+                interval: 15000,
                 user_id: -1,
                 rest_url: ''
             }, custom_options);
 
-        methods.init();                                                         // initialise plugin
+        // initialise plugin
+        methods.init();
 
         function debug(context, lines, data) {
             console.log('');
@@ -526,6 +644,7 @@
                 console.log('');
             }
         }
+
     }
 
 } (jQuery, window, document));

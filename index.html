@@ -12,7 +12,7 @@
     <div id="content">
         <form>
             <div id="controls">
-                <input type="text" class="textbox" id="terms" placeholder="Enter a url or list keyword(s)">
+                <input type="text" class="textbox" id="terms" placeholder="Enter a url or keyword(s)">
                 <select id="img_size" class="textbox dropdownlist">
                     <option>Minimum size</option>
                     <option>320x480</option>
@@ -82,18 +82,22 @@
             </div>
         </form>
     </div>
-    <div id="favorite_controls">
-        <a class="state" href="/"><i class="icon icon_fav"> Show Hide</a>
+
+    <div id="favorites_container">
+        <div id="favorite_controls">
+            <a class="state" href="/"><i class="icon icon_state_open"></i>Favorites</a>
+        </div>
+        <div id="favorites">
+            <ul>
+                <li><a class="placeholder" href="#"></a></li>
+                <li><a class="placeholder" href="#"></a></li>
+                <li><a class="placeholder" href="#"></a></li>
+                <li><a class="placeholder" href="#"></a></li>
+                <li><a class="placeholder" href="#"></a></li>
+            </ul>
+        </div>
     </div>
-    <div id="favorites">
-        <ul>
-            <li><a class="placeholder" href="#">&nbsp;</a></li>
-            <li><a class="placeholder" href="#">&nbsp;</a></li>
-            <li><a class="placeholder" href="#">&nbsp;</a></li>
-            <li><a class="placeholder" href="#">&nbsp;</a></li>
-            <li><a class="placeholder" href="#">&nbsp;</a></li>
-        </ul>
-    </div>
+
     <div style="display:none;" class="status"></div>
 
     <script src="http://code.jquery.com/jquery.min.js"></script>

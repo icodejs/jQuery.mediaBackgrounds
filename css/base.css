@@ -120,10 +120,17 @@ label.checkbox {
 #controls, .status {
     width:410px;
 }
-#favorites {
+#favorites_container {
+    display:none;
     position:absolute;
     right:0;
     top:150px;
+}
+#favorites {
+    padding-top: 16px;
+    position:absolute;
+    right:0;
+    top:0;
     width:255px;
     height:10px;
     z-index:98;
@@ -132,6 +139,7 @@ label.checkbox {
 }
 #favorites ul {
     margin-top:20px;
+    list-style: none;
 }
 #favorites li {
     height:132px;
@@ -143,12 +151,20 @@ label.checkbox {
     padding:5px;
     position:absolute;
     right:0;
-    top:148px;
+    top:0;
     width:265px;
-    height:28px;
+    height:26px;
     line-height:30px;
+    overflow:hidden;
     text-align:center;
     z-index:99;
+}
+#favorite_controls a.state {
+    color: #333;
+    display:block;
+    position:relative;
+    text-decoration:none;
+    padding-top:999px;
 }
 .loader {
     -webkit-border-radius: 5px;
@@ -206,6 +222,7 @@ label.checkbox {
     border-top:1px solid #ddd;
 }
 #buttons {
+    list-style: none;
 }
 #buttons li {
     float: left;
@@ -258,13 +275,6 @@ button.button:hover {
        -o-transition: background-position 0.1s linear;
           transition: background-position 0.1s linear;
 }
-.clearfix:after {
-    content: ".";
-    display: block;
-    height: 0;
-    clear: both;
-    visibility: hidden;
-}
 .icon {
     display: inline-block;
     width: 14px;
@@ -290,6 +300,24 @@ button.button:hover {
 .icon_help {
     background-position: -96px -96px;
 }
+.icon_state_open {
+    background-position: -313px -119px;
+}
+.icon_state_close {
+    background-position: -288px -120px;
+}
+#favorite_controls a.state .icon {
+    position:absolute;
+    left:10px;
+    top:8px;
+}
 .clearfix {
     display: inline-block;
 }  /* for IE/Mac */
+.clearfix:after {
+    content: ".";
+    display: block;
+    height: 0;
+    clear: both;
+    visibility: hidden;
+}
