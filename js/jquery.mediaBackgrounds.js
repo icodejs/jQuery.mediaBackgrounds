@@ -86,6 +86,14 @@
 
         // Global helper methods.
         var helpers = {
+
+            /**
+             * Add current image to favorites with the intention of saving them
+             * to the database or sending the URLs as an email to the user.
+             * Not finished.
+             *
+             * * @param {jQuery} elem.
+             */
             favorite: function (elem) {
                 if (elem && elem.data('img_dims')) {
                     var img = elem.data('img_dims');
@@ -94,31 +102,40 @@
                         $('<img />')
                             .attr({src: img.url, width: 255, height: 132})
                             .load(function () {
-                                var $ul = $pe.favorites_container.find('#favorites ul');// || $('<ul />').appendTo($pe.favorites_container),
-                                    $li = $('<li />').hide(),
-                                    $a  = $('<a />')
-                                        .attr({
-                                            href: img.url,
-                                            target: '_blank'
-                                        })
-                                        .html($(this));
+                                var $favs = $pe.favorites_container.find('#favorites'),
+                                    $ul   = $favs.find('ul')[0] ? $favs.find('ul') : $('<ul />').appendTo($favs),
+                                    $li   = $('<li />').hide(),
+                                    $a    = $('<a />').attr({href: img.url, target: '_blank'}).html($(this));
 
                                 $li.html($a).prependTo($ul).slideDown(1000);
-                            })
-                            .error(function (e) {
-                                error = {
-                                    func_name: 'helpers.favorite',
-                                    desc: '404 (Not Found)',
-                                    data: e
-                                };
-                                vars.errors.push(error);
-                                return methods.set_status('helpers.favorite', error.desc);
-                            });
 
-                        vars.favorites.push(img);
-                        $pe.favorites_container.attr('style') === 'display:none;' && $pe.favorites_container.fadeIn();
-                        methods.set_status('save', vars.favorites.length +
-                                ' image(s) saved in your favorites!', vars.favorites.length);
+                                var height = $ul.height() + 165,
+                                    state = $pe.favorite_controls_view_button.data('state'),
+                                    btn_config = {
+                                        element: $pe.favorite_controls_view_button,
+                                        state: 'open',
+                                        do_toggle: state === 'closed'
+                                    },
+                                    container_config = {
+                                        element: $favs,
+                                        state: state,
+                                        overflow: 'auto',
+                                        height: height > 435 ? 435 : height,
+                                        speed: 750
+                                    };
+
+                                interaction.view_favorites_show(container_config, function () {
+                                    interaction.view_favorites_button(btn_config);
+                                });
+
+                                $pe.favorites_container.attr('style') === 'display:none;' &&
+                                    $pe.favorites_container.fadeIn();
+
+                                vars.favorites.push(img);
+
+                                methods.set_status('save', vars.favorites.length +
+                                        ' image(s) saved in your favorites!', vars.favorites.length);
+                            });
                     }
                 }
             },
@@ -168,30 +185,42 @@
         // Global interaction methods that work with jQuery elements.
         var interaction = {
             view_favorites: function (event, elem, target_elem) {
-                var state = elem.data('state') || 'closed',
-                    $icon = elem.find('i'),
-                    speed = 750,
-                    close = 'icon_state_close',
-                    open  = 'icon_state_open';
+                var state      = elem.data('state'),
+                    $icon      = elem.find('i'),
+                    height     = target_elem.find('ul').height() + 30,
+                    btn_config = {
+                        element: elem,
+                        state: state === 'open' ? 'closed' : 'open',
+                        do_toggle: true
+                    },
+                    container_config = {
+                        element: target_elem,
+                        state: btn_config.state,
+                        overflow: state === 'open' ? 'hidden' : 'auto',
+                        height: state === 'open' ? 10 : height > 435 ? 435 : height,
+                        speed: 750
+                    };
 
-                target_elem.stop(true, true);
+                interaction.view_favorites_show(container_config, function () {
+                    interaction.view_favorites_button(btn_config);
+                });
 
-                if (state === 'open') {
-                    elem.data({state: 'closed'});
-                    target_elem.animate({
-                        height: 10
-                    }, speed, 'easeOutQuad', function() {
-                        $(this).css({overflow: 'hidden'});
-                    });
-                } else {
-                    elem.data({state: 'open'});
-                    target_elem.animate({
-                        height: 435
-                    }, speed, 'easeInQuad', function() {
-                        $(this).css({overflow: 'auto'});
-                    });
-                }
-                $icon.toggleClass(close, open);
+                console.log('state in view_favorites function: ', $pe.favorite_controls_view_button.data('state'));
+            },
+            view_favorites_button: function (obj) {
+                obj.element.data({state: obj.state});
+                obj.do_toggle && obj.element.find('i').toggleClass('icon_state_close', 'icon_state_open');
+            },
+            view_favorites_show: function (obj, callback) {
+                var easing = obj.state === 'open' ?  'easeOutQuad' : 'easeInQuad';
+
+                obj.element.stop(true, true);
+                obj.element.animate({
+                    height: obj.height
+                }, obj.speed, easing, function() {
+                    $(this).css({overflow: obj.overflow});
+                    callback();
+                });
             }
         };
 
@@ -200,6 +229,7 @@
             bg_container: null,
             body: null,
             favorites_container: null,
+            favorite_controls_view_button: null,
             img_size: null,
             keypress_detector: null,
             status: null,
@@ -291,11 +321,12 @@
                             });
 
                         // Bind and listen to click event of favorite_controls.
-                        $('#favorite_controls a')
+                        $pe.favorite_controls_view_button = $('#favorite_controls a')
                             .on('click', function (e) {
                                 e.preventDefault();
                                 interaction.view_favorites(e, $(this), $('#favorites'))
-                            });
+                            })
+                            .data({state: 'closed'});;
 
                         // Hack (fix asap). Create and input element and bind
                         // a keypress event handler. Perform certain actions
@@ -335,7 +366,7 @@
                 /**
                  * Base function from which new background images are retrieved
                  * ready to be appended to the background container div.
-                 * @param {jQuery} elem
+                 * @param {jQuery} elem.
                  */
                 get_bg: function (elem) {
                     // Monitor the error being brought back for a url or keyword.
@@ -397,7 +428,7 @@
                  * UI with the results.
                  *
                  * @param {object} data - Object literal containing image data.
-                 * @param {jQuery} elem
+                 * @param {jQuery} elem.
                  */
                 set_bg: function (data, elem) {
                     if (data && data.url) {
