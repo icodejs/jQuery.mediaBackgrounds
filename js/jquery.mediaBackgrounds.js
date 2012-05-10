@@ -122,7 +122,7 @@
 
         var interaction = {
             view_favorites: function (event, elem, target_elem) {
-                var state = elem.data('state') || 'open';
+                var state = elem.data('state') || 'closed';
 
                 if (state === 'open') {
                     elem.data({state: 'closed'});

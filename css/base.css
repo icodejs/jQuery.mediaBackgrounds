@@ -125,10 +125,10 @@ label.checkbox {
     right:0;
     top:150px;
     width:255px;
-    height:410px;
+    height:10px;
     z-index:98;
     border-top:none;
-    overflow:auto;
+    overflow:hidden;
 }
 #favorites ul {
     margin-top:20px;
