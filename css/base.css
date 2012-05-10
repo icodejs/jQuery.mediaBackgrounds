@@ -121,7 +121,6 @@ label.checkbox {
     width:410px;
 }
 #favorites_container {
-    display:none;
     position:absolute;
     right:0;
     top:150px;
@@ -145,6 +144,10 @@ label.checkbox {
     height:132px;
     background-color:#333;
     margin-bottom:10px;
+    -webkit-box-shadow: 0 1px 2px rgba(0,0,0,.15);
+    -moz-box-shadow: 0 1px 2px rgba(0,0,0,.15);
+    box-shadow: 0 1px 2px rgba(0,0,0,.15);
+    border-top:1px solid #ddd;
 }
 #favorite_controls {
     margin-right:16px;

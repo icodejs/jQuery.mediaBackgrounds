@@ -88,12 +88,37 @@
         var helpers = {
             favorite: function (elem) {
                 if (elem && elem.data('img_dims')) {
-                    var url = elem.data('img_dims').url;
+                    var img = elem.data('img_dims');
 
-                    if (!vars.favorites.contains(url, 'url')) {
-                        vars.favorites.push(elem.data('img_dims'));
-                        methods.set_status('save', vars.favorites.length + ' image(s) saved in your favorites!', vars.favorites.length);             // everytime this changes the view needs to be updated
-                        $pe.favorites_container.fadeIn();
+                    if (!vars.favorites.contains(img.url, 'url')) {
+                        $('<img />')
+                            .attr({src: img.url, width: 255, height: 132})
+                            .load(function () {
+                                var $ul = $pe.favorites_container.find('#favorites ul');// || $('<ul />').appendTo($pe.favorites_container),
+                                    $li = $('<li />').hide(),
+                                    $a  = $('<a />')
+                                        .attr({
+                                            href: img.url,
+                                            target: '_blank'
+                                        })
+                                        .html($(this));
+
+                                $li.html($a).prependTo($ul).slideDown(1000);
+                            })
+                            .error(function (e) {
+                                error = {
+                                    func_name: 'helpers.favorite',
+                                    desc: '404 (Not Found)',
+                                    data: e
+                                };
+                                vars.errors.push(error);
+                                return methods.set_status('helpers.favorite', error.desc);
+                            });
+
+                        vars.favorites.push(img);
+                        $pe.favorites_container.attr('style') === 'display:none;' && $pe.favorites_container.fadeIn();
+                        methods.set_status('save', vars.favorites.length +
+                                ' image(s) saved in your favorites!', vars.favorites.length);
                     }
                 }
             },
