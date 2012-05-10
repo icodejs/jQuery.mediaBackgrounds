@@ -10,6 +10,7 @@
  */
 
 ;(function($, window, document, undefined) {
+
     /**
      * Monkey patch Array object with a custom contains method
      * (may need check if string and use toLowerCase()).
@@ -171,12 +172,14 @@
 
         // Global jQuery page elements.
         var $pe = {
-            window: null,
-            body: null,
             bg_container: null,
+            body: null,
+            favorites_container: null,
+            img_size: null,
             keypress_detector: null,
             status: null,
-            favorites_container: null
+            terms: null,
+            window: null
         };
 
         // Base plugin methods.
@@ -187,12 +190,14 @@
                  * Initialisation function that does most of the heavy lifting.
                  */
                 init: function () {
-                    $pe.window = $(window);
-                    vars.win_width  = $pe.window.width(),
-                    vars.win_height = $pe.window.height();
-
+                    $pe.status              = $('.status');
+                    $pe.favorites_container = $('#favorites_container');
+                    $pe.terms               = $('#terms');
+                    $pe.img_size            = $('#img_size');
+                    $pe.window              = $(window);
+                    vars.win_width          = $pe.window.width();
+                    vars.win_height         = $pe.window.height();
                     $pe.window.on('resize', methods.resize_window);
-                    $pe.status = $('.status');
 
                     return base.each(function () {
 
@@ -238,7 +243,7 @@
                         $('#example')
                             .on('change', function () {
                                 var url = $(this).val();
-                                $('#terms').val(url)
+                                $pe.terms.val(url)
                                 $pe.keypress_detector.focus();
                             });
 
@@ -259,8 +264,6 @@
                                     methods.set_status('init', 'Slideshow cancelled. Press spacebar to load new images');
                                 }
                             });
-
-                        $pe.favorites_container = $('#favorites_container');
 
                         // Bind and listen to click event of favorite_controls.
                         $('#favorite_controls a')
@@ -323,7 +326,7 @@
 
                     var idx    = 0,
                         bg     = {},
-                        input  = $('#terms').val().toLowerCase(),
+                        input  = $pe.terms.val().toLowerCase(),
                         is_url = (input.indexOf('http://') >= 0 || input.indexOf('www') >= 0);
 
                     if ($('.loader').length === 0 && !vars.slideshow) {
@@ -368,7 +371,7 @@
                  * Responsible for calling the preload function and updating the
                  * UI with the results.
                  *
-                 * @param {object} data - Object literal containing image data
+                 * @param {object} data - Object literal containing image data.
                  * @param {jQuery} elem
                  */
                 set_bg: function (data, elem) {
@@ -496,13 +499,11 @@
                                 'Loaded image with dimensions: ' +
                                 img.width + ' x ' + img.height);
 
-                            var img_size = $('#img_size').val(),
-                                w = vars.win_width,
-                                h = vars.win_height;
+                            var w = vars.win_width, h = vars.win_height;
 
-                            if (img_size.indexOf('x') > 0) {
-                                w = img_size.split('x')[0];
-                                h = img_size.split('x')[1];
+                            if ($pe.img_size.val().indexOf('x') >= 0) {
+                                w = $pe.img_size.val().split('x')[0];
+                                h = $pe.img_size.val().split('x')[1];
                             }
 
                             // Filter out images that are too small for the current
