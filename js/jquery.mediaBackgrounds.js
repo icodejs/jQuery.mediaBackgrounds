@@ -204,8 +204,6 @@
                 interaction.view_favorites_show(container_config, function () {
                     interaction.view_favorites_button(btn_config);
                 });
-
-                console.log('state in view_favorites function: ', $pe.favorite_controls_view_button.data('state'));
             },
             view_favorites_button: function (obj) {
                 obj.element.data({state: obj.state});
