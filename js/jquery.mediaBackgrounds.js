@@ -142,7 +142,7 @@
         // Global interaction methods that work with jQuery elements.
         var interaction = {
             view_favorites: function (event, elem, target_elem) {
-                var state = elem.data('state') || 'closed'
+                var state = elem.data('state') || 'closed',
                     $icon = elem.find('i'),
                     speed = 750,
                     close = 'icon_state_close',
