@@ -547,23 +547,31 @@
                     $(new Image())
                         .hide()
                         .load(function () {
-                            var img = this;
+                            var img = this,
+                                img_w = img.width,
+                                img_h = img.height;
 
                             methods.set_status('preload_img',
                                 'Loaded image with dimensions: ' +
-                                img.width + ' x ' + img.height);
+                                img_w + ' x ' + img_h);
 
                             var w = vars.win_width, h = vars.win_height;
 
                             if ($pe.img_size.val().indexOf('x') >= 0) {
                                 w = $pe.img_size.val().split('x')[0];
                                 h = $pe.img_size.val().split('x')[1];
+                            } else {
+                                // CSS3 background-size:cover does a good job of
+                                // stretching images so allow images as much as
+                                // 50% smaller than current window size.
+                                img_w *= 1.5;
+                                img_h *= 1.5;
                             }
 
                             // Filter out images that are too small for the current
                             // window size or that are smaller than the minimum
                             // size specified by the user.
-                            if (img.width  < w || img.height < h) {
+                            if (img_w < w || img_h < h) {
                                 error = {
                                     func_name: 'preload_img',
                                     desc: 'image returned is too small'

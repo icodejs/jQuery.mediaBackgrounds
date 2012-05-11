@@ -81,6 +81,14 @@ label.checkbox {
     top:0;
     width:100%;
     height:100%;
+    background-color:transparent;
+    background-repeat: no-repeat;
+    background-position:center center;
+    background-attachment:fixed;
+    -webkit-background-size:cover;
+    -moz-background-size:cover;
+    -o-background-size:cover;
+    background-size:cover;
 }
 #content {
     position: absolute;
