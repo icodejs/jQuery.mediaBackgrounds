@@ -369,7 +369,7 @@
                 get_bg: function (elem) {
                     // Monitor the error being brought back for a url or keyword.
                     if (vars.errors.length > 10) {
-                        !$slideshow && $pe.body.find('.loader').fadeOut(1000, function () {
+                        !vars.slideshow && $pe.body.find('.loader').fadeOut(1000, function () {
                             $(this).remove();
                             vars.errors = [];
                         });
