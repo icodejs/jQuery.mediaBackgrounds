@@ -109,7 +109,7 @@
 
                                 $li.html($a).prependTo($ul).slideDown(1000);
 
-                                var height = $ul.height() + 165,
+                                var height = $ul.height() + 175,
                                     state = $pe.favorite_controls_view_button.data('state'),
                                     btn_config = {
                                         element: $pe.favorite_controls_view_button,
@@ -250,7 +250,14 @@
                     $pe.window              = $(window);
                     vars.win_width          = $pe.window.width();
                     vars.win_height         = $pe.window.height();
-                    $pe.window.on('resize', methods.resize_window);
+
+                    $pe.window
+                        .on('resize', methods.resize_window)
+                        .bind('beforeunload', function (e) {
+                            if ($pe.favorites_container.find('#favorites li').length > 0) {
+                                return 'You will loose your favorite images.';
+                            }
+                        });
 
                     return base.each(function () {
 
