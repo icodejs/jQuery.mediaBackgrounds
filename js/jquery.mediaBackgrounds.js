@@ -107,7 +107,7 @@
         }());
 
         // Global helper methods.
-        var helpers = {
+        var common = {
 
             /**
              * Add current image to favorites with the intention of saving them
@@ -116,7 +116,7 @@
              *
              * * @param {jQuery} elem.
              */
-            favorite: function (elem) {
+            add_favorite: function (elem) {
                 if (elem && elem.data('img_dims')) {
                     var img = elem.data('img_dims'),
                         thumb_width = 255,
@@ -132,9 +132,10 @@
                                     $rm_btn = $('<a class="remove" href="/"><i class="icon icon_x"></a>').on('click', interaction.remove_favorite_image),
                                     $li     = $('<li />').append($rm_btn).hide(),
                                     $a      = $('<a />').attr({href: img.url, target: '_blank'}).html($this),
-                                    height  = helpers.set_favorites_container_height($ul, thumb_height, $ul.find('li').length === 0),
-                                    state = $pe.favorite_show_hide.data('state'),
-                                    btn_config = {
+                                    height  = common.set_favorites_container_height($ul, thumb_height, $ul.find('li').length === 0),
+                                    state = $pe.favorite_show_hide.data('state');
+
+                                var btn_config = {
                                         element: $pe.favorite_show_hide,
                                         state: 'open',
                                         do_toggle: state === 'closed'
@@ -205,10 +206,10 @@
                     term = '';
 
                 if (st.length === 1) {
-                    return helpers.parse_search_term(st[idx]);
+                    return common.parse_search_term(st[idx]);
                 } else {
-                    idx = helpers.get_rnd_int(0, st.length -1);
-                    term = helpers.parse_search_term(st[idx]);
+                    idx = common.get_rnd_int(0, st.length -1);
+                    term = common.parse_search_term(st[idx]);
                     methods.set_status('get_rnd_term', 'search term: ' + term);
                     return term;
                 }
@@ -285,12 +286,16 @@
                         interaction.view_favorites(e, $pe.favorite_show_hide.data({state: 'closed'}), $favorites);
                     } else {
                         $pe.favorites_container
-                            .hide()
-                            .find('#favorites')
-                                .slideUp(1000)
-                                .removeAttr('style')
-                                .find('ul')
-                                    .remove();
+                            .slideUp(1000, function () {
+                                var $this = $(this)
+                                    .find('#favorites')
+                                        .slideUp(1000)
+                                        .removeAttr('style')
+                                        .find('ul')
+                                            .remove()
+                                        .end()
+                                    .end().hide();
+                            });
                     }
                 });
             }
@@ -356,11 +361,11 @@
                                 $pe.keypress_detector.focus();
 
                                 switch ($(this).attr('id').toLowerCase()) {
-                                    case 'fav':   helpers.favorite($pe.bg_container); break;
-                                    case 'save':  helpers.save($pe.bg_container); break;
-                                    case 'email': helpers.email($pe.bg_container); break;
-                                    case 'tweet': helpers.tweet($pe.bg_container); break;
-                                    case 'help':  helpers.help($pe.bg_container); break;
+                                    case 'fav':   common.add_favorite($pe.bg_container); break;
+                                    case 'save':  common.save($pe.bg_container); break;
+                                    case 'email': common.email($pe.bg_container); break;
+                                    case 'tweet': common.tweet($pe.bg_container); break;
+                                    case 'help':  common.help($pe.bg_container); break;
                                 }
                             });
 
@@ -478,7 +483,7 @@
                         if (is_url && i >= 0 && items[i] && items[i].images.length > 0) {
                             var images = items[i].images;
 
-                            idx = helpers.get_rnd_int(0, images.length -1);
+                            idx = common.get_rnd_int(0, images.length -1);
                             bg  = {url: images[idx].url};
 
                             methods.set_bg(bg, elem);
@@ -491,7 +496,7 @@
                                     return methods.set_status('get_bg', err);
                                 }
                                 if (images && images.length > 0) {
-                                    idx = helpers.get_rnd_int(0, images.length -1);
+                                    idx = common.get_rnd_int(0, images.length -1);
                                     bg  = {url: images[idx].url};
                                     methods.set_bg(bg, elem);
                                 }
@@ -551,11 +556,11 @@
                         url  = options.api_url + input;
                     } else {
                         url  = 'http://ajax.googleapis.com/ajax/services/search/images?v=1.0&q='
-                        url += (input.length > 0 ? helpers.parse_search_term(input) : helpers.get_rnd_term())
+                        url += (input.length > 0 ? common.parse_search_term(input) : common.get_rnd_term())
                         url += '&imgsz=xlarge|xxlarge|huge'                     // |huge (make this optional)
                         url += '&imgtype=photo'
                         url += '&rsz=8'                                         // max results per page
-                        url += '&start=' + helpers.get_rnd_int(1, 50);
+                        url += '&start=' + common.get_rnd_int(1, 50);
                     }
 
                     // Abort all ajax requests if any.
@@ -642,9 +647,9 @@
                             } else {
                                 // CSS3 background-size:cover does a good job of
                                 // stretching images so allow images as much as
-                                // 30% smaller than current window size.
-                                img_w *= 1.3;
-                                img_h *= 1.3;
+                                // 50% smaller than current window size.
+                                img_w *= 1.5;
+                                img_h *= 1.5;
                             }
 
                             // Filter out images that are too small for the current
