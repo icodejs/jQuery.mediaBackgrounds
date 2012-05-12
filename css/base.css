@@ -157,6 +157,9 @@ label.checkbox {
     box-shadow: 0 1px 2px rgba(0,0,0,.15);
     border-top:1px solid #ddd;
 }
+#favorites li a {
+    display:block;
+}
 #favorite_controls {
     margin-right:16px;
     padding:5px;
@@ -285,6 +288,11 @@ button.button:hover {
       -ms-transition: background-position 0.1s linear;
        -o-transition: background-position 0.1s linear;
           transition: background-position 0.1s linear;
+}
+.disabled {
+    background-color:#E7E7E7 !important;
+    /*background-image: none !important;*/
+    color:#C9C9C9 !important;
 }
 .icon {
     display: inline-block;

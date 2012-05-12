@@ -81,7 +81,25 @@
             win_height: 1024,
             interval_id: undefined,
             loading: false,
-            slideshow: false
+            ss_mode: false, // slideshow mode
+            max_container_height: 450
+        };
+
+        // Global jQuery page elements.
+        var $pe = {
+            bg_container: null,
+            body: null,
+            buttons: null,
+            controls_container: null,
+            favorites_container: null,
+            favorite_show_hide: null,
+            img_size: null,
+            keypress_detector: null,
+            ss_checkbox: null,
+            status: null,
+            terms: null,
+            window: null,
+            ws_dropdown: null
         };
 
         // Global helper methods.
@@ -96,23 +114,33 @@
              */
             favorite: function (elem) {
                 if (elem && elem.data('img_dims')) {
-                    var img = elem.data('img_dims');
+                    var img = elem.data('img_dims'),
+                        thumb_width = 255,
+                        thumb_height = 132;
 
                     if (!vars.favorites.contains(img.url, 'url')) {
                         $('<img />')
-                            .attr({src: img.url, width: 255, height: 132})
+                            .attr({src: img.url, width: thumb_width, height: thumb_height})
                             .load(function () {
-                                var $favs = $pe.favorites_container.find('#favorites'),
-                                    $ul   = $favs.find('ul')[0] ? $favs.find('ul') : $('<ul />').appendTo($favs),
-                                    $li   = $('<li />').hide(),
-                                    $a    = $('<a />').attr({href: img.url, target: '_blank'}).html($(this));
 
-                                $li.html($a).prependTo($ul).slideDown(1000);
+                                var $this  = $(this),
+                                    $favs  = $pe.favorites_container.find('#favorites'),
+                                    $ul    = $favs.find('ul')[0] ? $favs.find('ul') : $('<ul />').appendTo($favs),
+                                    $li    = $('<li />').hide(),
+                                    $a     = $('<a />').attr({href: img.url, target: '_blank'}).html($this),
+                                    height = (function () {
+                                        var $lis = $ul.find('li')
+                                            len = $lis.length + 1;
 
-                                var height = $ul.height() + 175,
-                                    state = $pe.favorite_controls_view_button.data('state'),
+                                        if ($lis.length) {
+                                            return ($lis.first().outerHeight(true) * len) + (len * 10);
+                                        } else {
+                                            return $ul.outerHeight(true) + thumb_height + 12;
+                                        }
+                                    }()),
+                                    state = $pe.favorite_show_hide.data('state'),
                                     btn_config = {
-                                        element: $pe.favorite_controls_view_button,
+                                        element: $pe.favorite_show_hide,
                                         state: 'open',
                                         do_toggle: state === 'closed'
                                     },
@@ -120,9 +148,11 @@
                                         element: $favs,
                                         state: state,
                                         overflow: 'auto',
-                                        height: height > 435 ? 435 : height,
+                                        height: height > vars.max_container_height ? vars.max_container_height : height,
                                         speed: 750
                                     };
+
+                                $li.html($a).prependTo($ul).slideDown(1000);
 
                                 interaction.view_favorites_show(container_config, function () {
                                     interaction.view_favorites_button(btn_config);
@@ -187,7 +217,7 @@
             view_favorites: function (event, elem, target_elem) {
                 var state      = elem.data('state'),
                     $icon      = elem.find('i'),
-                    height     = target_elem.find('ul').height() + 30,
+                    height     = target_elem.find('ul').outerHeight(true) + 10
                     btn_config = {
                         element: elem,
                         state: state === 'open' ? 'closed' : 'open',
@@ -197,7 +227,7 @@
                         element: target_elem,
                         state: btn_config.state,
                         overflow: state === 'open' ? 'hidden' : 'auto',
-                        height: state === 'open' ? 10 : height > 435 ? 435 : height,
+                        height: state === 'open' ? 10 : height > vars.max_container_height ? vars.max_container_height : height,
                         speed: 750
                     };
 
@@ -222,19 +252,6 @@
             }
         };
 
-        // Global jQuery page elements.
-        var $pe = {
-            bg_container: null,
-            body: null,
-            favorites_container: null,
-            favorite_controls_view_button: null,
-            img_size: null,
-            keypress_detector: null,
-            status: null,
-            terms: null,
-            window: null
-        };
-
         // Base plugin methods.
         var base = this,
             methods = {
@@ -243,10 +260,15 @@
                  * Initialisation function that does most of the heavy lifting.
                  */
                 init: function () {
+                    $pe.controls_container  = $('#controls');
                     $pe.status              = $('.status');
                     $pe.favorites_container = $('#favorites_container');
                     $pe.terms               = $('#terms');
                     $pe.img_size            = $('#img_size');
+                    $pe.buttons             = $('.button');
+                    $pe.ws_dropdown         = $('#wallpapers_sites');
+                    $pe.ss_checkbox         = $('#slideshow');
+                    $pe.favorite_show_hide  = $('#favorite_controls a');
                     $pe.window              = $(window);
                     vars.win_width          = $pe.window.width();
                     vars.win_height         = $pe.window.height();
@@ -284,7 +306,7 @@
 
                         // Bind and listen to all button click events and handle
                         // them accordingly.
-                        $('.button')
+                        $pe.buttons
                             .on('click', function (e) {
                                 e.preventDefault();
                                 $pe.keypress_detector.focus();
@@ -298,35 +320,42 @@
                                 }
                             });
 
-                        // Bind and listen to the change event of the #example
+                        // Bind and listen to the change event of the #wallpapers_sites
                         // drp and update the search textbox.
-                        $('#example')
+                        $pe.ws_dropdown
                             .on('change', function () {
                                 var url = $(this).val();
-                                $pe.terms.val(url)
+                                url.toLowerCase() !== 'none' && $pe.terms.val(url)
                                 $pe.keypress_detector.focus();
                             });
 
                         // Bind and listen to the change event of the slideshow checkbox
-                        // and initialise the image slide show based on the current
-                        // cache or search terms.
-                        $('#slideshow')
+                        // and initialise the image slide show based on the current cache
+                        // or search terms.
+                        $pe.ss_checkbox
                             .on('change', function () {
-                                vars.slideshow = $(this).attr('checked') ? true : false;
+                                var $inputs = $pe.controls_container.find('input, select, button').not('#slideshow, #fav');
 
-                                if (vars.slideshow) {
-                                     vars.interval_id = setInterval(function () {
+                                vars.ss_mode = $(this).attr('checked') ? true : false;
+
+                                if (vars.ss_mode) {
+                                    vars.interval_id = setInterval(function () {
                                         ($.xhrPool.length === 0 && !vars.loading) && methods.update_ui($pe.bg_container)
-                                     }, options.interval);
-                                    methods.set_status('init', 'Slideshow mode. A new image will load in shortly');
+                                    }, options.interval);
+
+                                    $inputs.attr({disabled: 'disabled'}).addClass('disabled');
+                                    methods.set_status('init', 'Slideshow mode. A new image will load in approximately ' + (options.interval / 1000) + ' seconds.');
                                 } else {
                                     clearInterval(vars.interval_id);
-                                    methods.set_status('init', 'Slideshow cancelled. Press spacebar to load new images');
+
+                                    $inputs.removeAttr('disabled').removeClass('disabled');
+                                    methods.set_status('init', 'Slideshow cancelled. Press the spacebar to load new images.');
                                 }
+                                console.log($inputs);
                             });
 
                         // Bind and listen to click event of favorite_controls.
-                        $pe.favorite_controls_view_button = $('#favorite_controls a')
+                        $pe.favorite_show_hide
                             .on('click', function (e) {
                                 e.preventDefault();
                                 interaction.view_favorites(e, $(this), $('#favorites'))
@@ -342,7 +371,7 @@
                             .focus()
                             .on('keypress', function (e) {
                                 e.preventDefault();
-                                if (e.which === 32 && !vars.slideshow) {
+                                if (e.which === 32 && !vars.ss_mode) {
                                     var now = new Date().getTime();
 
                                     // stop user from sending too many http requests
@@ -376,7 +405,7 @@
                 get_bg: function (elem) {
                     // Monitor the error being brought back for a url or keyword.
                     if (vars.errors.length > 10) {
-                        !vars.slideshow && $pe.body.find('.loader').fadeOut(1000, function () {
+                        !vars.ss_mode && $pe.body.find('.loader').fadeOut(1000, function () {
                             $(this).remove();
                             vars.errors = [];
                         });
@@ -390,7 +419,7 @@
                         input  = $pe.terms.val().toLowerCase(),
                         is_url = (input.indexOf('http://') >= 0 || input.indexOf('www') >= 0);
 
-                    if ($('.loader').length === 0 && !vars.slideshow) {
+                    if ($('.loader').length === 0 && !vars.ss_mode) {
                         $('<div />')
                             .hide()
                             .addClass('loader')
@@ -570,9 +599,9 @@
                             } else {
                                 // CSS3 background-size:cover does a good job of
                                 // stretching images so allow images as much as
-                                // 50% smaller than current window size.
-                                img_w *= 1.5;
-                                img_h *= 1.5;
+                                // 30% smaller than current window size.
+                                img_w *= 1.3;
+                                img_h *= 1.3;
                             }
 
                             // Filter out images that are too small for the current
@@ -590,7 +619,7 @@
                             setTimeout(function () {
                                 var obj = {width: img.width, height: img.height, url: src_url};
 
-                                if (!vars.slideshow) {
+                                if (!vars.ss_mode) {
                                     $pe.body.find('.loader').fadeOut(1000, function () {
                                         $(this).remove();
                                         vars.loading = false;
