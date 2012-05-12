@@ -351,7 +351,6 @@
                                     $inputs.removeAttr('disabled').removeClass('disabled');
                                     methods.set_status('init', 'Slideshow cancelled. Press the spacebar to load new images.');
                                 }
-                                console.log($inputs);
                             });
 
                         // Bind and listen to click event of favorite_controls.
