@@ -12,52 +12,6 @@
 ;(function($, window, document, undefined) {
 
     /**
-     * Monkey patch Array object with a custom contains method
-     * (may need check if string and use toLowerCase()).
-     */
-    (function () {
-        if (typeof Array.prototype.contains  !== 'function') {
-            Array.prototype.contains = function (needle, prop) {
-                var i = this.length;
-                while (i--) {
-                    if (prop) {
-                        if (this[i][prop] === needle) return true;
-                    } else {
-                        if (this[i] === needle) return true;
-                    }
-                }
-                return false;
-            }
-        }
-    }());
-
-    /**
-     * jQuery global function that keep a record of all ajax requests and
-     * provide a handly way of aborting them all at any given time.
-     */
-    (function () {
-        $.xhrPool = [];
-        $.xhrPool.abortAll = function () {
-            $(this).each(function (idx, jqXHR) {
-                jqXHR.abort();
-            });
-            $.xhrPool.length = 0;
-        };
-
-        $.ajaxSetup({
-            beforeSend: function (jqXHR) {
-                $.xhrPool.push(jqXHR);
-            },
-            complete: function (jqXHR) {
-                var index = $.xhrPool.indexOf(jqXHR);
-                if (index > -1) {
-                    $.xhrPool.splice(index, 1);
-                }
-            }
-        });
-    }());
-
-    /**
      * jQuery mediaBackgrounds plugin that ajax load images from external web
      * pages via a custom node.js REST API.
      *
@@ -65,7 +19,7 @@
      */
     $.fn.mediaBackgrounds = function (custom_options) {
 
-        // Global variables.
+       // Global variables.
         var vars = {
             timer: {
                 prev_req: 0,
@@ -102,6 +56,56 @@
             ws_dropdown: null
         };
 
+        /**
+         * Monkey patch Array object with a custom contains method
+         * (may need check if string and use toLowerCase()).
+         */
+        (function () {
+            if (typeof Array.prototype.contains  !== 'function') {
+                Array.prototype.contains = function (needle, prop) {
+                    var i = this.length;
+                    while (i--) {
+                        if (prop) {
+                            if (this[i][prop] === needle) return true;
+                        } else {
+                            if (this[i] === needle) return true;
+                        }
+                    }
+                    return false;
+                }
+            }
+        }());
+
+        /**
+         * jQuery global function that keep a record of all ajax requests and
+         * provide a handly way of aborting them all at any given time.
+         */
+        (function () {
+            $.xhrPool = [];
+            $.xhrPool.abortAll = function () {
+                $(this).each(function (idx, jqXHR) {
+                    jqXHR.abort();
+                });
+                $.xhrPool.length = 0;
+            };
+
+            $.ajaxSetup({
+                beforeSend: function (jqXHR) {
+                    $.xhrPool.push(jqXHR);
+                },
+                complete: function (jqXHR) {
+                    var index = $.xhrPool.indexOf(jqXHR);
+                    if (index > -1) {
+                        $.xhrPool.splice(index, 1);
+                    }
+                }
+            });
+
+            $.fn.css_attr_val = function(property) {
+                return parseInt(this.css(property).slice(0,-2));
+            };
+        }());
+
         // Global helper methods.
         var helpers = {
 
@@ -122,22 +126,13 @@
                         $('<img />')
                             .attr({src: img.url, width: thumb_width, height: thumb_height})
                             .load(function () {
-
-                                var $this  = $(this),
-                                    $favs  = $pe.favorites_container.find('#favorites'),
-                                    $ul    = $favs.find('ul')[0] ? $favs.find('ul') : $('<ul />').appendTo($favs),
-                                    $li    = $('<li />').html('<a class="remove" href="/"><i class="icon icon_x"></a>').hide(),
-                                    $a     = $('<a />').attr({href: img.url, target: '_blank'}).html($this),
-                                    height = (function () {
-                                        var $lis = $ul.find('li')
-                                            len = $lis.length + 1;
-
-                                        if ($lis.length) {
-                                            return ($lis.first().outerHeight(true) * len) + (len * 10);
-                                        } else {
-                                            return $ul.outerHeight(true) + thumb_height + 12;
-                                        }
-                                    }()),
+                                var $this   = $(this),
+                                    $favs   = $pe.favorites_container.find('#favorites'),
+                                    $ul     = $favs.find('ul')[0] ? $favs.find('ul') : $('<ul />').appendTo($favs),
+                                    $rm_btn = $('<a class="remove" href="/"><i class="icon icon_x"></a>').on('click', interaction.remove_favorite_image),
+                                    $li     = $('<li />').append($rm_btn).hide(),
+                                    $a      = $('<a />').attr({href: img.url, target: '_blank'}).html($this),
+                                    height  = helpers.set_favorites_container_height($ul, thumb_height, $ul.find('li').length === 0),
                                     state = $pe.favorite_show_hide.data('state'),
                                     btn_config = {
                                         element: $pe.favorite_show_hide,
@@ -156,17 +151,31 @@
 
                                 interaction.view_favorites_show(container_config, function () {
                                     interaction.view_favorites_button(btn_config);
+                                    $pe.keypress_detector.focus();
+                                    vars.favorites.push(img);
+                                    methods.set_status('save', vars.favorites.length +
+                                            ' image(s) saved in your favorites!', vars.favorites.length);
                                 });
 
-                                $pe.favorites_container.attr('style') === 'display:none;' &&
+                                var style = $pe.favorites_container.attr('style').replace(' ', '');
+
+                                style.indexOf('display:none;') >= 0 &&
                                     $pe.favorites_container.fadeIn();
-
-                                vars.favorites.push(img);
-
-                                methods.set_status('save', vars.favorites.length +
-                                        ' image(s) saved in your favorites!', vars.favorites.length);
                             });
                     }
+                }
+            },
+            set_favorites_container_height: function (container, single_thumb_height, is_new) {
+                var $lis = container.find('li')
+                    len = $lis.length + 1;
+
+                if ($lis.length) {
+                    var margin = $lis.css_attr_val('margin-bottom');
+                    return ($lis.first().outerHeight(true) * len) + (len * margin);
+                } else if (is_new) {
+                    return container.outerHeight(true) + single_thumb_height + 12; // hack
+                } else {
+                    return 0;
                 }
             },
             email: function () {
@@ -250,11 +259,40 @@
                     callback();
                 });
             },
-            remove_favorite_image: function (elem) {
-                var $parent_li = elem.closest('li');
+            remove_favorite_image: function (e) {
+                e.preventDefault();
+                var $parent_li = $(this).closest('li');
+
                 $parent_li.slideUp(1000, function () {
-                    $(this).remove();
-                })
+                    var i,
+                        len,
+                        img,
+                        $this = $(this)
+                        src = $parent_li.find('img').attr('src'),
+                        $siblings = $this.siblings(),
+                        $favorites = $pe.favorites_container.find('#favorites');
+
+                    $this.remove();
+
+                    for (i = 0, len = vars.favorites.length; i < len; i += 1) {
+                        if (vars.favorites[i].url.toLowerCase() === src.toLowerCase()) {
+                            img = vars.favorites.splice(i, 1);
+                            break;
+                        }
+                    }
+
+                    if ($siblings.length) {
+                        interaction.view_favorites(e, $pe.favorite_show_hide.data({state: 'closed'}), $favorites);
+                    } else {
+                        $pe.favorites_container
+                            .hide()
+                            .find('#favorites')
+                                .slideUp(1000)
+                                .removeAttr('style')
+                                .find('ul')
+                                    .remove();
+                    }
+                });
             }
         };
 
@@ -365,17 +403,7 @@
                                 e.preventDefault();
                                 interaction.view_favorites(e, $(this), $('#favorites'))
                             })
-                            .data({state: 'closed'});;
-
-                            console.log($('#favorites li a.remove'));
-
-                        // this need to be done with some kind of late binding function
-                        // $('#favorites li a.remove')
-                        //     .on('click', function (e) {
-                        //         e.preventDefault();
-                        //         console.log('hello');
-                        //         interaction.remove_favorite_image($(this));
-                        //     });
+                            .data({state: 'closed'});
 
                         // Hack (fix asap). Create and input element and bind
                         // a keypress event handler. Perform certain actions
