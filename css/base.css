@@ -3,7 +3,7 @@ html {
     -webkit-text-size-adjust: 100%;
     -ms-text-size-adjust: 100%;
 }
-body, .loader, .status, #controls, #favorites, #favorite_controls {
+body, .loader, .status, #controls, #favorites, #favorite_controls, #favorites li a.remove {
     background: url("../img/bg-grey.jpg") repeat scroll 0 0 transparent;
 }
 body {
@@ -150,15 +150,32 @@ label.checkbox {
 }
 #favorites li {
     height:132px;
-    background-color:#333;
+    width: 255px;
     margin-bottom:10px;
     -webkit-box-shadow: 0 1px 2px rgba(0,0,0,.3);
     -moz-box-shadow: 0 1px 2px rgba(0,0,0,.3);
     box-shadow: 0 1px 2px rgba(0,0,0,.3);
     border-top:1px solid #ddd;
+    position:relative;
 }
 #favorites li a {
     display:block;
+}
+#favorites li a.remove {
+    position:absolute;
+    width:15px;
+    height:15px;
+    line-height:15px;
+    padding:5px;
+    right:5px;
+    top:5px;
+    text-align:center;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    -webkit-box-shadow: 0 1px 2px rgba(0,0,0,.15);
+    -moz-box-shadow: 0 1px 2px rgba(0,0,0,.15);
+    box-shadow: 0 1px 2px rgba(0,0,0,.15);
 }
 #favorite_controls {
     margin-right:16px;
@@ -275,6 +292,10 @@ button.button {
     font-size: 13px;
     line-height: 18px;
 }
+#favorites li a.remove:hover {
+    background-image: none;
+    background-color: #C5C3C3;
+}
 button.button:hover {
   color: #333333;
   text-decoration: none;
@@ -324,6 +345,9 @@ button.button:hover {
 }
 .icon_state_close {
     background-position: -288px -120px;
+}
+.icon_x {
+    background-position: -312px 0;
 }
 #favorite_controls a.state .icon {
     position:absolute;

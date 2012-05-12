@@ -126,7 +126,7 @@
                                 var $this  = $(this),
                                     $favs  = $pe.favorites_container.find('#favorites'),
                                     $ul    = $favs.find('ul')[0] ? $favs.find('ul') : $('<ul />').appendTo($favs),
-                                    $li    = $('<li />').hide(),
+                                    $li    = $('<li />').html('<a class="remove" href="/"><i class="icon icon_x"></a>').hide(),
                                     $a     = $('<a />').attr({href: img.url, target: '_blank'}).html($this),
                                     height = (function () {
                                         var $lis = $ul.find('li')
@@ -152,7 +152,7 @@
                                         speed: 750
                                     };
 
-                                $li.html($a).prependTo($ul).slideDown(1000);
+                                $li.prepend($a).prependTo($ul).slideDown(1000);
 
                                 interaction.view_favorites_show(container_config, function () {
                                     interaction.view_favorites_button(btn_config);
@@ -249,6 +249,12 @@
                     $(this).css({overflow: obj.overflow});
                     callback();
                 });
+            },
+            remove_favorite_image: function (elem) {
+                var $parent_li = elem.closest('li');
+                $parent_li.slideUp(1000, function () {
+                    $(this).remove();
+                })
             }
         };
 
@@ -360,6 +366,16 @@
                                 interaction.view_favorites(e, $(this), $('#favorites'))
                             })
                             .data({state: 'closed'});;
+
+                            console.log($('#favorites li a.remove'));
+
+                        // this need to be done with some kind of late binding function
+                        // $('#favorites li a.remove')
+                        //     .on('click', function (e) {
+                        //         e.preventDefault();
+                        //         console.log('hello');
+                        //         interaction.remove_favorite_image($(this));
+                        //     });
 
                         // Hack (fix asap). Create and input element and bind
                         // a keypress event handler. Perform certain actions
