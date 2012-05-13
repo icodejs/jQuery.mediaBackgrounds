@@ -27,11 +27,6 @@
                     diff_ms: 0,
                     elaps: 0,
                     interval_id: -1
-                },
-                loading: {
-                    start: 0,
-                    elaps: 0,
-                    interval_id: -1
                 }
             },
             errors: [],
@@ -226,6 +221,44 @@
             },
             get_rnd_int: function (min, max)  {
                 return Math.floor(Math.random() * (max - min + 1)) + min;
+            },
+            loading: {
+                start_time: 0,
+                elaps: 0,
+                interval_id: -1,
+                begin: function () {
+                    if (common.loading.start_time > 0) {
+                        return true;
+                    } else if (common.loading.start_time === 0) {
+                        common.loading.start_time = new Date().getTime();
+                        //console.log('Start');
+                    }
+
+                    common.loading.interval_id = setInterval(function () {
+                        var now = new Date().getTime();
+                        var elaps = (now - common.loading.start_time) / 1000;
+
+                        if (elaps > 10) {
+                            return common.loading.reset(true);
+                        }
+
+                        //console.log('elaps', elaps);
+                    }, 2000);
+                },
+                reset: function (ui) {
+                    if (ui) {
+                        //console.log('fatal error! Clear UI and abort any oustanding ajax requests.');
+                        $.xhrPool.length > 0 && $.xhrPool.abortAll();
+                        methods.update_ui($pe.bg_container);
+                    }
+
+                    //console.log('timer cancelled');
+                    common.loading.start_time = 0;
+                    return clearInterval(common.loading.interval_id);
+                },
+                active: function () {
+                    return common.loading.start_time > 0;
+                }
             }
         };
 
@@ -439,7 +472,6 @@
                                         if (vars.timers.request.elaps >= 2) {
                                             vars.timers.request.prev_req = now;
                                         } else {
-                                            //debug('init keypress time check', ['please wait', vars.timers.request.elaps]);
                                             return;
                                         }
                                     }
@@ -483,6 +515,8 @@
                             .fadeIn();
                     }
 
+                    common.loading.begin();
+
                     // Check cache. If callback returns cached item index? Do stuff!
                     methods.check_cache(input, function (i) {
                         var items = vars.cache.items;
@@ -500,6 +534,7 @@
 
                             methods.get_json(is_url, input, function (err, images) {
                                 if (err) {
+                                    vars.errors.push(err);
                                     return methods.set_status('get_bg', err);
                                 }
                                 if (images && images.length > 0) {
@@ -526,6 +561,7 @@
                             var old_bg_containers = $('.bg_container');
 
                             if (err) {
+                                vars.errors.push(err);
                                 return methods.get_bg(elem);
                             }
 
@@ -577,7 +613,7 @@
                         url: url,
                         dataType: 'jsonp',
                         error: function (jqXHR, textStatus, errorThrown) {
-                             return vars.errors.push({
+                            return callback({
                                 func_name: 'get_json',
                                 desc: textStatus,
                                 data: errorThrown
@@ -587,12 +623,11 @@
                         if (status === 'success') {
                             try {
                                 if (data.error) {
-                                    vars.errors.push({
+                                    return callback({
                                         func_name: 'get_json',
                                         desc: data.error,
                                         data: data
                                     });
-                                    return callback(data.error);
                                 }
 
                                 // replace this logic with a custom function that can be passed in for each api
@@ -605,17 +640,15 @@
                                     if (results.length) {
                                         return callback(null, results);
                                     } else {
-                                        return callback('no results');
+                                        return callback({desc: 'no results'});
                                     }
                                 }
                             } catch (e) {
-                                var error = {
+                                return callback({
                                     func_name: 'get_json',
                                     desc: e.toString(),
                                     data: e
-                                };
-                                vars.errors.push(error);
-                                return callback(error);
+                                });
                             }
                         }
                     });
@@ -630,7 +663,6 @@
                  * @param {function} callback - Callback method for results.
                  */
                 preload_img: function (src_url, delay, callback) {
-                    var err;
                     vars.is_loading = true;
                     $pe.body.find('img.preloaded').remove();                    // remove this for now but in future we might hide it
 
@@ -663,12 +695,10 @@
                             // window size or that are smaller than the minimum
                             // size specified by the user.
                             if (img_w < w || img_h < h) {
-                                error = {
+                                return callback({
                                     func_name: 'preload_img',
                                     desc: 'image returned is too small'
-                                };
-                                vars.errors.push(error);
-                                return callback(error);
+                                });
                             }
 
                             setTimeout(function () {
@@ -684,21 +714,20 @@
                                     vars.is_loading = false;
                                     callback(null, obj);
                                 }
+                                common.loading.reset();
+
                             }, delay);
                         })
                         .addClass('preloaded')
                         .attr('src', src_url)
                         .prependTo('body')
                         .error(function (e) {
-                            error = {
+                            methods.set_status('preload_img', '404 (Not Found)');
+                            return callback({
                                 func_name: 'preload_img',
                                 desc: '404 (Not Found)',
                                 data: e
-                            };
-                            vars.errors.push(error);
-
-                            methods.set_status('preload_img', error.desc);
-                            return callback(error);
+                            });
                         }); // end JQ new Image
                 },
 
@@ -713,12 +742,6 @@
 
                     $pe.bg_container.css({'height': vars.win_height});
                     $pe.body.css({'height': vars.win_height});
-
-                    // debug('resize_window', [
-                    //     'window dimensions: ' +
-                    //     vars.win_width + ' x ' +
-                    //     vars.win_height
-                    // ]);
                 },
                 update_ui: function (elem) {
                     elem && methods.get_bg(elem);
@@ -786,18 +809,6 @@
 
         // initialise plugin
         methods.init();
-
-        function debug(context, lines, data) {
-            console.log('');
-            console.log('+++++++ ' + context + ' +++++++');
-
-            for (var i = 0; i < lines.length; i += 1) {
-                console.log(lines[i]);
-                data && console.log(data);
-                console.log('------------------------------');
-                console.log('');
-            }
-        }
 
     }
 
