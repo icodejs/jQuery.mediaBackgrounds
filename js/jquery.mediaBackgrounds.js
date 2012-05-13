@@ -238,7 +238,7 @@
                         var now = new Date().getTime();
                         var elaps = (now - common.loading.start_time) / 1000;
 
-                        if (elaps > 10) {
+                        if (elaps > 20) {
                             return common.loading.reset(true);
                         }
 
