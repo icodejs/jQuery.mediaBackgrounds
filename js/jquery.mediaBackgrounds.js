@@ -21,10 +21,18 @@
 
        // Global variables.
         var vars = {
-            timer: {
-                prev_req: 0,
-                diff_ms: 0,
-                elaps: 0
+            timers: {
+                request: {
+                    prev_req: 0,
+                    diff_ms: 0,
+                    elaps: 0,
+                    interval_id: -1
+                },
+                loading: {
+                    start: 0,
+                    elaps: 0,
+                    interval_id: -1
+                }
             },
             errors: [],
             cache: {
@@ -33,8 +41,7 @@
             favorites: [],
             win_width: 1024,
             win_height: 1024,
-            interval_id: undefined,
-            loading: false,
+            is_loading: false,
             ss_mode: false, // slideshow mode
             max_container_height: 450
         };
@@ -324,7 +331,7 @@
 
                     $pe.window
                         .on('resize', methods.resize_window)
-                        .bind('beforeunload', function (e) {
+                        .on('beforeunload', function (e) {
                             if ($pe.favorites_container.find('#favorites li').length > 0) {
                                 return 'You will loose your favorite images.';
                             }
@@ -333,7 +340,7 @@
                     return base.each(function () {
 
                         // disable right click
-                        $('*').bind('contextmenu', function () { return false });
+                        $('*').on('contextmenu', function () { return false });
 
                         // Bind and listen to bodyonclick events. Set focus to
                         // $pe.keypress_detector. This will allow me to listen
@@ -388,14 +395,14 @@
                                 vars.ss_mode = $(this).attr('checked') ? true : false;
 
                                 if (vars.ss_mode) {
-                                    vars.interval_id = setInterval(function () {
+                                    vars.timers.request.interval_id = setInterval(function () {
                                         ($.xhrPool.length === 0 && !vars.loading) && methods.update_ui($pe.bg_container)
                                     }, options.interval);
 
                                     $inputs.attr({disabled: 'disabled'}).addClass('disabled');
                                     methods.set_status('init', 'Slideshow mode. A new image will load in approximately ' + (options.interval / 1000) + ' seconds.');
                                 } else {
-                                    clearInterval(vars.interval_id);
+                                    clearInterval(vars.timers.request.interval_id);
 
                                     $inputs.removeAttr('disabled').removeClass('disabled');
                                     methods.set_status('init', 'Slideshow cancelled. Press the spacebar to load new images.');
@@ -423,16 +430,16 @@
                                     var now = new Date().getTime();
 
                                     // stop user from sending too many http requests
-                                    if (vars.timer.prev_req === 0) {
-                                        vars.timer.prev_req = now;
+                                    if (vars.timers.request.prev_req === 0) {
+                                        vars.timers.request.prev_req = now;
                                     } else {
-                                        vars.timer.diff_ms = now - vars.timer.prev_req;
-                                        vars.timer.elaps   = vars.timer.diff_ms / 1000;
+                                        vars.timers.request.diff_ms = now - vars.timers.request.prev_req;
+                                        vars.timers.request.elaps   = vars.timers.request.diff_ms / 1000;
 
-                                        if (vars.timer.elaps >= 2) {
-                                            vars.timer.prev_req = now;
+                                        if (vars.timers.request.elaps >= 2) {
+                                            vars.timers.request.prev_req = now;
                                         } else {
-                                            //debug('init keypress time check', ['please wait', vars.timer.elaps]);
+                                            //debug('init keypress time check', ['please wait', vars.timers.request.elaps]);
                                             return;
                                         }
                                     }
@@ -624,7 +631,7 @@
                  */
                 preload_img: function (src_url, delay, callback) {
                     var err;
-                    vars.loading = true;
+                    vars.is_loading = true;
                     $pe.body.find('img.preloaded').remove();                    // remove this for now but in future we might hide it
 
                     // Load image, hide it, add to the pages.
@@ -670,11 +677,11 @@
                                 if (!vars.ss_mode) {
                                     $pe.body.find('.loader').fadeOut(1000, function () {
                                         $(this).remove();
-                                        vars.loading = false;
+                                        vars.is_loading = false;
                                         callback(null, obj);
                                     });
                                 } else {
-                                    vars.loading = false;
+                                    vars.is_loading = false;
                                     callback(null, obj);
                                 }
                             }, delay);
