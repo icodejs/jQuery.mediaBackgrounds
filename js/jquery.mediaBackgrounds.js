@@ -10,6 +10,7 @@
  */
 
 ;(function($, window, document, undefined) {
+    "use strict";
 
     /**
      * jQuery mediaBackgrounds plugin that ajax load images from external web
@@ -68,13 +69,13 @@
                     var i = this.length;
                     while (i--) {
                         if (prop) {
-                            if (this[i][prop] === needle) return true;
+                            if (this[i][prop] === needle) { return true; }
                         } else {
-                            if (this[i] === needle) return true;
+                            if (this[i] === needle) { return true; }
                         }
                     }
                     return false;
-                }
+                };
             }
         }());
 
@@ -104,7 +105,7 @@
             });
 
             $.fn.css_attr_val = function(property) {
-                return parseInt(this.css(property).slice(0,-2));
+                return parseInt(this.css(property).slice(0,-2), 10);
             };
         }());
 
@@ -169,7 +170,7 @@
                 }
             },
             set_favorites_container_height: function (container, single_thumb_height, is_new) {
-                var $lis = container.find('li')
+                var $lis = container.find('li'),
                     len = $lis.length + 1;
 
                 if ($lis.length) {
@@ -267,7 +268,7 @@
             view_favorites: function (event, elem, target_elem) {
                 var state      = elem.data('state'),
                     $icon      = elem.find('i'),
-                    height     = target_elem.find('ul').outerHeight(true) + 10
+                    height     = target_elem.find('ul').outerHeight(true) + 10,
                     btn_config = {
                         element: elem,
                         state: state === 'open' ? 'closed' : 'open',
@@ -308,7 +309,7 @@
                     var i,
                         len,
                         img,
-                        $this = $(this)
+                        $this = $(this),
                         src = $parent_li.find('img').attr('src'),
                         $siblings = $this.siblings(),
                         $favorites = $pe.favorites_container.find('#favorites');
@@ -373,7 +374,7 @@
                     return base.each(function () {
 
                         // disable right click
-                        $('*').on('contextmenu', function () { return false });
+                        $('*').on('contextmenu', function () { return false; });
 
                         // Bind and listen to bodyonclick events. Set focus to
                         // $pe.keypress_detector. This will allow me to listen
@@ -414,7 +415,8 @@
                         $pe.ws_dropdown
                             .on('change', function () {
                                 var url = $(this).val();
-                                url.toLowerCase() !== 'none' && $pe.terms.val(url)
+
+                                url.toLowerCase() !== 'none' && $pe.terms.val(url);
                                 $pe.keypress_detector.focus();
                             });
 
@@ -429,7 +431,7 @@
 
                                 if (vars.ss_mode) {
                                     vars.timers.request.interval_id = setInterval(function () {
-                                        ($.xhrPool.length === 0 && !vars.loading) && methods.update_ui($pe.bg_container)
+                                        ($.xhrPool.length === 0 && !vars.loading) && methods.update_ui($pe.bg_container);
                                     }, options.interval);
 
                                     $inputs.attr({disabled: 'disabled'}).addClass('disabled');
@@ -446,7 +448,7 @@
                         $pe.favorite_show_hide
                             .on('click', function (e) {
                                 e.preventDefault();
-                                interaction.view_favorites(e, $(this), $('#favorites'))
+                                interaction.view_favorites(e, $(this), $('#favorites'));
                             })
                             .data({state: 'closed'});
 
@@ -595,14 +597,16 @@
                  * @param {function} callback - Callback method for results.
                  */
                 get_json: function (is_url, input, callback) {
+                    var url = '';
+
                     if (options.api_url.length > 0 && is_url) {
                         url  = options.api_url + input;
                     } else {
-                        url  = 'http://ajax.googleapis.com/ajax/services/search/images?v=1.0&q='
-                        url += (input.length > 0 ? common.parse_search_term(input) : common.get_rnd_term())
-                        url += '&imgsz=xlarge|xxlarge|huge'                     // |huge (make this optional)
-                        url += '&imgtype=photo'
-                        url += '&rsz=8'                                         // max results per page
+                        url  = 'http://ajax.googleapis.com/ajax/services/search/images?v=1.0&q=';
+                        url += (input.length > 0 ? common.parse_search_term(input) : common.get_rnd_term());
+                        url += '&imgsz=xlarge|xxlarge|huge';                     // |huge (make this optional)
+                        url += '&imgtype=photo';
+                        url += '&rsz=8';                                         // max results per page
                         url += '&start=' + common.get_rnd_int(1, 50);
                     }
 
@@ -777,23 +781,22 @@
                  * @param {object} data - Extra data that may be of use at a later date.
                  */
                 set_status: function (type, status, data) {
+                    var s = status;
+                        s += (type === 'save' ? ' <a href="#" id="view" class="button">view</a>' : '');
+                        s += ' ...';
+
                     $pe.status
                         .find('div')
                             .fadeOut()
                             .end()
                         .html('')
-                        .append($('<div>'
-                                    + status
-                                    + (type === 'save' ? ' <a href="#" id="view" class="button">view</a>' : '')
-                                    + ' ...'
-                                + '</div>')
-                        .fadeIn(1000))
+                        .append($('<div>' + s + '</div>').fadeIn(1000))
                         .fadeIn();
                 },
                 destroy: function () {
                     return base.each(function () {
                         // ...
-                    })
+                    });
                 }
             },
             options = $.extend({
@@ -810,6 +813,6 @@
         // initialise plugin
         methods.init();
 
-    }
+    };
 
 } (jQuery, window, document));
