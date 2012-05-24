@@ -1,149 +1,158 @@
 <!DOCTYPE html>
-<html lang="en">
+<title>Media Backgrounds - jQuery Plugin</title>
+<link rel="stylesheet" type="text/css" href="css/reset.css">
+<link rel="stylesheet" type="text/css" href="css/base.css">
+<!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js lt-ie9 lt-ie8" lang="en"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js lt-ie9" lang="en"> <![endif]-->
+<!-- Consider adding a manifest.appcache: h5bp.com/d/Offline -->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
 <head>
-    <title>Media Backgrounds - jQuery Plugin</title>
-    <link rel="stylesheet" type="text/css" href="css/reset.css">
-    <link rel="stylesheet" type="text/css" href="css/base.css">
-    <!--[if IE]>
-    <link rel="stylesheet" type="text/css" href="css/ie.css">
-    <![endif]-->
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Media Background</title>
+  <!-- Mobile viewport optimized: h5bp.com/viewport -->
+  <meta name="viewport" content="width=device-width">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/libs/modernizr-2.5.3.min.js"></script>
 </head>
 <body>
-    <a href="https://github.com/icodejs/jQuery.mediaBackgrounds" target="_blank">
-        <img style="position: absolute; top: 0; left: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_left_orange_ff7600.png" alt="Fork me on GitHub">
-    </a>
-    <div id="content">
-        <form>
-            <div id="controls">
-                <input type="text" class="textbox" id="terms" placeholder="Enter a url or keyword(s)">
-                <select id="img_size" class="textbox dropdownlist">
-                    <option>Minimum size</option>
-                    <option>320x480</option>
-                    <option>640x480</option>
-                    <option>800x480</option>
-                    <option>800x600</option>
-                    <option>1024x768</option>
-                    <option>1024x1024</option>
-                    <option>1152x864</option>
-                    <option>1280x720</option>
-                    <option>1280x800</option>
-                    <option>1280x960</option>
-                    <option>1280x1024</option>
-                    <option>1360x768</option>
-                    <option>1366x768</option>
-                    <option>1440x900</option>
-                    <option>1440x1050</option>
-                    <option>1600x1200</option>
-                    <option>1680x1050</option>
-                    <option>1680x1200</option>
-                    <option>1920x1080</option>
-                </select>
+  <!--[if lt IE 7]><p class=chromeframe>Your browser is <em>ancient!</em> <a href="http://browsehappy.com/">Upgrade to a different browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to experience this site.</p><![endif]-->
+  <a href="https://github.com/icodejs/jQuery.mediaBackgrounds" target="_blank">
+    <img style="position: absolute; top: 0; left: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_left_orange_ff7600.png" alt="Fork me on GitHub">
+  </a>
+  <section id="content">
+    <form>
+      <section id="controls">
+        <input type="text" class="textbox" id="terms" placeholder="Enter a url or keyword(s)">
+        <select id="img_size" class="textbox dropdownlist">
+          <option>Minimum size</option>
+          <option>320x480</option>
+          <option>640x480</option>
+          <option>800x480</option>
+          <option>800x600</option>
+          <option>1024x768</option>
+          <option>1024x1024</option>
+          <option>1152x864</option>
+          <option>1280x720</option>
+          <option>1280x800</option>
+          <option>1280x960</option>
+          <option>1280x1024</option>
+          <option>1360x768</option>
+          <option>1366x768</option>
+          <option>1440x900</option>
+          <option>1440x1050</option>
+          <option>1600x1200</option>
+          <option>1680x1050</option>
+          <option>1680x1200</option>
+          <option>1920x1080</option>
+        </select>
 
-                <select id="wallpapers_sites" class="textbox dropdownlist">
-                    <option value="none">Wallpapers sites</option>
-                    <option value="http://thepaperwall.com/wallpapers/sci-fi/big/">Sci-fi</option>
-                    <option value="http://thepaperwall.com/wallpapers/industrial/big/">Industrial</option>
-                    <option value="http://thepaperwall.com/wallpapers/architecture/big/">Architecture</option>
-                    <option value="http://thepaperwall.com/wallpapers/nature/big/">Nature</option>
-                    <option value="http://thepaperwall.com/wallpapers/cartoon_comic/big/">Cartoon / Comic</option>
-                    <option value="http://thepaperwall.com/wallpapers/cars/big/">Cars</option>
-                    <option value="http://thepaperwall.com/wallpapers/computer_tech/big/">Computer</option>
-                    <option value="http://thepaperwall.com/wallpapers/humor/big/">Humor</option>
-                    <option value="http://thepaperwall.com/wallpapers/sports/big/">Sports</option>
-                    <option value="http://thepaperwall.com/wallpapers/vintage_historical/big/">Vintage</option>
-                    <option value="http://thepaperwall.com/wallpapers/war_military/big/">War / Military</option>
-                    <option value="http://thepaperwall.com/wallpapers/animals/big/">Animals</option>
-                    <option value="http://thepaperwall.com/wallpapers/movies/big/">Movies</option>
-                    <option value="http://thepaperwall.com/wallpapers/television/big/">Television</option>
-                    <option value="http://thepaperwall.com/wallpapers/video_games/big/">Video Games</option>
-                    <option value="http://thepaperwall.com/wallpapers/big/">Big</option>
-                    <option value="http://thepaperwall.com/wallpapers/misc/big/">Misc</option>
-                    <option value="http://thepaperwall.com/wallpapers/digital_artwork/big/">Digital Artwork</option>
-                    <option value="http://thepaperwall.com/wallpapers/duel_monitor/big/">Dual Monitor</option>
-                    <option value="http://thepaperwall.com/wallpapers/fantasy/big/">Fantasy</option>
-                    <option value="http://thepaperwall.com/wallpapers/food_drink/big/">Food Drink</option>
-                    <option value="http://thepaperwall.com/wallpapers/informational/big/">Informational</option>
-                    <option value="http://thepaperwall.com/wallpapers/iphone_mobile/big/">iphone Mobile</option>
-                    <option value="http://thepaperwall.com/wallpapers/music/big/">Music</option>
-                    <option value="http://thepaperwall.com/wallpapers/people/big/">People</option>
-                    <option value="http://thepaperwall.com/wallpapers/quotes_worded/big/">Quotes Worded</option>
-                </select>
+        <select id="wallpapers_sites" class="textbox dropdownlist">
+          <option value="none">Wallpapers sites</option>
+          <option value="http://thepaperwall.com/wallpapers/sci-fi/big/">Sci-fi</option>
+          <option value="http://thepaperwall.com/wallpapers/industrial/big/">Industrial</option>
+          <option value="http://thepaperwall.com/wallpapers/architecture/big/">Architecture</option>
+          <option value="http://thepaperwall.com/wallpapers/nature/big/">Nature</option>
+          <option value="http://thepaperwall.com/wallpapers/cartoon_comic/big/">Cartoon / Comic</option>
+          <option value="http://thepaperwall.com/wallpapers/cars/big/">Cars</option>
+          <option value="http://thepaperwall.com/wallpapers/computer_tech/big/">Computer</option>
+          <option value="http://thepaperwall.com/wallpapers/humor/big/">Humor</option>
+          <option value="http://thepaperwall.com/wallpapers/sports/big/">Sports</option>
+          <option value="http://thepaperwall.com/wallpapers/vintage_historical/big/">Vintage</option>
+          <option value="http://thepaperwall.com/wallpapers/war_military/big/">War / Military</option>
+          <option value="http://thepaperwall.com/wallpapers/animals/big/">Animals</option>
+          <option value="http://thepaperwall.com/wallpapers/movies/big/">Movies</option>
+          <option value="http://thepaperwall.com/wallpapers/television/big/">Television</option>
+          <option value="http://thepaperwall.com/wallpapers/video_games/big/">Video Games</option>
+          <option value="http://thepaperwall.com/wallpapers/big/">Big</option>
+          <option value="http://thepaperwall.com/wallpapers/misc/big/">Misc</option>
+          <option value="http://thepaperwall.com/wallpapers/digital_artwork/big/">Digital Artwork</option>
+          <option value="http://thepaperwall.com/wallpapers/duel_monitor/big/">Dual Monitor</option>
+          <option value="http://thepaperwall.com/wallpapers/fantasy/big/">Fantasy</option>
+          <option value="http://thepaperwall.com/wallpapers/food_drink/big/">Food Drink</option>
+          <option value="http://thepaperwall.com/wallpapers/informational/big/">Informational</option>
+          <option value="http://thepaperwall.com/wallpapers/iphone_mobile/big/">iphone Mobile</option>
+          <option value="http://thepaperwall.com/wallpapers/music/big/">Music</option>
+          <option value="http://thepaperwall.com/wallpapers/people/big/">People</option>
+          <option value="http://thepaperwall.com/wallpapers/quotes_worded/big/">Quotes Worded</option>
+        </select>
 
-                <label class="checkbox">
-                    <input type="checkbox" id="slideshow" value="slideshow"> Slideshow?
-                </label>
+        <label class="checkbox">
+          <input type="checkbox" id="slideshow" value="slideshow"> Slideshow?
+        </label>
 
-                <div class="button_container">
-                    <ul id="buttons" class="clearfix">
-                        <li><button id="fav" class="button"><i class="icon icon_fav"></i> Favorite</button></li>
-                        <li><button id="save" class="button"><i class="icon icon_save"></i> Save</button></li>
-                        <li><button id="tweet" class="button"><i class="icon icon_tweet"></i> Tweet</button></li>
-                        <li><button id="email" class="button"><i class="icon icon_email"></i> Email</button></li>
-                        <li><button id="help" class="button"><i class="icon icon_help"></i> Help</button></li>
-                    </ul>
-                </div>
-            </div>
-        </form>
-    </div>
+        <section class="button_container">
+          <ul id="buttons" class="clearfix">
+            <li><button id="fav" class="button"><i class="icon icon_fav"></i> Favorite</button></li>
+            <li><button id="save" class="button"><i class="icon icon_save"></i> Save</button></li>
+            <li><button id="tweet" class="button"><i class="icon icon_tweet"></i> Tweet</button></li>
+            <li><button id="email" class="button"><i class="icon icon_email"></i> Email</button></li>
+            <li><button id="help" class="button"><i class="icon icon_help"></i> Help</button></li>
+          </ul>
+        </section>
+      </section>
+    </form>
+  </section>
 
-    <div id="favorites_container" style="display:none;">
-        <div id="favorite_controls">
-            <a class="state" href="/"><i class="icon icon_state_open"></i>Favorites</a>
-        </div>
-        <div id="favorites"></div>
-    </div>
+  <section id="favorites_container" style="display:none;">
+    <section id="favorite_controls">
+      <a class="state" href="/"><i class="icon icon_state_open"></i>Favorites</a>
+    </section>
+    <section id="favorites"></section>
+  </section>
 
-    <div style="display:none;" class="status"></div>
+  <section style="display:none;" class="status"></section>
 
-    <script src="http://code.jquery.com/jquery.min.js"></script>
-    <script src="js/jquery.easing.1.3.js"></script>
-    <script src="js/jquery.mediaBackgrounds.js"></script>
-    <!-- <script src="https://raw.github.com/icodejs/jQuery.mediaBackgrounds/master/js/jquery.mediaBackgrounds.min.js"></script> -->
-    <script>
-        $(function () {
-            var search_terms = [
-                'cityscape wallpaper',
-                'marvel comics',
-                'dc commics',
-                'space wallpaper',
-                'space stars wallpaper',
-                'space planets wallpaper',
-                'muscle cars',
-                'tokyo japan city',
-                'adult swim wallpaper',
-                'thepaperwall cityscape wallpapers',
-                'akira wallpaper',
-                'high res background textures',
-                'high res background wallpapers',
-                'architectural photography wallpapers',
-                'Street photography wallpapers',
-                'macro photography wallpapers',
-                'Aerial photography wallpapers',
-                'Black and White photography wallpapers',
-                'Night photography wallpapers',
-                'dream-wallpaper.com',
-                'flowers',
-                'graffiti',
-                'national geographic wallpaper'
-                ];
-            $('body').mediaBackgrounds(
-                {
-                    api: 'icodejs_image_scrape',
-                    api_url: 'http://icodejs.no.de/mb/?url=',
-                    search_terms: search_terms
-                });
+  <script src="http://code.jquery.com/jquery.min.js"></script>
+  <script src="js/jquery.easing.1.3.js"></script>
+  <script src="js/jquery.mediaBackgrounds.js"></script>
+  <!-- <script src="https://raw.github.com/icodejs/jQuery.mediaBackgrounds/master/js/jquery.mediaBackgrounds.min.js"></script> -->
+  <script>
+    $(function () {
+      var search_terms = [
+        'cityscape wallpaper',
+        'marvel comics',
+        'dc commics',
+        'space wallpaper',
+        'space stars wallpaper',
+        'space planets wallpaper',
+        'muscle cars',
+        'tokyo japan city',
+        'adult swim wallpaper',
+        'thepaperwall cityscape wallpapers',
+        'akira wallpaper',
+        'high res background textures',
+        'high res background wallpapers',
+        'architectural photography wallpapers',
+        'Street photography wallpapers',
+        'macro photography wallpapers',
+        'Aerial photography wallpapers',
+        'Black and White photography wallpapers',
+        'Night photography wallpapers',
+        'dream-wallpaper.com',
+        'flowers',
+        'graffiti',
+        'national geographic wallpaper'
+        ];
+      $('body').mediaBackgrounds(
+        {
+          api: 'icodejs_image_scrape',
+          api_url: 'http://icodejs.no.de/mb/?url=',
+          search_terms: search_terms
         });
-    </script>
-    <script>
-      // var _gaq = _gaq || [];
-      // _gaq.push(['_setAccount', 'UA-30537419-1']);
-      // _gaq.push(['_trackPageview']);
+      });
+  </script>
+  <script>
+    // var _gaq = _gaq || [];
+    // _gaq.push(['_setAccount', 'UA-30537419-1']);
+    // _gaq.push(['_trackPageview']);
 
-      // (function() {
-      //   var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-      //   ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-      //   var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-      // })();
-    </script>
+    // (function() {
+    //   var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    //   ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    //   var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    // })();
+  </script>
 </body>
 </html>
