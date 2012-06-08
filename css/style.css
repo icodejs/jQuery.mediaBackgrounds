@@ -240,7 +240,6 @@ body {
 }
 input, button, select, textarea {
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-    vertical-align: middle;
     height: 18px;
     padding: 4px;
     margin: 0;
@@ -291,9 +290,6 @@ hr {
 }
 .textbox {
     margin:0 2px 10px 0;
-
-}
-label.checkbox {
 
 }
 .bg_container {
@@ -355,20 +351,20 @@ label.checkbox {
     top:150px;
 }
 #favorites {
+    border-top:none;
+    height:10px;
+    overflow:hidden;
     padding-top: 16px;
     position:absolute;
     right:0;
     top:0;
     width:255px;
-    height:10px;
     z-index:98;
-    border-top:none;
-    overflow:hidden;
 }
 #favorites ul {
+    list-style: none;
     margin:20px 0 0;
     padding:0;
-    list-style: none;
 }
 #favorites li {
     height:132px;
