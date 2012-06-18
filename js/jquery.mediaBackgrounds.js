@@ -6,7 +6,7 @@
  *  Mac:  file:///Users/tyrone/Sites/mediaBackgrounds/index.html
  *  Dev:  http://localhost:4000/playpen/javascript/jquery/mediabackgrounds/
  *  Live: http://www.icodejs.com/playpen/javascript/jquery/mediaBackgrounds/
- *
+ *  JE
  */
 
 ;(function($, window, document, undefined) {
