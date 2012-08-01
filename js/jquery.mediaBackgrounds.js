@@ -598,6 +598,7 @@
             .addClass('bg_container')
             .height(vars.win_height)
             .css({
+              'background-color': 'transparent',
               'background-image': 'url("' + data.url + '")',
               'background-position': 'top',
               'background-repeat': 'repeat',
@@ -605,6 +606,9 @@
             })
             .data('img_dims', img_dims)
             .prependTo($pe.body);
+
+          // for when working on the plugin when you should be doing work :)
+          if (options.covert) $pe.bg_container.addClass('covert');
 
           old_bg_containers.fadeOut(1000, function () {
             $(this).remove();

@@ -364,3 +364,7 @@ button.button:hover {
     clear: both;
     visibility: hidden;
 }
+
+.covert {
+    opacity: 0.03;
+}
