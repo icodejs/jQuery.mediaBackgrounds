@@ -1,0 +1,21 @@
+<html>
+  <head>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script>
+    <script src="/js/libs/ui-setup.js"></script>
+    <script type="text/javascript">
+      $(function () {
+        var $wallpapers_sites = $('#wallpapers_sites');
+        bindWebSiteDropdown($wallpapers_sites, function (err, data) {
+          if (err) return console.log(err);
+
+          console.log(data);
+        });
+
+      });
+    </script>
+  </head>
+  <body>
+    <h1>json load test</h1>
+    <select id="wallpapers_sites" class="textbox dropdownlist"></select>
+  </body>
+</html>
