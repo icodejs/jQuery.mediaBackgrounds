@@ -1,8 +1,8 @@
 function bindWebSiteDropdown($dd, callback) {
   if ($dd) {
 
-    var url1 = 'http://192.168.0.128:5000/load/webPages/';
-    var url2 = 'http://192.168.0.128:5000/scrape/webPage/?url=http://thepaperwall.com/wallpapers/quotes_worded/big/';
+    var url1 = 'http://localhost:5000/load/webPages/';
+    var url2 = 'http://localhost:5000/scrape/webPage/?url=http://thepaperwall.com/wallpapers/quotes_worded/big/';
 
     $.ajax({
       url:  url1,

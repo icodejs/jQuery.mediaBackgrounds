@@ -188,6 +188,7 @@
       }
     },
     load_wallpapers_sites: function (callback) {
+
       $.ajax({
         url:  options.domain + '/load/webPages/',
         dataType: 'jsonp',
@@ -418,6 +419,8 @@
         }
       });
 
+    return base.each(function () {
+
       // disable right click
       //$('*').on('contextmenu', function () { return false; });
 
@@ -541,6 +544,8 @@
 
       methods.get_bg($pe.bg_container);
 
+    });
+
   },
 
   /**
@@ -550,6 +555,9 @@
    */
   get_bg: function (elem) {
     // Monitor the error being brought back for a url or keyword.
+
+    console.log('vars.errors.length: ', vars.errors.length);
+
     if (vars.errors.length > 10) {
       if (!vars.ss_mode) {
         $pe.body.find('.loader').fadeOut(1000, function () {
@@ -577,11 +585,15 @@
         .fadeIn();
     }
 
+    console.log('is_url: ', is_url);
+
     common.loading.begin();
 
     // Check cache. If callback returns cached item index? Do stuff!
     methods.check_cache(input, function (i) {
       var items = vars.cache.items, images;
+
+      console.log('items: ', items);
 
       if (is_url && i >= 0 && items[i] && items[i].images.length > 0) {
         images = items[i].images;
