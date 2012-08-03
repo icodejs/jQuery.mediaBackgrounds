@@ -24,39 +24,39 @@
   var vars = {
     timers: {
       request: {
-        prev_req: 0,
-        diff_ms: 0,
-        elaps: 0,
-        interval_id: -1
+        prev_req    : 0,
+        diff_ms     : 0,
+        elaps       : 0,
+        interval_id : -1
       }
     },
     errors: [],
     cache: {
       items: []
     },
-    favorites: [],
-    win_width: 1024,
-    win_height: 1024,
-    is_loading: false,
-    ss_mode: false, // slideshow mode
-    max_container_height: 450
+    favorites            : [],
+    win_width            : 1024,
+    win_height           : 1024,
+    is_loading           : false,
+    ss_mode              : false, // slideshow mode
+    max_container_height : 450
   };
 
   // Global jQuery page elements.
   var $pe = {
-    bg_container: null,
-    body: null,
-    buttons: null,
-    controls_container: null,
-    favorites_container: null,
-    favorite_show_hide: null,
-    img_size: null,
-    keypress_detector: null,
-    ss_checkbox: null,
-    status: null,
-    terms: null,
-    window: null,
-    ws_dropdown: null
+    bg_container        : null,
+    body                : null,
+    buttons             : null,
+    controls_container  : null,
+    favorites_container : null,
+    favorite_show_hide  : null,
+    img_size            : null,
+    keypress_detector   : null,
+    ss_checkbox         : null,
+    status              : null,
+    terms               : null,
+    window              : null,
+    ws_dropdown         : null
   };
 
   /**
@@ -69,9 +69,9 @@
         var i = this.length;
         while (i--) {
           if (prop) {
-            if (this[i][prop] === needle) { return true; }
+            if (this[i][prop] === needle) return true;
           } else {
-            if (this[i] === needle) { return true; }
+            if (this[i] === needle) return true;
           }
         }
         return false;
@@ -141,16 +141,16 @@
 
                 var
                 btn_config = {
-                  element: $pe.favorite_show_hide,
-                  state: 'open',
-                  do_toggle: state === 'closed'
+                  element   : $pe.favorite_show_hide,
+                  state     : 'open',
+                  do_toggle : state === 'closed'
                 },
                 container_config = {
-                  element: $favs,
-                  state: state,
-                  overflow: 'auto',
-                  height: height > vars.max_container_height ? vars.max_container_height : height,
-                  speed: 750
+                  element  : $favs,
+                  state    : state,
+                  overflow : 'auto',
+                  height   : height > vars.max_container_height ? vars.max_container_height : height,
+                  speed    : 750
                 };
 
                 $li.prepend($a).prependTo($ul).slideDown(1000);
@@ -185,6 +185,32 @@
       } else {
         return 0;
       }
+    },
+    load_wallpapers_sites: function (callback) {
+      $.ajax({
+        url:  options.domain + '/load/webPages/',
+        dataType: 'jsonp',
+        error: function (jqXHR, textStatus, errorThrown) {
+          console.log(errorThrown);
+          console.log(window);
+          return callback({
+            func_name : 'load_wallpapers_sites',
+            desc      : textStatus,
+            data      : jqXHR
+          });
+        }
+      }).done(function (data, status) {
+        var opts = '';
+        if (status === 'success') {
+          $.each(data, function(i, obj) {
+            opts += common.getTag(obj.category, 'option', 'value="' + obj.url + '"');
+          });
+          callback(null, opts);
+        }
+      });
+    },
+    getTag: function (input, t, attrs) {
+      return '<' + t + (attrs ? ' ' + attrs : '') + '>' + input + '</' + t + '>';
     },
     email: function () {
       methods.set_status('email', 'Check your inbox! (To do)');
@@ -276,16 +302,16 @@
         $icon      = elem.find('i'),
         height     = target_elem.find('ul').outerHeight(true) + 10,
         btn_config = {
-          element: elem,
-          state: state === 'open' ? 'closed' : 'open',
-          do_toggle: true
+          element   : elem,
+          state     : state === 'open' ? 'closed' : 'open',
+          do_toggle : true
         },
         container_config = {
-          element: target_elem,
-          state: btn_config.state,
-          overflow: state === 'open' ? 'hidden' : 'auto',
-          height: state === 'open' ? 10 : height > vars.max_container_height ? vars.max_container_height : height,
-          speed: 750
+          element  : target_elem,
+          state    : btn_config.state,
+          overflow : state === 'open' ? 'hidden' : 'auto',
+          height   : state === 'open' ? 10 : height > vars.max_container_height ? vars.max_container_height : height,
+          speed    : 750
         };
 
         interaction.view_favorites_show(container_config, function () {
@@ -378,6 +404,15 @@
       .on('beforeunload', function (e) {
         if ($pe.favorites_container.find('#favorites li').length > 0) {
           return 'You will loose your favorite images.';
+        }
+      });
+
+      common.load_wallpapers_sites(function (err, html) {
+        if (err) {
+          vars.errors.push(err);
+          return methods.set_status('init', err);
+        } else {
+          $pe.ws_dropdown.html(html);
         }
       });
 
@@ -547,9 +582,7 @@
 
     // Check cache. If callback returns cached item index? Do stuff!
     methods.check_cache(input, function (i) {
-      var
-      items = vars.cache.items,
-      images;
+      var items = vars.cache.items, images;
 
       if (is_url && i >= 0 && items[i] && items[i].images.length > 0) {
         images = items[i].images;
@@ -598,11 +631,11 @@
             .addClass('bg_container')
             .height(vars.win_height)
             .css({
-              'background-color': 'transparent',
-              'background-image': 'url("' + data.url + '")',
-              'background-position': 'top',
-              'background-repeat': 'repeat',
-              'height': vars.win_height
+              'background-color'    : 'transparent',
+              'background-image'    : 'url("' + data.url + '")',
+              'background-position' : 'top',
+              'background-repeat'   : 'repeat',
+              'height'              : vars.win_height
             })
             .data('img_dims', img_dims)
             .prependTo($pe.body);
@@ -630,8 +663,9 @@
   get_json: function (is_url, input, callback) {
     var url = '';
 
-    if (options.api_url.length > 0 && is_url) {
-      url  = options.api_url + input;
+    if (options.domain.length > 0 && options.scrape_path.length > 0 && is_url) {
+      url  = options.domain + options.scrape_path + '?url=' + input;
+      console.log(url);
     } else {
       url  = 'http://ajax.googleapis.com/ajax/services/search/images?v=1.0&q=';
       url += (input.length > 0 ? common.parse_search_term(input) : common.get_rnd_term());
@@ -650,10 +684,11 @@
       url: url,
       dataType: 'jsonp',
       error: function (jqXHR, textStatus, errorThrown) {
+        console.log(errorThrown);
         return callback({
-          func_name: 'get_json',
-          desc: textStatus,
-          data: errorThrown
+          func_name : 'get_json',
+          desc      : textStatus,
+          data      : errorThrown
         });
       }
     }).done(function (data, status) {
@@ -661,13 +696,13 @@
         try {
           if (data.error) {
             return callback({
-              func_name: 'get_json',
-              desc: data.error,
-              data: data
+              func_name : 'get_json',
+              desc      : data.error,
+              data      : data
             });
           }
           // replace this logic with a custom function that can be passed in for each api
-          if (options.api_url.length > 0 && is_url) {
+          if (options.domain.length > 0 && is_url) {
             if (!vars.cache.items.contains(input, 'id')) {
               vars.cache.items.push({id: input, images: data});
             }
@@ -682,9 +717,9 @@
           }
         } catch (e) {
           return callback({
-            func_name: 'get_json',
-            desc: e.toString(),
-            data: e
+            func_name : 'get_json',
+            desc      : e.toString(),
+            data      : e
           });
         }
       }
@@ -732,8 +767,8 @@
         // size specified by the user.
         if (img_w < w || img_h < h) {
           return callback({
-            func_name: 'preload_img',
-            desc: 'image returned is too small'
+            func_name : 'preload_img',
+            desc      : 'image returned is too small'
           });
         }
 
@@ -760,9 +795,9 @@
       .error(function (e) {
         methods.set_status('preload_img', '404 (Not Found)');
         return callback({
-          func_name: 'preload_img',
-          desc: '404 (Not Found)',
-          data: e
+          func_name : 'preload_img',
+          desc      : '404 (Not Found)',
+          data      : e
         });
       }); // end JQ new Image
   },
@@ -837,14 +872,13 @@
   }
   },
   options = $.extend({
-    api: 'google_image_search',
-    api_url: '',
-    loading_image: 'img/loader.gif',
-    search_terms: ['graffiti'],
-    media_type: 'img',
-    interval: 15000,
-    user_id: -1,
-    rest_url: ''
+    domain        : 'http://localhost:5000/',
+    api_url       : '',
+    loading_image : 'img/loader.gif',
+    search_terms  : ['graffiti'],
+    media_type    : 'img',
+    interval      : 15000,
+    user_id       : -1
   }, custom_options);
 
   // initialise plugin

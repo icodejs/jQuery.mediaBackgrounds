@@ -49,33 +49,6 @@
         </select>
 
         <select id="wallpapers_sites" class="textbox dropdownlist">
-          <option value="none">Wallpapers sites</option>
-          <option value="http://thepaperwall.com/wallpapers/sci-fi/big/">Sci-fi</option>
-          <option value="http://thepaperwall.com/wallpapers/industrial/big/">Industrial</option>
-          <option value="http://thepaperwall.com/wallpapers/architecture/big/">Architecture</option>
-          <option value="http://thepaperwall.com/wallpapers/nature/big/">Nature</option>
-          <option value="http://thepaperwall.com/wallpapers/cartoon_comic/big/">Cartoon / Comic</option>
-          <option value="http://thepaperwall.com/wallpapers/cars/big/">Cars</option>
-          <option value="http://thepaperwall.com/wallpapers/computer_tech/big/">Computer</option>
-          <option value="http://thepaperwall.com/wallpapers/humor/big/">Humor</option>
-          <option value="http://thepaperwall.com/wallpapers/sports/big/">Sports</option>
-          <option value="http://thepaperwall.com/wallpapers/vintage_historical/big/">Vintage</option>
-          <option value="http://thepaperwall.com/wallpapers/war_military/big/">War / Military</option>
-          <option value="http://thepaperwall.com/wallpapers/animals/big/">Animals</option>
-          <option value="http://thepaperwall.com/wallpapers/movies/big/">Movies</option>
-          <option value="http://thepaperwall.com/wallpapers/television/big/">Television</option>
-          <option value="http://thepaperwall.com/wallpapers/video_games/big/">Video Games</option>
-          <option value="http://thepaperwall.com/wallpapers/big/">Big</option>
-          <option value="http://thepaperwall.com/wallpapers/misc/big/">Misc</option>
-          <option value="http://thepaperwall.com/wallpapers/digital_artwork/big/">Digital Artwork</option>
-          <option value="http://thepaperwall.com/wallpapers/duel_monitor/big/">Dual Monitor</option>
-          <option value="http://thepaperwall.com/wallpapers/fantasy/big/">Fantasy</option>
-          <option value="http://thepaperwall.com/wallpapers/food_drink/big/">Food Drink</option>
-          <option value="http://thepaperwall.com/wallpapers/informational/big/">Informational</option>
-          <option value="http://thepaperwall.com/wallpapers/iphone_mobile/big/">iphone Mobile</option>
-          <option value="http://thepaperwall.com/wallpapers/music/big/">Music</option>
-          <option value="http://thepaperwall.com/wallpapers/people/big/">People</option>
-          <option value="http://thepaperwall.com/wallpapers/quotes_worded/big/">Quotes Worded</option>
         </select>
 
         <label class="checkbox">
@@ -137,10 +110,11 @@
         'national geographic wallpaper'
         ];
       $('body').mediaBackgrounds({
-          api          : 'icodejs_image_scrape',
-          api_url      : 'http://icodejs.no.de/mb/?url=',
+          domain       : 'http://localhost:5000',
+          scrape_path  : '/scrape/webPage/',
+          api_url      : 'http://icodejs.no.de/mb/',
           search_terms : search_terms,
-          covert       : false
+          covert       : true
         });
       });
   </script>
