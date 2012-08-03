@@ -1,8 +1,11 @@
 function bindWebSiteDropdown($dd, callback) {
   if ($dd) {
 
+    var url1 = 'http://192.168.0.128:5000/load/webPages/';
+    var url2 = 'http://192.168.0.128:5000/scrape/webPage/?url=http://thepaperwall.com/wallpapers/quotes_worded/big/';
+
     $.ajax({
-      url:  'http://localhost:5000/load/webPages/',
+      url:  url1,
       dataType: 'jsonp',
       error: function (jqXHR, textStatus, errorThrown) {
         callback({
@@ -13,6 +16,7 @@ function bindWebSiteDropdown($dd, callback) {
     }).done(function (data, status) {
       var options = '';
       if (status === 'success') {
+        console.log(data);
         $.each(data, function(i, obj) {
           options += getTag(obj.category, 'option', 'value="' + obj.url + '"');
         });

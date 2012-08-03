@@ -12,7 +12,6 @@
 ;(function($, window, document, undefined) {
   "use strict";
 
-
   /**
    * jQuery mediaBackgrounds plugin that ajax load images from external web
    * pages via a custom node.js REST API.
@@ -21,361 +20,362 @@
    */
   $.fn.mediaBackgrounds = function (custom_options) {
 
-  // Global variables.
-  var vars = {
-    timers: {
-      request: {
-        prev_req    : 0,
-        diff_ms     : 0,
-        elaps       : 0,
-        interval_id : -1
-      }
-    },
-    errors: [],
-    cache: {
-      items: []
-    },
-    favorites            : [],
-    win_width            : 1024,
-    win_height           : 1024,
-    is_loading           : false,
-    ss_mode              : false, // slideshow mode
-    max_container_height : 450
-  };
-
-  // Global jQuery page elements.
-  var $pe = {
-    bg_container        : null,
-    body                : null,
-    buttons             : null,
-    controls_container  : null,
-    favorites_container : null,
-    favorite_show_hide  : null,
-    img_size            : null,
-    keypress_detector   : null,
-    ss_checkbox         : null,
-    status              : null,
-    terms               : null,
-    window              : null,
-    ws_dropdown         : null
-  };
-
-  /**
-   * Monkey patch Array object with a custom contains method
-   * (may need check if string and use toLowerCase()).
-   */
-  (function () {
-    if (typeof Array.prototype.contains  !== 'function') {
-      Array.prototype.contains = function (needle, prop) {
-        var i = this.length;
-        while (i--) {
-          if (prop) {
-            if (this[i][prop] === needle) return true;
-          } else {
-            if (this[i] === needle) return true;
-          }
+    // Global variables.
+    var vars = {
+      timers: {
+        request: {
+          prev_req    : 0,
+          diff_ms     : 0,
+          elaps       : 0,
+          interval_id : -1
         }
-        return false;
-      };
-    }
-  }());
+      },
+      errors: [],
+      cache: {
+        items: []
+      },
+      favorites            : [],
+      win_width            : 1024,
+      win_height           : 1024,
+      is_loading           : false,
+      ss_mode              : false, // slideshow mode
+      max_container_height : 450
+    };
 
-  /**
-   * jQuery global function that keep a record of all ajax requests and
-   * provide a handly way of aborting them all at any given time.
-   */
-  (function () {
-      $.xhrPool = [];
-      $.xhrPool.abortAll = function () {
-        $(this).each(function (idx, jqXHR) {
-          jqXHR.abort();
-        });
-        $.xhrPool.length = 0;
-      };
-
-      $.ajaxSetup({
-        beforeSend: function (jqXHR) {
-          $.xhrPool.push(jqXHR);
-        },
-        complete: function (jqXHR) {
-          var index = $.xhrPool.indexOf(jqXHR);
-          if (index > -1) {
-            $.xhrPool.splice(index, 1);
-          }
-        }
-      });
-
-      $.fn.css_attr_val = function (property) {
-        return parseInt(this.css(property).slice(0,-2), 10);
-      };
-  }());
-
-  // Global helper methods.
-  var common = {
+    // Global jQuery page elements.
+    var $pe = {
+      bg_container        : null,
+      body                : null,
+      buttons             : null,
+      controls_container  : null,
+      favorites_container : null,
+      favorite_show_hide  : null,
+      img_size            : null,
+      keypress_detector   : null,
+      ss_checkbox         : null,
+      status              : null,
+      terms               : null,
+      window              : null,
+      ws_dropdown         : null
+    };
 
     /**
-     * Add current image to favorites with the intention of saving them
-     * to the database or sending the URLs as an email to the user.
-     * Not finished.
-     *
-     * * @param {jQuery} elem.
+     * Monkey patch Array object with a custom contains method
+     * (may need check if string and use toLowerCase()).
      */
-    add_favorite: function (elem) {
-      if (elem && elem.data('img_dims')) {
-        var img = elem.data('img_dims'),
-            thumb_width = 255,
-            thumb_height = 132;
-
-        if (!vars.favorites.contains(img.url, 'url')) {
-          $('<img />')
-              .attr({src: img.url, width: thumb_width, height: thumb_height})
-              .load(function () {
-                var
-                $this   = $(this),
-                $favs   = $pe.favorites_container.find('#favorites'),
-                $ul     = $favs.find('ul')[0] ? $favs.find('ul') : $('<ul />').appendTo($favs),
-                $rm_btn = $('<a class="remove" href="/"><i class="icon icon_x"></a>').on('click', interaction.remove_favorite_image),
-                $li     = $('<li />').append($rm_btn).hide(),
-                $a      = $('<a />').attr({href: img.url, target: '_blank'}).html($this),
-                height  = common.set_favorites_container_height($ul, thumb_height, $ul.find('li').length === 0),
-                state   = $pe.favorite_show_hide.data('state');
-
-                var
-                btn_config = {
-                  element   : $pe.favorite_show_hide,
-                  state     : 'open',
-                  do_toggle : state === 'closed'
-                },
-                container_config = {
-                  element  : $favs,
-                  state    : state,
-                  overflow : 'auto',
-                  height   : height > vars.max_container_height ? vars.max_container_height : height,
-                  speed    : 750
-                };
-
-                $li.prepend($a).prependTo($ul).slideDown(1000);
-
-                interaction.view_favorites_show(container_config, function () {
-                  interaction.view_favorites_button(btn_config);
-                  $pe.keypress_detector.focus();
-                  vars.favorites.push(img);
-                  methods.set_status('save', vars.favorites.length + ' image(s) saved in your favorites!', vars.favorites.length);
-                });
-
-                var style = $pe.favorites_container.attr('style').replace(' ', '');
-
-                if (style.indexOf('display:none;') >= 0) {
-                  $pe.favorites_container.fadeIn();
-                }
-              });
-        }
-      }
-    },
-    set_favorites_container_height: function (container, single_thumb_height, is_new) {
-      var
-      $lis = container.find('li'),
-      len = $lis.length + 1,
-      margin;
-
-      if ($lis.length) {
-        margin = $lis.css_attr_val('margin-bottom');
-        return ($lis.first().outerHeight(true) * len) + (len * margin);
-      } else if (is_new) {
-        return container.outerHeight(true) + single_thumb_height + 12; // hack
-      } else {
-        return 0;
-      }
-    },
-    load_wallpapers_sites: function (callback) {
-      $.ajax({
-        url:  options.domain + '/load/webPages/',
-        dataType: 'jsonp',
-        error: function (jqXHR, textStatus, errorThrown) {
-          return callback({
-            func_name : 'load_wallpapers_sites',
-            desc      : textStatus,
-            data      : jqXHR
-          });
-        }
-      }).done(function (data, status) {
-        var opts = '';
-        if (status === 'success') {
-          opts += common.getTag('[ websites ]', 'option', 'value=""');
-          $.each(data, function(i, obj) {
-            opts += common.getTag(obj.category, 'option', 'value="' + obj.url + '"');
-          });
-          callback(null, opts);
-        }
-      });
-    },
-    getTag: function (input, t, attrs) {
-      return '<' + t + (attrs ? ' ' + attrs : '') + '>' + input + '</' + t + '>';
-    },
-    email: function () {
-      methods.set_status('email', 'Check your inbox! (To do)');
-    },
-    tweet: function () {
-      methods.set_status('tweet', 'tweet tweet (To do)');
-    },
-    save: function () {
-      // $.ajax({
-      //   type: 'POST',
-      //   url: url,
-      //   data: data,
-      //   success: success,
-      //   dataType: dataType
-      // });
-      methods.set_status('save', 'Your favorites list has been saved. (To do)');
-    },
-    help: function () {
-      methods.set_status('help', 'Use the spacebar to load new images. (To do)');
-    },
-    get_rnd_term: function () {
-      var
-      idx  = 0,
-      st   = options.search_terms,
-      term = '';
-
-      if (st.length === 1) {
-        return common.parse_search_term(st[idx]);
-      } else {
-        idx = common.get_rnd_int(0, st.length -1);
-        term = common.parse_search_term(st[idx]);
-        methods.set_status('get_rnd_term', 'search term: ' + term);
-        return term;
-      }
-    },
-    parse_search_term: function (term) {
-      return term.split(' ').join('+');
-    },
-    get_rnd_int: function (min, max)  {
-      return Math.floor(Math.random() * (max - min + 1)) + min;
-    },
-    loading: {
-      start_time: 0,
-      elaps: 0,
-      interval_id: -1,
-      begin: function () {
-        if (common.loading.start_time > 0) {
-          return true;
-        } else if (common.loading.start_time === 0) {
-          common.loading.start_time = new Date().getTime();
-          //console.log('Start');
-        }
-
-        common.loading.interval_id = setInterval(function () {
-          var
-          now   = new Date().getTime(),
-          elaps = (now - common.loading.start_time) / 1000;
-
-          if (elaps > 20) {
-            return common.loading.reset(true);
+    (function () {
+      if (typeof Array.prototype.contains  !== 'function') {
+        Array.prototype.contains = function (needle, prop) {
+          var i = this.length;
+          while (i--) {
+            if (prop) {
+              if (this[i][prop] === needle) return true;
+            } else {
+              if (this[i] === needle) return true;
+            }
           }
-
-          //console.log('elaps', elaps);
-        }, 2000);
-      },
-      reset: function (ui) {
-        if (ui) {
-          if ($.xhrPool.length > 0) {
-            $.xhrPool.abortAll();
-          }
-          methods.update_ui($pe.bg_container);
-        }
-
-        //console.log('timer cancelled');
-        common.loading.start_time = 0;
-        return clearInterval(common.loading.interval_id);
-      },
-      active: function () {
-        return common.loading.start_time > 0;
+          return false;
+        };
       }
-    }
-  };
+    }());
 
-  // Global interaction methods that work with jQuery elements.
-  var interaction = {
-    view_favorites: function (event, elem, target_elem) {
-        var
-        state      = elem.data('state'),
-        $icon      = elem.find('i'),
-        height     = target_elem.find('ul').outerHeight(true) + 10,
-        btn_config = {
-          element   : elem,
-          state     : state === 'open' ? 'closed' : 'open',
-          do_toggle : true
-        },
-        container_config = {
-          element  : target_elem,
-          state    : btn_config.state,
-          overflow : state === 'open' ? 'hidden' : 'auto',
-          height   : state === 'open' ? 10 : height > vars.max_container_height ? vars.max_container_height : height,
-          speed    : 750
+    /**
+     * jQuery global function that keep a record of all ajax requests and
+     * provide a handly way of aborting them all at any given time.
+     */
+    (function () {
+        $.xhrPool = [];
+        $.xhrPool.abortAll = function () {
+          $(this).each(function (idx, jqXHR) {
+            jqXHR.abort();
+          });
+          $.xhrPool.length = 0;
         };
 
-        interaction.view_favorites_show(container_config, function () {
-          interaction.view_favorites_button(btn_config);
-        });
-      },
-      view_favorites_button: function (obj) {
-        obj.element.data({state: obj.state});
-        if (obj.do_toggle) {
-          obj.element.find('i').toggleClass('icon_state_close', 'icon_state_open');
-        }
-      },
-      view_favorites_show: function (obj, callback) {
-        var easing = obj.state === 'open' ?  'easeOutQuad' : 'easeInQuad';
-
-        obj.element.stop(true, true);
-        obj.element.animate({
-          height: obj.height
-        }, obj.speed, easing, function() {
-          $(this).css({overflow: obj.overflow});
-          callback();
-        });
-      },
-      remove_favorite_image: function (e) {
-        e.preventDefault();
-        var $parent_li = $(this).closest('li');
-
-        $parent_li.slideUp(1000, function () {
-          var
-          i,
-          len,
-          img,
-          $this = $(this),
-          src = $parent_li.find('img').attr('src'),
-          $siblings = $this.siblings(),
-          $favorites = $pe.favorites_container.find('#favorites');
-
-          $this.remove();
-
-          for (i = 0, len = vars.favorites.length; i < len; i += 1) {
-            if (vars.favorites[i].url.toLowerCase() === src.toLowerCase()) {
-              img = vars.favorites.splice(i, 1);
-              break;
+        $.ajaxSetup({
+          beforeSend: function (jqXHR) {
+            $.xhrPool.push(jqXHR);
+          },
+          complete: function (jqXHR) {
+            var index = $.xhrPool.indexOf(jqXHR);
+            if (index > -1) {
+              $.xhrPool.splice(index, 1);
             }
           }
-
-          if ($siblings.length) {
-            interaction.view_favorites(e, $pe.favorite_show_hide.data({state: 'closed'}), $favorites);
-          } else {
-            $pe.favorites_container
-              .slideUp(1000, function () {
-                  var $this = $(this)
-                    .find('#favorites')
-                      .slideUp(1000)
-                      .removeAttr('style')
-                      .find('ul')
-                        .remove()
-                      .end()
-                    .end().hide();
-                });
-            }
         });
+
+        $.fn.css_attr_val = function (property) {
+          return parseInt(this.css(property).slice(0,-2), 10);
+        };
+    }());
+
+    // Global helper methods.
+    var common = {
+
+      /**
+       * Add current image to favorites with the intention of saving them
+       * to the database or sending the URLs as an email to the user.
+       * Not finished.
+       *
+       * * @param {jQuery} elem.
+       */
+      add_favorite: function (elem) {
+        if (elem && elem.data('img_dims')) {
+          var img = elem.data('img_dims'),
+              thumb_width = 255,
+              thumb_height = 132;
+
+          if (!vars.favorites.contains(img.url, 'url')) {
+            $('<img />')
+                .attr({src: img.url, width: thumb_width, height: thumb_height})
+                .load(function () {
+                  var
+                  $this   = $(this),
+                  $favs   = $pe.favorites_container.find('#favorites'),
+                  $ul     = $favs.find('ul')[0] ? $favs.find('ul') : $('<ul />').appendTo($favs),
+                  $rm_btn = $('<a class="remove" href="/"><i class="icon icon_x"></a>').on('click', interaction.remove_favorite_image),
+                  $li     = $('<li />').append($rm_btn).hide(),
+                  $a      = $('<a />').attr({href: img.url, target: '_blank'}).html($this),
+                  height  = common.set_favorites_container_height($ul, thumb_height, $ul.find('li').length === 0),
+                  state   = $pe.favorite_show_hide.data('state');
+
+                  var
+                  btn_config = {
+                    element   : $pe.favorite_show_hide,
+                    state     : 'open',
+                    do_toggle : state === 'closed'
+                  },
+                  container_config = {
+                    element  : $favs,
+                    state    : state,
+                    overflow : 'auto',
+                    height   : height > vars.max_container_height ? vars.max_container_height : height,
+                    speed    : 750
+                  };
+
+                  $li.prepend($a).prependTo($ul).slideDown(1000);
+
+                  interaction.view_favorites_show(container_config, function () {
+                    interaction.view_favorites_button(btn_config);
+                    $pe.keypress_detector.focus();
+                    vars.favorites.push(img);
+                    methods.set_status('save', vars.favorites.length + ' image(s) saved in your favorites!', vars.favorites.length);
+                  });
+
+                  var style = $pe.favorites_container.attr('style').replace(' ', '');
+
+                  if (style.indexOf('display:none;') >= 0) {
+                    $pe.favorites_container.fadeIn();
+                  }
+                });
+          }
+        }
+      },
+      set_favorites_container_height: function (container, single_thumb_height, is_new) {
+        var
+        $lis = container.find('li'),
+        len = $lis.length + 1,
+        margin;
+
+        if ($lis.length) {
+          margin = $lis.css_attr_val('margin-bottom');
+          return ($lis.first().outerHeight(true) * len) + (len * margin);
+        } else if (is_new) {
+          return container.outerHeight(true) + single_thumb_height + 12; // hack
+        } else {
+          return 0;
+        }
+      },
+      load_wallpapers_sites: function (callback) {
+        $.ajax({
+          url:  options.domain + '/load/webPages/',
+          dataType: 'jsonp',
+          error: function (jqXHR, textStatus, errorThrown) {
+            console.log(errorThrown);
+            console.log(window);
+            return callback({
+              func_name : 'load_wallpapers_sites',
+              desc      : textStatus,
+              data      : jqXHR
+            });
+          }
+        }).done(function (data, status) {
+          var opts = '';
+          if (status === 'success') {
+            $.each(data, function(i, obj) {
+              opts += common.getTag(obj.category, 'option', 'value="' + obj.url + '"');
+            });
+            callback(null, opts);
+          }
+        });
+      },
+      getTag: function (input, t, attrs) {
+        return '<' + t + (attrs ? ' ' + attrs : '') + '>' + input + '</' + t + '>';
+      },
+      email: function () {
+        methods.set_status('email', 'Check your inbox! (To do)');
+      },
+      tweet: function () {
+        methods.set_status('tweet', 'tweet tweet (To do)');
+      },
+      save: function () {
+        // $.ajax({
+        //   type: 'POST',
+        //   url: url,
+        //   data: data,
+        //   success: success,
+        //   dataType: dataType
+        // });
+        methods.set_status('save', 'Your favorites list has been saved. (To do)');
+      },
+      help: function () {
+        methods.set_status('help', 'Use the spacebar to load new images. (To do)');
+      },
+      get_rnd_term: function () {
+        var
+        idx  = 0,
+        st   = options.search_terms,
+        term = '';
+
+        if (st.length === 1) {
+          return common.parse_search_term(st[idx]);
+        } else {
+          idx = common.get_rnd_int(0, st.length -1);
+          term = common.parse_search_term(st[idx]);
+          methods.set_status('get_rnd_term', 'search term: ' + term);
+          return term;
+        }
+      },
+      parse_search_term: function (term) {
+        return term.split(' ').join('+');
+      },
+      get_rnd_int: function (min, max)  {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+      },
+      loading: {
+        start_time: 0,
+        elaps: 0,
+        interval_id: -1,
+        begin: function () {
+          if (common.loading.start_time > 0) {
+            return true;
+          } else if (common.loading.start_time === 0) {
+            common.loading.start_time = new Date().getTime();
+            //console.log('Start');
+          }
+
+          common.loading.interval_id = setInterval(function () {
+            var
+            now   = new Date().getTime(),
+            elaps = (now - common.loading.start_time) / 1000;
+
+            if (elaps > 20) {
+              return common.loading.reset(true);
+            }
+
+            //console.log('elaps', elaps);
+          }, 2000);
+        },
+        reset: function (ui) {
+          if (ui) {
+            if ($.xhrPool.length > 0) {
+              $.xhrPool.abortAll();
+            }
+            methods.update_ui($pe.bg_container);
+          }
+
+          //console.log('timer cancelled');
+          common.loading.start_time = 0;
+          return clearInterval(common.loading.interval_id);
+        },
+        active: function () {
+          return common.loading.start_time > 0;
+        }
       }
-  };
+    };
+
+    // Global interaction methods that work with jQuery elements.
+    var interaction = {
+      view_favorites: function (event, elem, target_elem) {
+          var
+          state      = elem.data('state'),
+          $icon      = elem.find('i'),
+          height     = target_elem.find('ul').outerHeight(true) + 10,
+          btn_config = {
+            element   : elem,
+            state     : state === 'open' ? 'closed' : 'open',
+            do_toggle : true
+          },
+          container_config = {
+            element  : target_elem,
+            state    : btn_config.state,
+            overflow : state === 'open' ? 'hidden' : 'auto',
+            height   : state === 'open' ? 10 : height > vars.max_container_height ? vars.max_container_height : height,
+            speed    : 750
+          };
+
+          interaction.view_favorites_show(container_config, function () {
+            interaction.view_favorites_button(btn_config);
+          });
+        },
+        view_favorites_button: function (obj) {
+          obj.element.data({state: obj.state});
+          if (obj.do_toggle) {
+            obj.element.find('i').toggleClass('icon_state_close', 'icon_state_open');
+          }
+        },
+        view_favorites_show: function (obj, callback) {
+          var easing = obj.state === 'open' ?  'easeOutQuad' : 'easeInQuad';
+
+          obj.element.stop(true, true);
+          obj.element.animate({
+            height: obj.height
+          }, obj.speed, easing, function() {
+            $(this).css({overflow: obj.overflow});
+            callback();
+          });
+        },
+        remove_favorite_image: function (e) {
+          e.preventDefault();
+          var $parent_li = $(this).closest('li');
+
+          $parent_li.slideUp(1000, function () {
+            var
+            i,
+            len,
+            img,
+            $this = $(this),
+            src = $parent_li.find('img').attr('src'),
+            $siblings = $this.siblings(),
+            $favorites = $pe.favorites_container.find('#favorites');
+
+            $this.remove();
+
+            for (i = 0, len = vars.favorites.length; i < len; i += 1) {
+              if (vars.favorites[i].url.toLowerCase() === src.toLowerCase()) {
+                img = vars.favorites.splice(i, 1);
+                break;
+              }
+            }
+
+            if ($siblings.length) {
+              interaction.view_favorites(e, $pe.favorite_show_hide.data({state: 'closed'}), $favorites);
+            } else {
+              $pe.favorites_container
+                .slideUp(1000, function () {
+                    var $this = $(this)
+                      .find('#favorites')
+                        .slideUp(1000)
+                        .removeAttr('style')
+                        .find('ul')
+                          .remove()
+                        .end()
+                      .end().hide();
+                  });
+              }
+          });
+        }
+    };
 
   // Base plugin methods.
   var
@@ -392,23 +392,12 @@
     $pe.terms               = $('#terms');
     $pe.img_size            = $('#img_size');
     $pe.buttons             = $('.button');
-    $pe.ws_dropdown         = $('#wallpapers_sites').hide();
+    $pe.ws_dropdown         = $('#wallpapers_sites');
     $pe.ss_checkbox         = $('#slideshow');
     $pe.favorite_show_hide  = $('#favorite_controls a');
     $pe.window              = $(window);
     vars.win_width          = $pe.window.width();
     vars.win_height         = $pe.window.height();
-
-    setTimeout(function () {
-      common.load_wallpapers_sites(function (err, html) {
-        if (err) {
-          vars.errors.push(err);
-          return methods.set_status('init', err);
-        } else {
-          $pe.ws_dropdown.html(html).show(500);
-        }
-      });
-    }, 1000);
 
     $pe.window
       .on('resize', methods.resize_window)
@@ -418,13 +407,24 @@
         }
       });
 
+      common.load_wallpapers_sites(function (err, html) {
+        if (err) {
+          vars.errors.push(err);
+          return methods.set_status('init', err);
+        } else {
+          $pe.ws_dropdown.html(html);
+        }
+      });
+
+    return base.each(function () {
+
       // disable right click
       //$('*').on('contextmenu', function () { return false; });
 
       // Bind and listen to bodyonclick events. Set focus to
       // $pe.keypress_detector. This will allow me to listen
       // to keyboard events.
-      $pe.body = $('body')
+      $pe.body = $(this)
         .height(vars.win_height)
         .on('click', function (e) {
           if (e.target.id !== 'controls' && e.target.parentElement.id !== 'controls') {
@@ -439,7 +439,8 @@
         .hide()
         .prependTo($pe.body);
 
-      // Bind and listen to all button click events and handle them accordingly.
+      // Bind and listen to all button click events and handle
+      // them accordingly.
       $pe.buttons
         .on('click', function (e) {
           e.preventDefault();
@@ -540,7 +541,7 @@
         .appendTo($pe.body);
 
       methods.get_bg($pe.bg_container);
-
+    });
   },
 
   /**
@@ -664,6 +665,7 @@
 
     if (options.domain.length > 0 && options.scrape_path.length > 0 && is_url) {
       url  = options.domain + options.scrape_path + '?url=' + input;
+      console.log(url);
     } else {
       url  = 'http://ajax.googleapis.com/ajax/services/search/images?v=1.0&q=';
       url += (input.length > 0 ? common.parse_search_term(input) : common.get_rnd_term());
@@ -682,6 +684,7 @@
       url: url,
       dataType: 'jsonp',
       error: function (jqXHR, textStatus, errorThrown) {
+        console.log(errorThrown);
         return callback({
           func_name : 'get_json',
           desc      : textStatus,
@@ -884,4 +887,3 @@
   };
 
 } (jQuery, window, document));
-
