@@ -262,7 +262,6 @@
           return true;
         } else if (common.loading.start_time === 0) {
           common.loading.start_time = new Date().getTime();
-          //console.log('Start');
         }
 
         common.loading.interval_id = setInterval(function () {
@@ -270,22 +269,19 @@
           now   = new Date().getTime(),
           elaps = (now - common.loading.start_time) / 1000;
 
-          if (elaps > 20) {
+          if (elaps > 20)
             return common.loading.reset(true);
-          }
 
-          //console.log('elaps', elaps);
         }, 2000);
       },
       reset: function (ui) {
         if (ui) {
-          if ($.xhrPool.length > 0) {
+          if ($.xhrPool.length) {
             $.xhrPool.abortAll();
           }
           methods.update_ui($pe.bg_container);
         }
 
-        //console.log('timer cancelled');
         common.loading.start_time = 0;
         return clearInterval(common.loading.interval_id);
       },
@@ -414,7 +410,7 @@
     $pe.window
       .on('resize', methods.resize_window)
       .on('beforeunload', function (e) {
-        if ($pe.favorites_container.find('#favorites li').length > 0) {
+        if ($pe.favorites_container.find('#favorites li').length) {
           return 'You will loose your favorite images.';
         }
       });
@@ -556,8 +552,6 @@
   get_bg: function (elem) {
     // Monitor the error being brought back for a url or keyword.
 
-    console.log('vars.errors.length: ', vars.errors.length);
-
     if (vars.errors.length > 10) {
       if (!vars.ss_mode) {
         $pe.body.find('.loader').fadeOut(1000, function () {
@@ -585,17 +579,13 @@
         .fadeIn();
     }
 
-    console.log('is_url: ', is_url);
-
     common.loading.begin();
 
     // Check cache. If callback returns cached item index? Do stuff!
     methods.check_cache(input, function (i) {
       var items = vars.cache.items, images;
 
-      console.log('items: ', items);
-
-      if (is_url && i >= 0 && items[i] && items[i].images.length > 0) {
+      if (is_url && i >= 0 && items[i] && items[i].images.length) {
         images = items[i].images;
         idx    = common.get_rnd_int(0, images.length -1);
         bg     = {url: images[idx].url};
@@ -610,7 +600,7 @@
             vars.errors.push(err);
             return methods.set_status('get_bg', err);
           }
-          if (images && images.length > 0) {
+          if (images && images.length) {
             idx = common.get_rnd_int(0, images.length -1);
             bg  = {url: images[idx].url};
             methods.set_bg(bg, elem);
@@ -674,11 +664,11 @@
   get_json: function (is_url, input, callback) {
     var url = '';
 
-    if (options.domain.length > 0 && options.scrape_path.length > 0 && is_url) {
+    if (options.domain.length && options.scrape_path.length && is_url) {
       url  = options.domain + options.scrape_path + '?url=' + input;
     } else {
       url  = 'http://ajax.googleapis.com/ajax/services/search/images?v=1.0&q=';
-      url += (input.length > 0 ? common.parse_search_term(input) : common.get_rnd_term());
+      url += (input.length ? common.parse_search_term(input) : common.get_rnd_term());
       url += '&imgsz=xlarge|xxlarge|huge';                     // |huge (make this optional)
       url += '&imgtype=photo';
       url += '&rsz=8';                                         // max results per page
@@ -686,7 +676,7 @@
     }
 
     // Abort all ajax requests if any
-    if ($.xhrPool.length > 0) {
+    if ($.xhrPool.length) {
       $.xhrPool.abortAll();
     }
 
@@ -701,6 +691,7 @@
         });
       }
     }).done(function (data, status) {
+
       if (status === 'success') {
         try {
           if (data.error) {
@@ -711,7 +702,8 @@
             });
           }
           // replace this logic with a custom function that can be passed in for each api
-          if (options.domain.length > 0 && is_url) {
+
+          if (options.domain.length && is_url) {
             if (!vars.cache.items.contains(input, 'id')) {
               vars.cache.items.push({id: input, images: data});
             }
@@ -724,6 +716,7 @@
               return callback({desc: 'no results'});
             }
           }
+
         } catch (e) {
           return callback({
             func_name : 'get_json',
@@ -843,7 +836,7 @@
     items = vars.cache.items,
     len = items.length;
 
-    if (items.length > 0) {
+    if (len) {
       for (i = 0; i < len; i += 1) {
         if (id.toLowerCase() === items[i].id.toLowerCase()) {
           return callback(i);
