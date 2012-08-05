@@ -80,44 +80,11 @@
   <script>window.jQuery || document.write('<script src="js/libs/jquery-1.7.1.min.js"><\/script>')</script>
   <script src="js/libs/jquery.easing.1.3.js"></script>
   <script src="js/libs/store.min.js"></script>
-  <script src="js/jquery.mediaBackgrounds.js"></script>
   <!-- <script src="https://raw.github.com/icodejs/jQuery.mediaBackgrounds/master/js/jquery.mediaBackgrounds.min.js"></script> -->
-  <script>
-    $(function () {
-      var search_terms = [
-        'cityscape wallpaper',
-        'marvel comics',
-        'dc commics',
-        'space wallpaper',
-        'space stars wallpaper',
-        'space planets wallpaper',
-        'muscle cars',
-        'tokyo japan city',
-        'adult swim wallpaper',
-        'thepaperwall cityscape wallpapers',
-        'akira wallpaper',
-        'high res background textures',
-        'high res background wallpapers',
-        'architectural photography wallpapers',
-        'Street photography wallpapers',
-        'macro photography wallpapers',
-        'Aerial photography wallpapers',
-        'Black and White photography wallpapers',
-        'Night photography wallpapers',
-        'dream-wallpaper.com',
-        'flowers',
-        'graffiti',
-        'national geographic wallpaper'
-        ];
-      $('body').mediaBackgrounds({
-          domain       : 'http://localhost:5000',
-          scrape_path  : '/scrape/webPage/',
-          api_url      : 'http://icodejs.no.de/mb/',
-          search_terms : search_terms,
-          covert       : false
-        });
-      });
-  </script>
+  <script src="js/MB.common.js"></script>
+  <script src="js/MB.setup.js"></script>
+  <script src="js/MB.ui.js"></script>
+  <script src="js/jquery.mediaBackgrounds.js"></script>
   <script>
     // var _gaq = _gaq || [];
     // _gaq.push(['_setAccount', 'UA-30537419-1']);
