@@ -299,10 +299,16 @@ MB.app = (function($, global, document, undefined) {
           MB.app.methods.get_bg(MB.app.$pe.bg_container);
       },
       email: function () {
-        MB.ui.set_status('email', 'Check your inbox! (To do)');
+        MB.app.$pe.window.trigger('updateStatus', {
+          functionName: 'email',
+          description: 'Check your inbox! (To do)'
+        });
       },
       tweet: function () {
-        MB.ui.set_status('tweet', 'tweet tweet (To do)');
+        MB.app.$pe.window.trigger('updateStatus', {
+          functionName: 'tweet',
+          description: 'tweet tweet! (To do)'
+        });
       },
       save: function () {
         // $.ajax({
@@ -312,10 +318,16 @@ MB.app = (function($, global, document, undefined) {
         //   success: success,
         //   dataType: dataType
         // });
-        MB.ui.set_status('save', 'Your favorites list has been saved. (To do)');
+        MB.app.$pe.window.trigger('updateStatus', {
+          functionName: 'save',
+          description: 'Your favorites list has been saved. (To do)'
+        });
       },
       help: function () {
-        MB.ui.set_status('help', 'Use the spacebar to load new images. (To do)');
+        MB.app.$pe.window.trigger('updateStatus', {
+          functionName: 'help',
+          description: 'Use the spacebar to load new images. (To do)'
+        });
       },
       /**
        * Add current image to favorites with the intention of saving them
@@ -583,7 +595,9 @@ MB.app = (function($, global, document, undefined) {
           .attr('src', src_url)
           .prependTo('body')
           .error(function (e) {
+
             MB.ui.set_status('preload_img', '404 (Not Found)');
+
             return callback({
               func_name : 'preload_img',
               desc      : '404 (Not Found)',
