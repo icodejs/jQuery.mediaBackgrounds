@@ -1,7 +1,19 @@
 
 var MB = MB || {};
 
-MB.ui = {};
+MB.ui = (function () {
+  return {
+    updateStatus: function (data) {
+      MB.app.$pe.status
+        .find('section')
+          .fadeOut()
+        .end()
+          .html('')
+          .append($('<section>' + data.description + '</section>').fadeIn(1000))
+          .fadeIn();
+    }
+  };
+}());
 
 MB.ui.load_wallpapers_sites = (function () {
   return function (callback) {
@@ -139,15 +151,6 @@ MB.ui.set_status = (function () {
   };
 }());
 
-MB.ui.updateStatus = (function () {
-  return function (data) {
-    MB.app.$pe.status
-        .find('section')
-        .fadeOut()
-      .end()
-        .html('')
-        .append($('<section>' + data.description + '</section>').fadeIn(1000))
-        .fadeIn();
-  };
-}());
+
+
 
