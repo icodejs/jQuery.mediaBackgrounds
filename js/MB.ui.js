@@ -3,15 +3,7 @@ var MB = MB || {};
 
 MB.ui = (function () {
   return {
-    updateStatus: function (data) {
-      MB.app.$pe.status
-        .find('section')
-          .fadeOut()
-        .end()
-          .html('')
-          .append($('<section>' + data.description + '</section>').fadeIn(1000))
-          .fadeIn();
-    }
+    // move all the functions below into here
   };
 }());
 
@@ -151,6 +143,17 @@ MB.ui.set_status = (function () {
   };
 }());
 
+MB.ui.updateStatus = (function () {
+  return function (data) {
+    MB.app.$pe.status
+        .find('section')
+        .fadeOut()
+      .end()
+        .html('')
+        .append($('<section>' + data.description + '</section>').fadeIn(1000))
+        .fadeIn();
+  };
+}());
 
 
 
