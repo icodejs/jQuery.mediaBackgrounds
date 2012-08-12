@@ -1,20 +1,21 @@
 
 var MB = MB || {};
 
-MB.ui = (function () {
-  return {
-    // move all the functions below into here
-  };
-}());
+MB.ui = {};
 
-MB.ui.load_wallpapers_sites = (function () {
+MB.init = function () {
+  //console.log(this);
+};
+MB.init();
+
+MB.ui.loadWallpaperSites = (function () {
   return function (callback) {
     $.ajax({
       url:  MB.options.domain + '/load/webPages/',
       dataType: 'jsonp',
       error: function (jqXHR, textStatus, errorThrown) {
         return callback({
-          func_name : 'load_wallpapers_sites',
+          func_name : 'loadWallpaperSites',
           desc      : textStatus,
           data      : jqXHR
         });
@@ -145,13 +146,14 @@ MB.ui.set_status = (function () {
 
 MB.ui.updateStatus = (function () {
   return function (data) {
-    MB.app.$pe.status
-        .find('section')
-        .fadeOut()
-      .end()
-        .html('')
-        .append($('<section>' + data.description + '</section>').fadeIn(1000))
-        .fadeIn();
+    if (data.description.length)
+      MB.app.$pe.status
+          .find('section')
+          .fadeOut()
+        .end()
+          .html('')
+          .append($('<section>' + data.description + '</section>').fadeIn(1000))
+          .fadeIn();
   };
 }());
 

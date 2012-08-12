@@ -51,7 +51,8 @@ MB.app = (function($, global, document, undefined) {
       status              : null,
       terms               : null,
       window              : null,
-      ws_dropdown         : null
+      ws_dropdown         : null,
+      eventBoundElement   : null
     },
 
     // Global interaction methods that work with jQuery elements.
@@ -153,14 +154,19 @@ MB.app = (function($, global, document, undefined) {
         MB.app.$pe.ss_checkbox         = $('#slideshow');
         MB.app.$pe.favorite_show_hide  = $('#favorite_controls a');
         MB.app.$pe.window              = $(global);
+        MB.app.$pe.eventElement        = MB.app.$pe.window;
         MB.app.vars.win_width          = MB.app.$pe.window.width();
         MB.app.vars.win_height         = MB.app.$pe.window.height();
 
         setTimeout(function () {
-          MB.ui.load_wallpapers_sites(function (err, html) {
+          MB.ui.loadWallpaperSites(function (err, html) {
             if (err) {
               MB.app.vars.errors.push(err);
-              return MB.ui.set_status('init', err);
+              return MB.events.trigger('updateStatus', [{
+                functionName: 'preload_img',
+                error: err,
+                errors: MB.app.vars.errors
+              }]);
             } else {
               MB.app.$pe.ws_dropdown.html(html).show(500);
             }
@@ -249,12 +255,19 @@ MB.app = (function($, global, document, undefined) {
                 }, MB.options.interval);
 
                 $inputs.attr({disabled: 'disabled'}).addClass('disabled');
-                MB.ui.set_status('init', 'Slideshow mode. A new image will load in approximately ' + (MB.options.interval / 1000) + ' seconds.');
+
+                return MB.events.trigger('updateStatus', [{
+                  functionName: 'init',
+                  description: 'Slideshow mode. A new image will load in approximately ' + (MB.options.interval / 1000) + ' seconds.'
+                }]);
               } else {
                 clearInterval(MB.app.vars.timers.request.interval_id);
-
                 $inputs.removeAttr('disabled').removeClass('disabled');
-                MB.ui.set_status('init', 'Slideshow cancelled. Press the spacebar to load new images.');
+
+                return MB.events.trigger('updateStatus', [{
+                  functionName: 'init',
+                  description: 'Slideshow cancelled. Press the spacebar to load new images.'
+                }]);
               }
             });
 
@@ -296,19 +309,32 @@ MB.app = (function($, global, document, undefined) {
             })
             .appendTo(MB.app.$pe.body);
 
-          MB.app.methods.get_bg(MB.app.$pe.bg_container);
+            MB.events.init([
+              {
+                elem: MB.app.$pe.eventElement,
+                name: 'updateStatus',
+                func: MB.ui.updateStatus
+              },
+              {
+                elem: MB.app.$pe.eventElement,
+                name: 'getWallpaper',
+                func: MB.app.methods.get_bg
+              }
+            ]);
+
+          MB.events.trigger('getWallpaper', [MB.app.$pe.bg_container]);
       },
       email: function () {
-        MB.app.$pe.window.trigger('updateStatus', {
+        MB.events.trigger('updateStatus', [{
           functionName: 'email',
           description: 'Check your inbox! (To do)'
-        });
+        }]);
       },
       tweet: function () {
-        MB.app.$pe.window.trigger('updateStatus', {
+        MB.events.trigger('updateStatus', [{
           functionName: 'tweet',
           description: 'tweet tweet! (To do)'
-        });
+        }]);
       },
       save: function () {
         // $.ajax({
@@ -318,16 +344,16 @@ MB.app = (function($, global, document, undefined) {
         //   success: success,
         //   dataType: dataType
         // });
-        MB.app.$pe.window.trigger('updateStatus', {
+        MB.events.trigger('updateStatus', [{
           functionName: 'save',
-          description: 'Your favorites list has been saved. (To do)'
-        });
+          description: 'Your favorites list has been saved! (To do)'
+        }]);
       },
       help: function () {
-        MB.app.$pe.window.trigger('updateStatus', {
+        MB.events.trigger('updateStatus', [{
           functionName: 'help',
-          description: 'Use the spacebar to load new images. (To do)'
-        });
+          description: 'Use the spacebar to load new images! (To do)'
+        }]);
       },
       /**
        * Add current image to favorites with the intention of saving them
@@ -348,6 +374,7 @@ MB.app = (function($, global, document, undefined) {
                 .load(function () {
                   var
                   $this   = $(this),
+                  style   = '',
                   $favs   = MB.app.$pe.favorites_container.find('#favorites'),
                   $ul     = $favs.find('ul')[0] ? $favs.find('ul') : $('<ul />').appendTo($favs),
                   $rm_btn = $('<a class="remove" href="/"><i class="icon icon_x"></a>').on('click', MB.app.interaction.remove_favorite_image),
@@ -376,10 +403,14 @@ MB.app = (function($, global, document, undefined) {
                     MB.app.interaction.view_favorites_button(btn_config);
                     MB.app.$pe.keypress_detector.focus();
                     MB.app.vars.favorites.push(img);
-                    MB.ui.set_status('save', MB.app.vars.favorites.length + ' image(s) saved in your favorites!', MB.app.vars.favorites.length);
+
+                    return MB.events.trigger('updateStatus', [{
+                      functionName: 'save',
+                      description: MB.app.vars.favorites.length + ' image(s) saved in your favorites!'
+                    }]);
                   });
 
-                  var style = MB.app.$pe.favorites_container.attr('style').replace(' ', '');
+                  style = MB.app.$pe.favorites_container.attr('style').replace(' ', '');
 
                   if (style.indexOf('display:none;') >= 0) {
                     MB.app.$pe.favorites_container.fadeIn();
@@ -403,9 +434,12 @@ MB.app = (function($, global, document, undefined) {
               MB.app.vars.errors = [];
             });
           }
-          return MB.ui.set_status('get_bg',
-                'Insuffient images for the current URL. Please enter another URL or keyword(s)',
-                MB.app.vars.errors);
+
+          return MB.events.trigger('updateStatus', [{
+            functionName: 'get_bg',
+            description: 'Insuffient images for the current URL. Please enter another URL or keyword(s)',
+            errors: MB.app.vars.errors
+          }]);
         }
 
         var
@@ -442,7 +476,13 @@ MB.app = (function($, global, document, undefined) {
             MB.app.methods.get_json(is_url, input, function (err, images) {
               if (err) {
                 MB.app.vars.errors.push(err);
-                return MB.ui.set_status('get_bg', err);
+                return MB.events.trigger('updateStatus', [{
+                  functionName: 'get_bg',
+                  description: 'See error object',
+                  error: err,
+                  errors: MB.app.vars.errors
+                }]);
+
               }
               if (images && images.length) {
                 idx = MB.common.get_rnd_int(0, images.length -1);
@@ -551,7 +591,10 @@ MB.app = (function($, global, document, undefined) {
             w     = MB.app.vars.win_width,
             h     = MB.app.vars.win_height;
 
-            MB.ui.set_status('preload_img', 'Loaded image with dimensions: ' + img_w + ' x ' + img_h);
+            MB.events.trigger('updateStatus', [{
+              functionName: 'preload_img',
+              description: 'Validating image with dimensions: ' + img_w + ' x ' + img_h
+            }]);
 
             if (MB.app.$pe.img_size.val().indexOf('x') >= 0) {
               w = MB.app.$pe.img_size.val().split('x')[0];
@@ -590,19 +633,16 @@ MB.app = (function($, global, document, undefined) {
               MB.common.reset();
             }, delay);
 
-          })
-          .addClass('preloaded')
-          .attr('src', src_url)
-          .prependTo('body')
-          .error(function (e) {
-
-            MB.ui.set_status('preload_img', '404 (Not Found)');
-
-            return callback({
-              func_name : 'preload_img',
-              desc      : '404 (Not Found)',
-              data      : e
-            });
+            })
+            .addClass('preloaded')
+            .attr('src', src_url)
+            .prependTo('body')
+            .error(function (e) {
+              return callback({
+                func_name   : 'preload_img',
+                description : '404 (Not Found)',
+                error       : e
+              });
           }); // end JQ new Image
       },
       /**

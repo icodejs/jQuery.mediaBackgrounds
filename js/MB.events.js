@@ -4,30 +4,32 @@ MB.events = (function () {
   var events = [];
 
   return {
-    add: function (event) {
-      events.push(event);
+    add: function (e) {
+      events.push(e);
+    },
+    bind: function (o) {
+      events.push(o);
+      o.elem.on(o.name, function(event, data) {
+        o.func(data);
+      });
+    },
+    trigger: function (name, args) {
+      events.forEach(function (o) {
+        if (name.toLowerCase() === o.name.toLowerCase()) {
+          o.elem.trigger(o.name, args);
+        }
+      });
+
     },
     init: function (arr) {
       var items = arr || events;
 
-      if (!items.length) {
-        // some kind of error handling
-      }
+      if (!items.length) { /*some kind of error handling */ }
 
-      items.forEach(function (e) {
-        e.elem.on(e.name, function(event, data) {
-          e.func(data);
-        });
+      items.forEach(function (o) {
+        MB.events.bind(o);
       });
     }
   };
 }());
 
-
-MB.events.init([
-  {
-    elem: MB.app.$pe.window,
-    name: 'updateStatus',
-    func: MB.ui.updateStatus
-  }
-]);
