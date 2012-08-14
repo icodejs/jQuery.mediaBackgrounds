@@ -3,10 +3,9 @@ var MB = MB || {};
 
 MB.ui = {};
 
-MB.init = function () {
-  //console.log(this);
+MB.ui.init = function ($pe) {
+  MB.ui.$pe = $pe;
 };
-MB.init();
 
 MB.ui.loadWallpaperSites = (function () {
   return function (callback) {
@@ -41,11 +40,11 @@ MB.ui.resize_window = (function () {
   return function () {
     var
     $this           = $(this);
-    MB.app.vars.win_width  = $this.width();
-    MB.app.vars.win_height = $this.height();
+    MB.common.vars.win_width  = $this.width();
+    MB.common.vars.win_height = $this.height();
 
-    MB.app.$pe.bg_container.css({'height': MB.app.vars.win_height});
-    MB.app.$pe.body.css({'height': MB.app.vars.win_height});
+    MB.app.$pe.bg_container.css({'height': MB.common.vars.win_height});
+    MB.app.$pe.body.css({'height': MB.common.vars.win_height});
   };
 }());
 
@@ -82,32 +81,32 @@ MB.ui.set_bg = (function () {
           var old_bg_containers = $('.bg_container');
 
           if (err) {
-            MB.app.vars.errors.push(err);
+            MB.common.vars.errors.push(err);
             return MB.app.methods.get_bg(elem);
           }
 
-          MB.app.$pe.bg_container = $('<section />')
+          MB.ui.$pe.bg_container = $('<section />')
             .addClass('bg_container')
-            .height(MB.app.vars.win_height)
+            .height(MB.common.vars.win_height)
             .css({
               'background-color'    : 'transparent',
               'background-image'    : 'url("' + data.url + '")',
               'background-position' : 'top',
               'background-repeat'   : 'repeat',
-              'height'              : MB.app.vars.win_height
+              'height'              : MB.common.vars.win_height
             })
             .data('img_dims', img_dims)
-            .prependTo(MB.app.$pe.body);
+            .prependTo(MB.ui.$pe.body);
 
           // for when working on the plugin when you should be doing work :)
-          if (MB.options.covert) MB.app.$pe.bg_container.addClass('covert');
+          if (MB.options.covert) MB.ui.$pe.bg_container.addClass('covert');
 
           old_bg_containers.fadeOut(1000, function () {
             $(this).remove();
           });
       });
 
-      MB.app.$pe.keypress_detector.focus();
+      MB.ui.$pe.keypress_detector.focus();
     }
   };
 }());
@@ -120,34 +119,34 @@ MB.ui.update_ui = (function () {
   };
 }());
 
-/**
- * Updates the status bar with the results of called functions.
- *
- * @param {string} type - Name of function.
- * @param {string} status - Text to be added to the status.
- * @param {object} data - Extra data that may be of use at a later date.
- */
-MB.ui.set_status = (function () {
-  return function (type, status, data) {
-    var
-    s = status;
-    s += (type === 'save' ? ' <a href="#" id="view" class="button">view</a>' : '');
-    s += ' ...';
+// /**
+//  * Updates the status bar with the results of called functions.
+//  *
+//  * @param {string} type - Name of function.
+//  * @param {string} status - Text to be added to the status.
+//  * @param {object} data - Extra data that may be of use at a later date.
+//  */
+// MB.ui.set_status = (function () {
+//   return function (type, status, data) {
+//     var
+//     s = status;
+//     s += (type === 'save' ? ' <a href="#" id="view" class="button">view</a>' : '');
+//     s += ' ...';
 
-    MB.app.$pe.status
-      .find('section')
-        .fadeOut()
-        .end()
-      .html('')
-      .append($('<section>' + s + '</section>').fadeIn(1000))
-      .fadeIn();
-  };
-}());
+//     MB.app.$pe.status
+//       .find('section')
+//         .fadeOut()
+//         .end()
+//       .html('')
+//       .append($('<section>' + s + '</section>').fadeIn(1000))
+//       .fadeIn();
+//   };
+// }());
 
 MB.ui.updateStatus = (function () {
   return function (data) {
-    if (data.description.length)
-      MB.app.$pe.status
+    if (data.description && data.description.length)
+      data.$status_el
           .find('section')
           .fadeOut()
         .end()

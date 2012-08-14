@@ -5,7 +5,7 @@ MB.options = {
   domain        : 'http://localhost:5000',
   scrape_path   : '/scrape/webPage/',
   api_url       : 'http://icodejs.no.de/mb/',
-  covert        : false,
+  covert        : true,
   loading_image : 'img/loader.gif',
   media_type    : 'img',
   interval      : 15000,

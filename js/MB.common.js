@@ -3,25 +3,32 @@ var MB = MB || {};
 
 MB.common = {};
 
+MB.common.vars = (function () {
+  return {
+    timers: {
+      request: {
+        prev_req    : 0,
+        diff_ms     : 0,
+        elaps       : 0,
+        interval_id : -1
+      }
+    },
+    errors: [],
+    cache: {
+      items: []
+    },
+    favorites            : [],
+    win_width            : 1024,
+    win_height           : 1024,
+    is_loading           : false,
+    ss_mode              : false, // slideshow mode
+    max_container_height : 450
+  };
+}());
+
+
 MB.common.getTag = function (input, t, attrs) {
   return '<' + t + (attrs ? ' ' + attrs : '') + '>' + input + '</' + t + '>';
-};
-
-
-MB.common.get_rnd_term = function () {
-  var
-  idx  = 0,
-  st   = MB.options.search_terms,
-  term = '';
-
-  if (st.length === 1) {
-    return MB.common.parse_search_term(st[idx]);
-  } else {
-    idx = MB.common.get_rnd_int(0, st.length -1);
-    term = MB.common.parse_search_term(st[idx]);
-    MB.ui.set_status('get_rnd_term', 'search term: ' + term);
-    return term;
-  }
 };
 
 
@@ -30,7 +37,7 @@ MB.common.loading = (function () {
     start_time: 0,
     elaps: 0,
     interval_id: -1,
-    begin: function () {
+    begin: function (bg_container) {
       var that = this;
       if (that.start_time > 0) {
         return true;
@@ -43,19 +50,19 @@ MB.common.loading = (function () {
         now   = new Date().getTime(),
         elaps = (now - that.start_time) / 1000;
 
-        if (elaps > 20) return MB.common.reset(true);
+        if (elaps > 20) return MB.common.reset(true, bg_container);
       }, 2000);
     }
   };
 }());
 
 
-MB.common.reset = function (ui) {
-  if (ui) {
+MB.common.reset = function (ui, bg_container) {
+  if (ui && bg_container) {
     if ($.xhrPool.length) {
       $.xhrPool.abortAll();
     }
-    MB.ui.update_ui(MB.app.$pe.bg_container);
+    MB.ui.update_ui(bg_container);
   }
   MB.common.loading.start_time = 0;
 
