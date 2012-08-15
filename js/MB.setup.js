@@ -38,6 +38,8 @@ MB.options = {
 };
 
 MB.setup = (function () {
+  "use strict";
+
   return function ($) {
 
     /**

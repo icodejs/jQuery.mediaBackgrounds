@@ -2,6 +2,8 @@
 var MB = MB || {};
 
 MB.events = (function () {
+  "use strict";
+
   var events = [];
 
   // public API

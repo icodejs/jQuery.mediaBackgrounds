@@ -1,7 +1,8 @@
 
 var MB = MB || {};
 
-MB.interaction = (function () {
+MB.interaction = (function ($) {
+   "use strict";
 
   // public API
   return {
@@ -128,7 +129,7 @@ MB.interaction = (function () {
       }
 
       if ($siblings.length) {
-        view_favorites(e, MB.ui.$pe.favoritesorite_show_hide.data({state: 'closed'}), $favorites);
+        MB.ui.view_favorites(e, MB.ui.$pe.favoritesorite_show_hide.data({state: 'closed'}), $favorites);
       } else {
         MB.ui.$pe.favorites_container
           .slideUp(1000, function () {
@@ -146,5 +147,5 @@ MB.interaction = (function () {
     });
   }
 
-}());
+}(jQuery));
 

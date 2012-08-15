@@ -1,7 +1,8 @@
 
 var MB = MB || {};
 
-MB.ui = (function (){
+MB.ui = (function ($){
+  "use strict";
 
   var $pe = {};
 
@@ -295,7 +296,7 @@ MB.ui = (function (){
     $pe.favorite_show_hide
       .on('click', function (e) {
         e.preventDefault();
-        view_favorites(e, $(this), $('#favorites'));
+        MB.ui.view_favorites(e, $(this), $('#favorites'));
       }).data({state: 'closed'});
 
     // setup events
@@ -337,5 +338,5 @@ MB.ui = (function (){
     $pe                            : $pe
   };
 
-}());
+}(jQuery));
 

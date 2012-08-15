@@ -1,7 +1,8 @@
 
 var MB = MB || {};
 
-MB.common = (function () {
+MB.common = (function ($) {
+  "use strict";
 
   var vars = (function () {
     return {
@@ -82,4 +83,4 @@ MB.common = (function () {
     active            : active
   };
 
-}());
+}(jQuery));

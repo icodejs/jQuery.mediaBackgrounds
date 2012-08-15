@@ -2,6 +2,7 @@
 var MB = MB || {};
 
 MB.errors = (function () {
+  "use strict";
   var errors = [];
 
   // public API
@@ -31,6 +32,7 @@ MB.errors = (function () {
 
   function toString() {
     var i, len = this.len, output = '';
+
     for (i = 0; i < len; i += 1) {
       output += errors[i].description + '\n';
     }
