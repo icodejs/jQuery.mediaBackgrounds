@@ -63,13 +63,13 @@ MB.ui = (function (){
   var set_bg = (function () {
     return function (data, elem) {
       if (data && data.url) {
-          MB.app.methods.preload_img(data.url, 0, function (err, img_dims) {
+          MB.app.preload_img(data.url, 0, function (err, img_dims) {
             // create a new bg_container section which will replace the old on
             var old_bg_containers = $('.bg_container');
 
             if (err) {
-              MB.common.vars.errors.push(err);
-              return MB.app.methods.getWallpaper(elem);
+              MB.errors.add(err);
+              return MB.app.getWallpaper(elem);
             }
 
             $pe.bg_container = $('<section />')
@@ -102,7 +102,7 @@ MB.ui = (function (){
   var update_ui = (function () {
     return function (elem) {
       if (elem) {
-        MB.app.methods.getWallpaper(elem);
+        MB.app.getWallpaper(elem);
       }
     };
   }());
@@ -308,7 +308,7 @@ MB.ui = (function (){
       {
         elem: $pe.eventElement,
         name: 'getWallpaper',
-        func: MB.app.methods.getWallpaper
+        func: MB.app.getWallpaper
       },
       {
         elem: $pe.eventElement,
@@ -316,9 +316,6 @@ MB.ui = (function (){
         func: MB.common.loading.begin
       }
     ]);
-
-    MB.events.trigger('getWallpaper', [$pe.bg_container]);
-
 
     callback($pe);
     //$('*').on('contextmenu', function () { return false; }); // disable right click

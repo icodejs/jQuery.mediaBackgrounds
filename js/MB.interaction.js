@@ -53,53 +53,53 @@ MB.interaction = (function () {
 
       if (!MB.common.vars.favorites.contains(img.url, 'url')) {
         $('<img />')
-            .attr({src: img.url, width: thumb_width, height: thumb_height})
-            .load(function () {
-              var
-              $this   = $(this),
-              style   = '',
-              $favs   = MB.ui.$pe.favorites_container.find('#favorites'),
-              $ul     = $favs.find('ul')[0] ? $favs.find('ul') : $('<ul />').appendTo($favs),
-              $rm_btn = $('<a class="remove" href="/"><i class="icon icon_x"></a>').on('click', MB.interaction.remove_favorite_image),
-              $li     = $('<li />').append($rm_btn).hide(),
-              $a      = $('<a />').attr({href: img.url, target: '_blank'}).html($this),
-              height  = MB.ui.set_favorites_container_height($ul, thumb_height, $ul.find('li').length === 0),
-              state   = MB.ui.$pe.favorite_show_hide.data('state');
+          .attr({src: img.url, width: thumb_width, height: thumb_height})
+          .load(function () {
+            var
+            $this   = $(this),
+            style   = '',
+            $favs   = MB.ui.$pe.favorites_container.find('#favorites'),
+            $ul     = $favs.find('ul')[0] ? $favs.find('ul') : $('<ul />').appendTo($favs),
+            $rm_btn = $('<a class="remove" href="/"><i class="icon icon_x"></a>').on('click', MB.interaction.remove_favorite_image),
+            $li     = $('<li />').append($rm_btn).hide(),
+            $a      = $('<a />').attr({href: img.url, target: '_blank'}).html($this),
+            height  = MB.ui.set_favorites_container_height($ul, thumb_height, $ul.find('li').length === 0),
+            state   = MB.ui.$pe.favorite_show_hide.data('state');
 
-              var
-              btn_config = {
-                element   : MB.ui.$pe.favorite_show_hide,
-                state     : 'open',
-                do_toggle : state === 'closed'
-              },
-              container_config = {
-                element  : $favs,
-                state    : state,
-                overflow : 'auto',
-                height   : height > MB.common.vars.max_container_height ? MB.common.vars.max_container_height : height,
-                speed    : 750
-              };
+            var
+            btn_config = {
+              element   : MB.ui.$pe.favorite_show_hide,
+              state     : 'open',
+              do_toggle : state === 'closed'
+            },
+            container_config = {
+              element  : $favs,
+              state    : state,
+              overflow : 'auto',
+              height   : height > MB.common.vars.max_container_height ? MB.common.vars.max_container_height : height,
+              speed    : 750
+            };
 
-              $li.prepend($a).prependTo($ul).slideDown(1000);
+            $li.prepend($a).prependTo($ul).slideDown(1000);
 
-              MB.ui.view_favorites_show(container_config, function () {
-                view_favorites_button(btn_config);
-                MB.ui.$pe.keypress_detector.focus();
-                MB.common.vars.favorites.push(img);
+            MB.ui.view_favorites_show(container_config, function () {
+              MB.ui.view_favorites_button(btn_config);
+              MB.ui.$pe.keypress_detector.focus();
+              MB.common.vars.favorites.push(img);
 
-                return MB.events.trigger('updateStatus', [{
-                  functionName: 'save',
-                  description: MB.common.vars.favorites.length + ' image(s) saved in your favorites!',
-                  $status_el: MB.ui.$pe.status
-                }]);
-              });
-
-              style = MB.ui.$pe.favorites_container.attr('style').replace(' ', '');
-
-              if (style.indexOf('display:none;') >= 0) {
-                MB.ui.$pe.favorites_container.fadeIn();
-              }
+              return MB.events.trigger('updateStatus', [{
+                functionName: 'save',
+                description: MB.common.vars.favorites.length + ' image(s) saved in your favorites!',
+                $status_el: MB.ui.$pe.status
+              }]);
             });
+
+            style = MB.ui.$pe.favorites_container.attr('style').replace(' ', '');
+
+            if (style.indexOf('display:none;') >= 0) {
+              MB.ui.$pe.favorites_container.fadeIn();
+            }
+          });
       }
     }
   }
