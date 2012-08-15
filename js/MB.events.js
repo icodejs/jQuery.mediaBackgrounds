@@ -85,23 +85,23 @@ MB.events = (function () {
   }
 
   function pressF() {
-    console.log('F was pressed');
+    MB.interaction.add_favorite(MB.ui.$pe.bg_container);
   }
 
   function pressS() {
-    console.log('S was pressed');
-  }
-
-  function pressH() {
-    console.log('H was pressed');
-  }
-
-  function pressE() {
-    console.log('E was pressed');
+    MB.interaction.save(MB.ui.$pe.bg_container);
   }
 
   function pressT() {
-    console.log('T was pressed');
+    MB.interaction.tweet(MB.ui.$pe.bg_container);
+  }
+
+  function pressE() {
+    MB.interaction.email(MB.ui.$pe.bg_container);
+  }
+
+  function pressH() {
+    MB.interaction.help(MB.ui.$pe.bg_container);
   }
 
 }());

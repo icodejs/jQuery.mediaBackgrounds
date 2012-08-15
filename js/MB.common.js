@@ -61,11 +61,11 @@ MB.common = (function ($) {
     return clearInterval(MB.common.loading.interval_id);
   }
 
-  function parse_search_term(term) {
+  function parseSearchTerm(term) {
     return term.split(' ').join('+');
   }
 
-  function get_rnd_int(min, max)  {
+  function getRandomInt(min, max)  {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 
@@ -75,12 +75,12 @@ MB.common = (function ($) {
 
   // public API
   return {
-    vars              : vars,
-    loading           : loading,
-    reset             : reset,
-    parse_search_term : parse_search_term,
-    get_rnd_int       : get_rnd_int,
-    active            : active
+    vars            : vars,
+    loading         : loading,
+    reset           : reset,
+    parseSearchTerm : parseSearchTerm,
+    getRandomInt    : getRandomInt,
+    active          : active
   };
 
 }(jQuery));

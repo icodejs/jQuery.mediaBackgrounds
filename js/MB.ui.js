@@ -64,7 +64,7 @@ MB.ui = (function ($){
   var set_bg = (function () {
     return function (data, elem) {
       if (data && data.url) {
-          MB.app.preload_img(data.url, 0, function (err, img_dims) {
+          MB.app.preloadImage(data.url, 0, function (err, img_dims) {
             // create a new bg_container section which will replace the old on
             var old_bg_containers = $('.bg_container');
 
@@ -129,6 +129,29 @@ MB.ui = (function ($){
     return name + '="' + value + '"';
   }
 
+  function viewFavorites(event, elem, target_elem) {
+    var
+    state      = elem.data('state'),
+    $icon      = elem.find('i'),
+    height     = target_elem.find('ul').outerHeight(true) + 10,
+    btn_config = {
+      element   : elem,
+      state     : state === 'open' ? 'closed' : 'open',
+      do_toggle : true
+    },
+    container_config = {
+      element  : target_elem,
+      state    : btn_config.state,
+      overflow : state === 'open' ? 'hidden' : 'auto',
+      height   : state === 'open' ? 10 : height > MB.common.vars.max_container_height ? MB.common.vars.max_container_height : height,
+      speed    : 750
+    };
+
+    view_favorites_show(container_config, function () {
+      view_favorites_button(btn_config);
+    });
+  }
+
   function view_favorites_show(obj, callback) {
     var easing = obj.state === 'open' ?  'easeOutQuad' : 'easeInQuad';
 
@@ -149,14 +172,13 @@ MB.ui = (function ($){
   }
 
   function init(pageElements, callback) {
-    var that = this;
-
-    that.$pe = pageElements;
-    $pe = that.$pe;
+    MB.ui.$pe = pageElements;
+    $pe = MB.ui.$pe;
 
     MB.common.vars.win_width  = $pe.window.width();
     MB.common.vars.win_height = $pe.window.height();
 
+    //$('*').on('contextmenu', function () { return false; }); // disable right click
 
     // load wallpaper sites from server
     setTimeout(function () {
@@ -164,7 +186,7 @@ MB.ui = (function ($){
         if (err) {
           MB.errors.add(err);
           return MB.events.trigger('updateStatus', [{
-            functionName : 'preload_img',
+            functionName : 'preloadImage',
             error        : err,
             errors       : MB.errors.toString(),
             description  : 'init error',
@@ -204,21 +226,11 @@ MB.ui = (function ($){
         $pe.keypress_detector.focus();
 
         switch ($(this).attr('id').toLowerCase()) {
-        case 'fav':
-          MB.interaction.add_favorite($pe.bg_container);
-          break;
-        case 'save':
-          MB.interaction.save($pe.bg_container);
-          break;
-        case 'email':
-          MB.interaction.email($pe.bg_container);
-          break;
-        case 'tweet':
-          MB.interaction.tweet($pe.bg_container);
-          break;
-        case 'help':
-          MB.interaction.help($pe.bg_container);
-          break;
+          case 'fav'   : MB.interaction.add_favorite($pe.bg_container); break;
+          case 'save'  : MB.interaction.save($pe.bg_container); break;
+          case 'tweet' : MB.interaction.tweet($pe.bg_container); break;
+          case 'email' : MB.interaction.email($pe.bg_container); break;
+          case 'help'  : MB.interaction.help($pe.bg_container); break;
         }
       });
 
@@ -296,7 +308,7 @@ MB.ui = (function ($){
     $pe.favorite_show_hide
       .on('click', function (e) {
         e.preventDefault();
-        MB.ui.view_favorites(e, $(this), $('#favorites'));
+        viewFavorites(e, $(this), $('#favorites'));
       }).data({state: 'closed'});
 
     // setup events
@@ -319,7 +331,6 @@ MB.ui = (function ($){
     ]);
 
     callback($pe);
-    //$('*').on('contextmenu', function () { return false; }); // disable right click
   }
 
   // public API

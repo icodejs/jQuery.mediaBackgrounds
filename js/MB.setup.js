@@ -5,7 +5,7 @@ MB.options = {
   domain        : 'http://localhost:5000',
   scrape_path   : '/scrape/webPage/',
   api_url       : 'http://icodejs.no.de/mb/',
-  covert        : true,
+  covert        : false,
   loading_image : 'img/loader.gif',
   media_type    : 'img',
   interval      : 15000,
@@ -37,55 +37,53 @@ MB.options = {
   ]
 };
 
-MB.setup = (function () {
+MB.setup = (function ($) {
   "use strict";
 
-  return function ($) {
-
-    /**
-     * Monkey patch Array object with a custom contains method
-     * (may need check if string and use toLowerCase()).
-     */
-    if (typeof Array.prototype.contains  !== 'function') {
-      Array.prototype.contains = function (needle, prop) {
-        var i = this.length;
-        while (i--) {
-          if (prop) {
-            if (this[i][prop] === needle) return true;
-          } else {
-            if (this[i] === needle) return true;
-          }
+  /**
+   * Monkey patch Array object with a custom contains method
+   * (may need check if string and use toLowerCase()).
+   */
+  if (typeof Array.prototype.contains  !== 'function') {
+    Array.prototype.contains = function (needle, prop) {
+      var i = this.length;
+      while (i--) {
+        if (prop) {
+          if (this[i][prop] === needle) return true;
+        } else {
+          if (this[i] === needle) return true;
         }
-        return false;
-      };
-    }
+      }
+      return false;
+    };
+  }
 
-    /**
-     * jQuery global function that keep a record of all ajax requests and
-     * provide a handly way of aborting them all at any given time.
-     */
-      $.xhrPool = [];
-      $.xhrPool.abortAll = function () {
-        $(this).each(function (idx, jqXHR) {
-          jqXHR.abort();
-        });
-        $.xhrPool.length = 0;
-      };
-
-      $.ajaxSetup({
-        beforeSend: function (jqXHR) {
-          $.xhrPool.push(jqXHR);
-        },
-        complete: function (jqXHR) {
-          var index = $.xhrPool.indexOf(jqXHR);
-          if (index > -1) {
-            $.xhrPool.splice(index, 1);
-          }
-        }
-      });
-
-      $.fn.css_attr_val = function (property) {
-        return parseInt(this.css(property).slice(0,-2), 10);
-      };
+  /**
+   * jQuery global function that keep a record of all ajax requests and
+   * provide a handly way of aborting them all at any given time.
+   */
+  $.xhrPool = [];
+  $.xhrPool.abortAll = function () {
+    $(this).each(function (idx, jqXHR) {
+      jqXHR.abort();
+    });
+    $.xhrPool.length = 0;
   };
-}());
+
+  $.ajaxSetup({
+    beforeSend: function (jqXHR) {
+      $.xhrPool.push(jqXHR);
+    },
+    complete: function (jqXHR) {
+      var index = $.xhrPool.indexOf(jqXHR);
+      if (index > -1) {
+        $.xhrPool.splice(index, 1);
+      }
+    }
+  });
+
+  $.fn.css_attr_val = function (property) {
+    return parseInt(this.css(property).slice(0,-2), 10);
+  };
+
+}(jQuery));

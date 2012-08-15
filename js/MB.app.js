@@ -16,9 +16,9 @@ MB.app = (function($, global, document, undefined) {
 
   // public API
   return {
-    init         : init,
-    getWallpaper : getWallpaper,
-    preload_img  : preload_img
+    init          : init,
+    getWallpaper  : getWallpaper,
+    preloadImage  : preloadImage
   };
 
   /**
@@ -29,7 +29,7 @@ MB.app = (function($, global, document, undefined) {
    * @param {integer} delay - Option to call the callback with a delay
    * @param {function} callback - Callback method for results.
    */
-  function preload_img(src_url, delay, callback) {
+  function preloadImage(src_url, delay, callback) {
     MB.common.vars.is_loading = true;
     // remove this for now but in future we might hide it
     MB.ui.$pe.body.find('img.preloaded').remove();
@@ -46,7 +46,7 @@ MB.app = (function($, global, document, undefined) {
         h     = MB.common.vars.win_height;
 
         MB.events.trigger('updateStatus', [{
-          functionName: 'preload_img',
+          functionName: 'preloadImage',
           description: 'Validating image with dimensions: ' + img_w + ' x ' + img_h,
           $status_el: MB.ui.$pe.status
         }]);
@@ -67,7 +67,7 @@ MB.app = (function($, global, document, undefined) {
         // size specified by the user.
         if (img_w < w || img_h < h) {
           return callback({
-            func_name : 'preload_img',
+            func_name : 'preloadImage',
             desc      : 'image returned is too small'
           });
         }
@@ -94,7 +94,7 @@ MB.app = (function($, global, document, undefined) {
       .prependTo('body')
       .error(function (e) {
         return callback({
-          func_name   : 'preload_img',
+          func_name   : 'preloadImage',
           description : '404 (Not Found)',
           error       : e
         });
@@ -167,12 +167,12 @@ MB.app = (function($, global, document, undefined) {
     MB.events.trigger('image_loading', [MB.ui.$pe.bg_container]);
 
     // Check cache. If callback returns cached item index? Do stuff!
-    check_cache(input, function (i) {
+    checkCache(input, function (i) {
       var items = MB.common.vars.cache.items, images;
 
       if (is_url && i >= 0 && items[i] && items[i].images.length) {
         images = items[i].images;
-        idx    = MB.common.get_rnd_int(0, images.length -1);
+        idx    = MB.common.getRandomInt(0, images.length -1);
         bg     = {url: images[idx].url};
 
         MB.ui.set_bg(bg, elem);
@@ -180,7 +180,7 @@ MB.app = (function($, global, document, undefined) {
         // Clear error if accessing an uncached URL.
         MB.errors.clear();
 
-        get_json(is_url, input, function (err, images) {
+        getJson(is_url, input, function (err, images) {
           if (err) {
             MB.errors.add(err);
 
@@ -194,7 +194,7 @@ MB.app = (function($, global, document, undefined) {
 
           }
           if (images && images.length) {
-            idx = MB.common.get_rnd_int(0, images.length -1);
+            idx = MB.common.getRandomInt(0, images.length -1);
             bg  = {url: images[idx].url};
             MB.ui.set_bg(bg, elem);
           }
@@ -211,31 +211,29 @@ MB.app = (function($, global, document, undefined) {
    * @param {string} input - User input.
    * @param {function} callback - Callback method for results.
    */
-  function get_json(is_url, input, callback) {
+  function getJson(is_url, input, callback) {
     var url = '';
 
     if (MB.options.domain.length && MB.options.scrape_path.length && is_url) {
       url  = MB.options.domain + MB.options.scrape_path + '?url=' + input;
     } else {
       url  = 'http://ajax.googleapis.com/ajax/services/search/images?v=1.0&q=';
-      url += (input.length ? MB.common.parse_search_term(input) : get_rnd_term());
+      url += (input.length ? MB.common.parseSearchTerm(input) : getRandomSearchTerm());
       url += '&imgsz=xlarge|xxlarge|huge';                     // |huge (make this optional)
       url += '&imgtype=photo';
       url += '&rsz=8';                                         // max results per page
-      url += '&start=' + MB.common.get_rnd_int(1, 50);
+      url += '&start=' + MB.common.getRandomInt(1, 50);
     }
 
     // Abort all ajax requests if any
-    if ($.xhrPool.length) {
-      $.xhrPool.abortAll();
-    }
+    if ($.xhrPool.length) $.xhrPool.abortAll();
 
     $.ajax({
       url: url,
       dataType: 'jsonp',
       error: function (jqXHR, textStatus, errorThrown) {
         return callback({
-          func_name : 'ajax get_json',
+          func_name : 'ajax getJson',
           desc      : textStatus,
           data      : errorThrown
         });
@@ -246,7 +244,7 @@ MB.app = (function($, global, document, undefined) {
         try {
           if (data.error) {
             return callback({
-              func_name : 'done get_json',
+              func_name : 'done getJson',
               desc      : data.error,
               data      : data
             });
@@ -269,7 +267,7 @@ MB.app = (function($, global, document, undefined) {
 
         } catch (e) {
           return callback({
-            func_name : 'get_json',
+            func_name : 'getJson',
             desc      : e.toString(),
             data      : e
           });
@@ -278,30 +276,7 @@ MB.app = (function($, global, document, undefined) {
     });
   }
 
-  function view_favorites(event, elem, target_elem) {
-    var
-    state      = elem.data('state'),
-    $icon      = elem.find('i'),
-    height     = target_elem.find('ul').outerHeight(true) + 10,
-    btn_config = {
-      element   : elem,
-      state     : state === 'open' ? 'closed' : 'open',
-      do_toggle : true
-    },
-    container_config = {
-      element  : target_elem,
-      state    : btn_config.state,
-      overflow : state === 'open' ? 'hidden' : 'auto',
-      height   : state === 'open' ? 10 : height > MB.common.vars.max_container_height ? MB.common.vars.max_container_height : height,
-      speed    : 750
-    };
-
-    MB.ui.view_favorites_show(container_config, function () {
-      MB.ui.view_favorites_button(btn_config);
-    });
-  }
-
-  function check_cache(id, callback) {
+  function checkCache(id, callback) {
     var
     i,
     items = MB.common.vars.cache.items,
@@ -317,20 +292,20 @@ MB.app = (function($, global, document, undefined) {
     return callback(-1);
   }
 
-  function get_rnd_term() {
+  function getRandomSearchTerm() {
     var
     idx  = 0,
     st   = MB.options.search_terms,
     term = '';
 
     if (st.length === 1) {
-      return MB.common.parse_search_term(st[idx]);
+      return MB.common.parseSearchTerm(st[idx]);
     } else {
-      idx = MB.common.get_rnd_int(0, st.length -1);
-      term = MB.common.parse_search_term(st[idx]);
+      idx = MB.common.getRandomInt(0, st.length -1);
+      term = MB.common.parseSearchTerm(st[idx]);
 
       MB.events.trigger('updateStatus', [{
-        functionName: 'get_rnd_term',
+        functionName: 'getRandomSearchTerm',
         description: 'search term: ' + term,
         $status_el: MB.ui.$pe.status
       }]);
@@ -341,6 +316,3 @@ MB.app = (function($, global, document, undefined) {
 
 } (jQuery, this, document));
 
-MB.setup(jQuery);
-
-MB.app.init();

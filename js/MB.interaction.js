@@ -6,12 +6,11 @@ MB.interaction = (function ($) {
 
   // public API
   return {
-    email                 : email,
-    tweet                 : tweet,
-    save                  : save,
-    help                  : help,
-    add_favorite          : add_favorite,
-    remove_favorite_image : remove_favorite_image
+    email          : email,
+    tweet          : tweet,
+    save           : save,
+    help           : help,
+    add_favorite   : add_favorite
   };
 
   function email() {
@@ -41,7 +40,7 @@ MB.interaction = (function ($) {
   function help() {
     MB.events.trigger('updateStatus', [{
       functionName: 'help',
-      description: 'Use the spacebar to load new images! (To do)',
+      description: 'Spacebar: Load, F: Favorites, S: Save, T: Tweet, E: Email, H: Help',
       $status_el: MB.ui.$pe.status
     }]);
   }
@@ -61,7 +60,7 @@ MB.interaction = (function ($) {
             style   = '',
             $favs   = MB.ui.$pe.favorites_container.find('#favorites'),
             $ul     = $favs.find('ul')[0] ? $favs.find('ul') : $('<ul />').appendTo($favs),
-            $rm_btn = $('<a class="remove" href="/"><i class="icon icon_x"></a>').on('click', MB.interaction.remove_favorite_image),
+            $rm_btn = $('<a class="remove" href="/"><i class="icon icon_x"></a>').on('click', removeFavImage),
             $li     = $('<li />').append($rm_btn).hide(),
             $a      = $('<a />').attr({href: img.url, target: '_blank'}).html($this),
             height  = MB.ui.set_favorites_container_height($ul, thumb_height, $ul.find('li').length === 0),
@@ -105,7 +104,7 @@ MB.interaction = (function ($) {
     }
   }
 
-  function remove_favorite_image(e) {
+  function removeFavImage(e) {
     e.preventDefault();
     var $parent_li = $(this).closest('li');
 

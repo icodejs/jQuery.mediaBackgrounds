@@ -31,7 +31,7 @@ MB.errors = (function () {
   }
 
   function toString() {
-    var i, len = this.len, output = '';
+    var i, len = MB.errors.len, output = '';
 
     for (i = 0; i < len; i += 1) {
       output += errors[i].description + '\n';
