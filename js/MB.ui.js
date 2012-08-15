@@ -38,8 +38,8 @@ MB.ui = (function ($){
       MB.common.vars.win_width  = $this.width();
       MB.common.vars.win_height = $this.height();
 
-      MB.app.$pe.bg_container.css({'height': MB.common.vars.win_height});
-      MB.app.$pe.body.css({'height': MB.common.vars.win_height});
+      $pe.bg_container.css({'height': MB.common.vars.win_height});
+      $pe.body.css({'height': MB.common.vars.win_height});
     };
   }());
 
