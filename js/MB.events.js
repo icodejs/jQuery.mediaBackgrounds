@@ -2,7 +2,7 @@
 var MB = MB || {};
 
 MB.events = (function () {
-  "use strict";
+  'use strict';
 
   var events = [];
 

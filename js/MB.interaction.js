@@ -2,7 +2,7 @@
 var MB = MB || {};
 
 MB.interaction = (function ($) {
-   "use strict";
+   'use strict';
 
   // public API
   return {
@@ -15,34 +15,80 @@ MB.interaction = (function ($) {
 
   function email() {
     MB.events.trigger('updateStatus', [{
-      functionName: 'email',
-      description: 'Check your inbox! (To do)',
-      $status_el: MB.ui.$pe.status
+      functionName : 'email',
+      description  : 'Check your inbox! (To do)',
+      elem         : MB.ui.$pe.status
     }]);
   }
 
   function tweet() {
     MB.events.trigger('updateStatus', [{
-      functionName: 'tweet',
-      description: 'tweet tweet! (To do)',
-      $status_el: MB.ui.$pe.status
+      functionName : 'tweet',
+      description  : 'tweet tweet! (To do)',
+      elem         : MB.ui.$pe.status
     }]);
   }
 
   function save() {
     MB.events.trigger('updateStatus', [{
-      functionName: 'save',
-      description: 'Your favorites list has been saved! (To do)',
-      $status_el: MB.ui.$pe.status
+      functionName : 'save',
+      description  : 'Your favorites list has been saved! (To do)',
+      elem         : MB.ui.$pe.status
     }]);
   }
 
   function help() {
     MB.events.trigger('updateStatus', [{
-      functionName: 'help',
-      description: 'Spacebar: Load, F: Favorites, S: Save, T: Tweet, E: Email, H: Help',
-      $status_el: MB.ui.$pe.status
+      functionName : 'help',
+      description  : 'Spacebar: Load, F: Favorites, S: Save, T: Tweet, E: Email, H: Help',
+      elem         : MB.ui.$pe.status
     }]);
+  }
+
+  function removeFavImage(e) {
+    e.preventDefault();
+
+    var $parent_li = $(this).closest('li');
+
+    $parent_li.slideUp(1000, function () {
+      var
+      i,
+      len,
+      img,
+      $this      = $(this),
+      src        = $parent_li.find('img').attr('src'),
+      $siblings  = $this.siblings(),
+      $favorites = MB.ui.$pe.favorites_container.find('#favorites');
+
+      $this.remove();
+
+      for (i = 0, len = MB.common.vars.favorites.length; i < len; i += 1) {
+        if (MB.common.vars.favorites[i].url.toLowerCase() === src.toLowerCase()) {
+          img = MB.common.vars.favorites.splice(i, 1);
+          break;
+        }
+      }
+
+      if ($siblings.length) {
+        MB.ui.view_favorites(e, MB.ui.$pe.favoritesorite_show_hide.data({state: 'closed'}), $favorites);
+      } else {
+        MB.ui.$pe.favorites_container
+          .slideUp(1000, function () {
+              var $this = $(this)
+                .find('#favorites')
+                  .slideUp(1000)
+                  .removeAttr('style')
+                  .find('ul')
+                    .remove()
+                  .end()
+                .end()
+                .hide();
+            });
+
+        // reset state
+        MB.ui.$pe.favorite_show_hide.removeData('state');
+      }
+    });
   }
 
   function add_favorite(elem) {
@@ -90,7 +136,7 @@ MB.interaction = (function ($) {
               return MB.events.trigger('updateStatus', [{
                 functionName: 'save',
                 description: MB.common.vars.favorites.length + ' image(s) saved in your favorites!',
-                $status_el: MB.ui.$pe.status
+                elem: MB.ui.$pe.status
               }]);
             });
 
@@ -102,48 +148,6 @@ MB.interaction = (function ($) {
           });
       }
     }
-  }
-
-  function removeFavImage(e) {
-    e.preventDefault();
-    var $parent_li = $(this).closest('li');
-
-    $parent_li.slideUp(1000, function () {
-      var
-      i,
-      len,
-      img,
-      $this      = $(this),
-      src        = $parent_li.find('img').attr('src'),
-      $siblings  = $this.siblings(),
-      $favorites = MB.ui.$pe.favorites_container.find('#favorites');
-
-      $this.remove();
-
-      for (i = 0, len = MB.common.vars.favorites.length; i < len; i += 1) {
-        if (MB.common.vars.favorites[i].url.toLowerCase() === src.toLowerCase()) {
-          img = MB.common.vars.favorites.splice(i, 1);
-          break;
-        }
-      }
-
-      if ($siblings.length) {
-        MB.ui.view_favorites(e, MB.ui.$pe.favoritesorite_show_hide.data({state: 'closed'}), $favorites);
-      } else {
-        MB.ui.$pe.favorites_container
-          .slideUp(1000, function () {
-              var $this = $(this)
-                .find('#favorites')
-                  .slideUp(1000)
-                  .removeAttr('style')
-                  .find('ul')
-                    .remove()
-                  .end()
-                .end()
-                .hide();
-            });
-        }
-    });
   }
 
 }(jQuery));

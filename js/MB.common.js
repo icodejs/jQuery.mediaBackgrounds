@@ -2,7 +2,7 @@
 var MB = MB || {};
 
 MB.common = (function ($) {
-  "use strict";
+  'use strict';
 
   var vars = (function () {
     return {

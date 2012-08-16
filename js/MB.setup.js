@@ -5,7 +5,7 @@ MB.options = {
   domain        : 'http://localhost:5000',
   scrape_path   : '/scrape/webPage/',
   api_url       : 'http://icodejs.no.de/mb/',
-  covert        : false,
+  covert        : true,
   loading_image : 'img/loader.gif',
   media_type    : 'img',
   interval      : 15000,
@@ -38,7 +38,7 @@ MB.options = {
 };
 
 MB.setup = (function ($) {
-  "use strict";
+  'use strict';
 
   /**
    * Monkey patch Array object with a custom contains method

@@ -12,7 +12,7 @@
 var MB = MB || {};
 
 MB.app = (function($, global, document, undefined) {
-  "use strict";
+  'use strict';
 
   // public API
   return {
@@ -46,9 +46,9 @@ MB.app = (function($, global, document, undefined) {
         h     = MB.common.vars.win_height;
 
         MB.events.trigger('updateStatus', [{
-          functionName: 'preloadImage',
-          description: 'Validating image with dimensions: ' + img_w + ' x ' + img_h,
-          $status_el: MB.ui.$pe.status
+          functionName : 'preloadImage',
+          description  : 'Validating image with dimensions: ' + img_w + ' x ' + img_h,
+          elem         : MB.ui.$pe.status
         }]);
 
         if (MB.ui.$pe.img_size.val().indexOf('x') >= 0) {
@@ -131,6 +131,15 @@ MB.app = (function($, global, document, undefined) {
    * @param {jQuery} elem.
    */
   function getWallpaper(elem) {
+
+
+
+    // CLEAN THIS CODE UP ASAP.
+    // clean up this method by moving some decision making to other modules.
+    // Remove circular reference between getWallpaper and set_bg
+
+
+
     // Monitor the error being brought back for a url or keyword.
     if (MB.errors.len > 10) {
       if (!MB.common.vars.ss_mode) {
@@ -141,18 +150,18 @@ MB.app = (function($, global, document, undefined) {
       }
 
       return MB.events.trigger('updateStatus', [{
-        functionName: 'getWallpaper',
-        description: 'Insuffient images for the current URL. Please enter another URL or keyword(s)',
-        errors: MB.errors.toString(),
-        $status_el: MB.ui.$pe.status
+        functionName : 'getWallpaper',
+        description  : 'Insufficient images for the current URL. Please enter another URL or keyword(s)',
+        errors       : MB.errors.toString(),
+        elem         : MB.ui.$pe.status
       }]);
     }
 
     var
-    idx    = 0,
-    bg     = {},
-    input  = MB.ui.$pe.terms.val().toLowerCase(),
-    is_url = (input.indexOf('http://') >= 0 || input.indexOf('www') >= 0);
+    index     = 0,
+    wallpaper = {},
+    input     = MB.ui.$pe.terms.val().toLowerCase(),
+    is_url    = (input.indexOf('http://') >= 0 || input.indexOf('www') >= 0);
 
     if ($('.loader').length === 0 && !MB.common.vars.ss_mode) {
       $('<section />')
@@ -163,19 +172,21 @@ MB.app = (function($, global, document, undefined) {
         .fadeIn();
     }
 
-    // MB.common.loading.begin(MB.ui.$pe.bg_container);
     MB.events.trigger('image_loading', [MB.ui.$pe.bg_container]);
 
     // Check cache. If callback returns cached item index? Do stuff!
     checkCache(input, function (i) {
-      var items = MB.common.vars.cache.items, images;
+      var
+      images = [],
+      items  = MB.common.vars.cache.items,
+      cached = is_url && i >= 0 && items[i] && items[i].images.length;
 
-      if (is_url && i >= 0 && items[i] && items[i].images.length) {
-        images = items[i].images;
-        idx    = MB.common.getRandomInt(0, images.length -1);
-        bg     = {url: images[idx].url};
+      if (cached) {
+        images    = items[i].images;
+        index     = MB.common.getRandomInt(0, images.length -1);
+        wallpaper = { url: images[index].url };
 
-        MB.ui.set_bg(bg, elem);
+        MB.ui.set_bg(wallpaper, elem);
       } else {
         // Clear error if accessing an uncached URL.
         MB.errors.clear();
@@ -185,18 +196,18 @@ MB.app = (function($, global, document, undefined) {
             MB.errors.add(err);
 
             return MB.events.trigger('updateStatus', [{
-              functionName: 'getWallpaper',
-              description: 'getWallpaper: See error object',
-              error: err,
-              errors: MB.errors.toString(),
-              $status_el: MB.ui.$pe.status
+              functionName : 'getWallpaper',
+              description  : 'getWallpaper: See error object',
+              error        : err,
+              errors       : MB.errors.toString(),
+              elem         : MB.ui.$pe.status
             }]);
 
           }
           if (images && images.length) {
-            idx = MB.common.getRandomInt(0, images.length -1);
-            bg  = {url: images[idx].url};
-            MB.ui.set_bg(bg, elem);
+            index     = MB.common.getRandomInt(0, images.length -1);
+            wallpaper = { url: images[index].url };
+            MB.ui.set_bg(wallpaper, elem);
           }
         });
       }
@@ -294,20 +305,20 @@ MB.app = (function($, global, document, undefined) {
 
   function getRandomSearchTerm() {
     var
-    idx  = 0,
-    st   = MB.options.search_terms,
-    term = '';
+    index       = 0,
+    searchTerms = MB.options.search_terms,
+    term        = '';
 
-    if (st.length === 1) {
-      return MB.common.parseSearchTerm(st[idx]);
+    if (searchTerms.length === 1) {
+      return MB.common.parseSearchTerm(searchTerms[index]);
     } else {
-      idx = MB.common.getRandomInt(0, st.length -1);
-      term = MB.common.parseSearchTerm(st[idx]);
+      index = MB.common.getRandomInt(0, searchTerms.length -1);
+      term  = MB.common.parseSearchTerm(searchTerms[index]);
 
       MB.events.trigger('updateStatus', [{
-        functionName: 'getRandomSearchTerm',
-        description: 'search term: ' + term,
-        $status_el: MB.ui.$pe.status
+        functionName : 'getRandomSearchTerm',
+        description  : 'search term: ' + term,
+        elem         : MB.ui.$pe.status
       }]);
 
       return term;

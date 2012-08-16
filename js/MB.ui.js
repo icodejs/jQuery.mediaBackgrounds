@@ -2,7 +2,7 @@
 var MB = MB || {};
 
 MB.ui = (function ($){
-  "use strict";
+  'use strict';
 
   var $pe = {};
 
@@ -99,7 +99,6 @@ MB.ui = (function ($){
     };
   }());
 
-
   var update_ui = (function () {
     return function (elem) {
       if (elem) {
@@ -111,8 +110,8 @@ MB.ui = (function ($){
   var updateStatus = (function () {
     return function (data) {
       if (data.description && data.description.length)
-        data.$status_el
-            .find('section')
+        data.elem
+            .find('section.status')
             .fadeOut()
           .end()
             .html('')
@@ -120,6 +119,52 @@ MB.ui = (function ($){
             .fadeIn();
     };
   }());
+
+  function reset() {
+    MB.ui.$pe.bg_container.remove();
+    MB.ui.$pe.status.html('');
+    MB.ui.removeLoader(null);
+    MB.errors.clear();
+  }
+
+  function hardReset() {
+    MB.ui.reset();
+    MB.common.vars.cache.items = [];
+    // remove current background image
+    // remove loader swirley
+    // remove all favorites
+    // clear all textboxs and dropdown selections and checkboxes
+    // clear cache
+    // remove all errors
+    // update the status with a meaningful warning
+  }
+
+  function addLoader() {
+    $('<section />')
+      .hide()
+      .addClass('loader')
+      .append($('<img />').attr('src', MB.options.loading_image))
+      .appendTo(MB.ui.$pe.body)
+      .fadeIn();
+  }
+
+  function removeLoader(elem) {
+    var $loader = elem || $('.loader');
+    $loader.fadeOut(1000, function () {
+      $(this).remove();
+    });
+  }
+
+  function toggleLoader() {
+    if (MB.common.vars.ss_mode || MB.common.vars.is_loading) return;
+
+    var $loader = MB.ui.$pe.body.find('.loader');
+    if ($loader.length) {
+      removeLoader($loader);
+    } else {
+      addLoader();
+    }
+  }
 
   function getTag(input, t, attrs) {
     return '<' + t + (attrs ? ' ' + attrs : '') + '>' + input + '</' + t + '>';
@@ -190,7 +235,7 @@ MB.ui = (function ($){
             error        : err,
             errors       : MB.errors.toString(),
             description  : 'init error',
-            $status_el   : $pe.status
+            elem   : $pe.status
           }]);
         } else {
           $pe.ws_dropdown.html(html).show(500);
@@ -289,7 +334,7 @@ MB.ui = (function ($){
           return MB.events.trigger('updateStatus', [{
             functionName: 'init',
             description: 'Slideshow mode. A new image will load in approximately ' + (MB.options.interval / 1000) + ' seconds.',
-            $status_el: $pe.status
+            elem: $pe.status
           }]);
         } else {
           clearInterval(MB.common.vars.timers.request.interval_id);
@@ -297,9 +342,9 @@ MB.ui = (function ($){
           $inputs.removeAttr('disabled').removeClass('disabled');
 
           return MB.events.trigger('updateStatus', [{
-            functionName: 'init',
-            description: 'Slideshow cancelled. Press the spacebar to load new images.',
-            $status_el: $pe.status
+            functionName : 'init',
+            description  : 'Slideshow cancelled. Press the spacebar to load new images.',
+            elem         : $pe.status
           }]);
         }
       });
@@ -346,7 +391,9 @@ MB.ui = (function ($){
     getAttr                        : getAttr,
     view_favorites_show            : view_favorites_show,
     view_favorites_button          : view_favorites_button,
-    $pe                            : $pe
+    $pe                            : $pe,
+    hardReset                      : hardReset,
+    reset                          : reset
   };
 
 }(jQuery));
