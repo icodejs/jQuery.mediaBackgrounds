@@ -8,7 +8,7 @@ MB.options = {
   covert        : true,
   loading_image : 'img/loader.gif',
   media_type    : 'img',
-  interval      : 15000,
+  interval      : 10000,
   user_id       : -1,
   search_terms : [
     'cityscape wallpaper',

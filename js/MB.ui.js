@@ -64,7 +64,7 @@ MB.ui = (function ($){
   var set_bg = (function () {
     return function (data, elem) {
       if (data && data.url) {
-          MB.app.preloadImage(data.url, 0, function (err, img_dims) {
+          preloadImage(data.url, 0, function (err, img_dims) {
             // create a new bg_container section which will replace the old on
             var old_bg_containers = $('.bg_container');
 
@@ -129,7 +129,7 @@ MB.ui = (function ($){
 
   function hardReset() {
     MB.ui.reset();
-    MB.common.vars.cache.items = [];
+    MB.data.cache.items = [];
     // remove current background image
     // remove loader swirley
     // remove all favorites
@@ -371,11 +371,80 @@ MB.ui = (function ($){
       {
         elem: $pe.eventElement,
         name: 'image_loading',
-        func: MB.common.loading.begin
+        func: MB.utils.loading.begin
       }
     ]);
 
     callback($pe);
+  }
+
+  function preloadImage(src_url, delay, callback) {
+    MB.common.vars.is_loading = true;
+    // remove this for now but in future we might hide it
+    MB.ui.$pe.body.find('img.preloaded').remove();
+
+    // Load image, hide it, add to the pages.
+    $(new Image())
+      .hide()
+      .load(function () {
+        var
+        img   = this,
+        img_w = img.width,
+        img_h = img.height,
+        w     = MB.common.vars.win_width,
+        h     = MB.common.vars.win_height;
+
+        MB.events.trigger('updateStatus', [{
+          functionName : 'preloadImage',
+          description  : 'preloading image with dimensions: ' + img_w + ' x ' + img_h,
+          elem         : MB.ui.$pe.status
+        }]);
+
+        if (MB.ui.$pe.img_size.val().indexOf('x') >= 0) {
+          w = MB.ui.$pe.img_size.val().split('x')[0];
+          h = MB.ui.$pe.img_size.val().split('x')[1];
+        } else {
+          img_w *= 1.5;
+          img_h *= 1.5;
+        }
+
+        // Filter out images that are too small for the current
+        // window size or that are smaller than the minimum
+        // size specified by the user.
+        if (img_w < w || img_h < h) {
+          return callback({
+            func_name : 'preloadImage',
+            desc      : 'image returned is too small'
+          });
+        }
+
+        setTimeout(function () {
+          var obj = {width: img.width, height: img.height, url: src_url};
+
+          if (!MB.common.vars.ss_mode) {
+            MB.ui.$pe.body.find('.loader').fadeOut(1000, function () {
+              $(this).remove();
+              MB.common.vars.is_loading = false;
+              callback(null, obj);
+            });
+          } else {
+            MB.common.vars.is_loading = false;
+            callback(null, obj);
+          }
+          MB.utils.reset();
+        }, delay);
+
+      })
+      .addClass('preloaded')
+      .attr('src', src_url)
+      .prependTo('body')
+      .error(function (e) {
+        return callback({
+          func_name   : 'preloadImage',
+          description : '404 (Not Found)',
+          error       : e
+        });
+      }); // end JQ new Image
   }
 
   // public API

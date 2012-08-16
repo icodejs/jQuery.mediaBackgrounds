@@ -1,7 +1,7 @@
 
 var MB = MB || {};
 
-MB.common = (function ($) {
+MB.common = (function () {
   'use strict';
 
   var vars = (function () {
@@ -26,61 +26,10 @@ MB.common = (function ($) {
     };
   }());
 
-  var loading = (function () {
-    return {
-      start_time  : 0,
-      elaps       : 0,
-      interval_id : -1,
-      begin       : function (bg_container) {
-        var that = this;
-
-        if (that.start_time > 0) {
-          return true;
-        } else if (that.start_time === 0) {
-          that.start_time = new Date().getTime();
-        }
-
-        that.interval_id = setInterval(function () {
-          var now = new Date().getTime(), elaps = (now - that.start_time) / 1000;
-          if (elaps > 20)
-            return MB.common.reset(true, bg_container);
-        }, 2000);
-      }
-    };
-  }());
-
-  function reset(ui, bg_container) {
-    if (ui && bg_container) {
-      if ($.xhrPool.length) {
-        $.xhrPool.abortAll();
-      }
-      MB.ui.update_ui(bg_container);
-    }
-    MB.common.loading.start_time = 0;
-
-    return clearInterval(MB.common.loading.interval_id);
-  }
-
-  function parseSearchTerm(term) {
-    return term.split(' ').join('+');
-  }
-
-  function getRandomInt(min, max)  {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-  }
-
-  function active() {
-    return MB.common.loading.start_time > 0;
-  }
 
   // public API
   return {
-    vars            : vars,
-    loading         : loading,
-    reset           : reset,
-    parseSearchTerm : parseSearchTerm,
-    getRandomInt    : getRandomInt,
-    active          : active
+    vars : vars
   };
 
-}(jQuery));
+}());

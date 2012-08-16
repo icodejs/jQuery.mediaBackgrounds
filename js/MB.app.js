@@ -17,89 +17,8 @@ MB.app = (function($, global, document, undefined) {
   // public API
   return {
     init          : init,
-    getWallpaper  : getWallpaper,
-    preloadImage  : preloadImage
+    getWallpaper  : getWallpaper
   };
-
-  /**
-   * Preload images so that large images are fully loaded ready to
-   * be faded in.
-   *
-   * @param {string} src_url - Image URL.
-   * @param {integer} delay - Option to call the callback with a delay
-   * @param {function} callback - Callback method for results.
-   */
-  function preloadImage(src_url, delay, callback) {
-    MB.common.vars.is_loading = true;
-    // remove this for now but in future we might hide it
-    MB.ui.$pe.body.find('img.preloaded').remove();
-
-    // Load image, hide it, add to the pages.
-    $(new Image())
-      .hide()
-      .load(function () {
-        var
-        img   = this,
-        img_w = img.width,
-        img_h = img.height,
-        w     = MB.common.vars.win_width,
-        h     = MB.common.vars.win_height;
-
-        MB.events.trigger('updateStatus', [{
-          functionName : 'preloadImage',
-          description  : 'Validating image with dimensions: ' + img_w + ' x ' + img_h,
-          elem         : MB.ui.$pe.status
-        }]);
-
-        if (MB.ui.$pe.img_size.val().indexOf('x') >= 0) {
-          w = MB.ui.$pe.img_size.val().split('x')[0];
-          h = MB.ui.$pe.img_size.val().split('x')[1];
-        } else {
-          // CSS3 background-size:cover does a good job of
-          // stretching images so allow images as much as
-          // 50% smaller than current window size.
-          img_w *= 1.5;
-          img_h *= 1.5;
-        }
-
-        // Filter out images that are too small for the current
-        // window size or that are smaller than the minimum
-        // size specified by the user.
-        if (img_w < w || img_h < h) {
-          return callback({
-            func_name : 'preloadImage',
-            desc      : 'image returned is too small'
-          });
-        }
-
-        setTimeout(function () {
-          var obj = {width: img.width, height: img.height, url: src_url};
-
-          if (!MB.common.vars.ss_mode) {
-            MB.ui.$pe.body.find('.loader').fadeOut(1000, function () {
-              $(this).remove();
-              MB.common.vars.is_loading = false;
-              callback(null, obj);
-            });
-          } else {
-            MB.common.vars.is_loading = false;
-            callback(null, obj);
-          }
-          MB.common.reset();
-        }, delay);
-
-      })
-      .addClass('preloaded')
-      .attr('src', src_url)
-      .prependTo('body')
-      .error(function (e) {
-        return callback({
-          func_name   : 'preloadImage',
-          description : '404 (Not Found)',
-          error       : e
-        });
-      }); // end JQ new Image
-  }
 
   /**
    * Initialisation function that does most of the heavy lifting.
@@ -178,12 +97,12 @@ MB.app = (function($, global, document, undefined) {
     checkCache(input, function (i) {
       var
       images = [],
-      items  = MB.common.vars.cache.items,
+      items  = MB.data.cache.items,
       cached = is_url && i >= 0 && items[i] && items[i].images.length;
 
       if (cached) {
         images    = items[i].images;
-        index     = MB.common.getRandomInt(0, images.length -1);
+        index     = MB.utils.getRandomInt(0, images.length -1);
         wallpaper = { url: images[index].url };
 
         MB.ui.set_bg(wallpaper, elem);
@@ -191,13 +110,13 @@ MB.app = (function($, global, document, undefined) {
         // Clear error if accessing an uncached URL.
         MB.errors.clear();
 
-        getJson(is_url, input, function (err, images) {
+        MB.utils.getJson(is_url, input, function (err, images) {
           if (err) {
             MB.errors.add(err);
-
+            //console.log(err);
             return MB.events.trigger('updateStatus', [{
               functionName : 'getWallpaper',
-              description  : 'getWallpaper: See error object',
+              description  : 'getWallpaper: See error object - ' + MB.errors.toString(),
               error        : err,
               errors       : MB.errors.toString(),
               elem         : MB.ui.$pe.status
@@ -205,7 +124,7 @@ MB.app = (function($, global, document, undefined) {
 
           }
           if (images && images.length) {
-            index     = MB.common.getRandomInt(0, images.length -1);
+            index     = MB.utils.getRandomInt(0, images.length -1);
             wallpaper = { url: images[index].url };
             MB.ui.set_bg(wallpaper, elem);
           }
@@ -214,83 +133,10 @@ MB.app = (function($, global, document, undefined) {
     });
   }
 
-  /**
-   * Responsible for performing ajax calls and returning the relevant
-   * information to the callback.
-   *
-   * @param {boolean} is_url - Has the user entered a URL or a keyword.
-   * @param {string} input - User input.
-   * @param {function} callback - Callback method for results.
-   */
-  function getJson(is_url, input, callback) {
-    var url = '';
-
-    if (MB.options.domain.length && MB.options.scrape_path.length && is_url) {
-      url  = MB.options.domain + MB.options.scrape_path + '?url=' + input;
-    } else {
-      url  = 'http://ajax.googleapis.com/ajax/services/search/images?v=1.0&q=';
-      url += (input.length ? MB.common.parseSearchTerm(input) : getRandomSearchTerm());
-      url += '&imgsz=xlarge|xxlarge|huge';                     // |huge (make this optional)
-      url += '&imgtype=photo';
-      url += '&rsz=8';                                         // max results per page
-      url += '&start=' + MB.common.getRandomInt(1, 50);
-    }
-
-    // Abort all ajax requests if any
-    if ($.xhrPool.length) $.xhrPool.abortAll();
-
-    $.ajax({
-      url: url,
-      dataType: 'jsonp',
-      error: function (jqXHR, textStatus, errorThrown) {
-        return callback({
-          func_name : 'ajax getJson',
-          desc      : textStatus,
-          data      : errorThrown
-        });
-      }
-    }).done(function (data, status) {
-
-      if (status === 'success') {
-        try {
-          if (data.error) {
-            return callback({
-              func_name : 'done getJson',
-              desc      : data.error,
-              data      : data
-            });
-          }
-          // replace this logic with a custom function that can be passed in for each api
-
-          if (MB.options.domain.length && is_url) {
-            if (!MB.common.vars.cache.items.contains(input, 'id')) {
-              MB.common.vars.cache.items.push({id: input, images: data});
-            }
-            return callback(null, data);
-          } else {
-            var results = data.responseData.results;
-            if (results.length) {
-              return callback(null, results);
-            } else {
-              return callback({desc: 'no results'});
-            }
-          }
-
-        } catch (e) {
-          return callback({
-            func_name : 'getJson',
-            desc      : e.toString(),
-            data      : e
-          });
-        }
-      }
-    });
-  }
-
   function checkCache(id, callback) {
     var
     i,
-    items = MB.common.vars.cache.items,
+    items = MB.data.cache.items,
     len   = items.length;
 
     if (len) {
@@ -301,28 +147,6 @@ MB.app = (function($, global, document, undefined) {
       }
     }
     return callback(-1);
-  }
-
-  function getRandomSearchTerm() {
-    var
-    index       = 0,
-    searchTerms = MB.options.search_terms,
-    term        = '';
-
-    if (searchTerms.length === 1) {
-      return MB.common.parseSearchTerm(searchTerms[index]);
-    } else {
-      index = MB.common.getRandomInt(0, searchTerms.length -1);
-      term  = MB.common.parseSearchTerm(searchTerms[index]);
-
-      MB.events.trigger('updateStatus', [{
-        functionName : 'getRandomSearchTerm',
-        description  : 'search term: ' + term,
-        elem         : MB.ui.$pe.status
-      }]);
-
-      return term;
-    }
   }
 
 } (jQuery, this, document));
