@@ -94,23 +94,18 @@ MB.app = (function($, global, document, undefined) {
     MB.events.trigger('image_loading', [MB.ui.$pe.bg_container]);
 
     // Check cache. If callback returns cached item index? Do stuff!
-    checkCache(input, function (i) {
-      var
-      images = [],
-      items  = MB.data.cache.items,
-      cached = is_url && i >= 0 && items[i] && items[i].images.length;
+    MB.data.cache.checkCache(input, function (images) {
+      var cached = is_url && images && images.length;
 
       if (cached) {
-        images    = items[i].images;
         index     = MB.utils.getRandomInt(0, images.length -1);
         wallpaper = { url: images[index].url };
-
         MB.ui.set_bg(wallpaper, elem);
       } else {
         // Clear error if accessing an uncached URL.
         MB.errors.clear();
 
-        MB.utils.getJson(is_url, input, function (err, images) {
+        MB.utils.getJson(is_url, input, function (err, imgs) {
           if (err) {
             MB.errors.add(err);
             //console.log(err);
@@ -123,9 +118,9 @@ MB.app = (function($, global, document, undefined) {
             }]);
 
           }
-          if (images && images.length) {
-            index     = MB.utils.getRandomInt(0, images.length -1);
-            wallpaper = { url: images[index].url };
+          if (imgs && imgs.length) {
+            index     = MB.utils.getRandomInt(0, imgs.length -1);
+            wallpaper = { url: imgs[index].url };
             MB.ui.set_bg(wallpaper, elem);
           }
         });
@@ -133,21 +128,6 @@ MB.app = (function($, global, document, undefined) {
     });
   }
 
-  function checkCache(id, callback) {
-    var
-    i,
-    items = MB.data.cache.items,
-    len   = items.length;
-
-    if (len) {
-      for (i = 0; i < len; i += 1) {
-        if (id.toLowerCase() === items[i].id.toLowerCase()) {
-          return callback(i);
-        }
-      }
-    }
-    return callback(-1);
-  }
 
 } (jQuery, this, document));
 

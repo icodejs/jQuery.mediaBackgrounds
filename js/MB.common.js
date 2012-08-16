@@ -14,9 +14,6 @@ MB.common = (function () {
           interval_id : -1
         }
       },
-      cache: {
-        items: []
-      },
       favorites            : [],
       win_width            : 1024,
       win_height           : 1024,

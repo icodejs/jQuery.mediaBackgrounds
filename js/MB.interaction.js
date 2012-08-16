@@ -70,7 +70,7 @@ MB.interaction = (function ($) {
       }
 
       if ($siblings.length) {
-        MB.ui.view_favorites(e, MB.ui.$pe.favoritesorite_show_hide.data({state: 'closed'}), $favorites);
+        MB.ui.viewFavorites(e, MB.ui.$pe.favorite_show_hide.data({state: 'closed'}), $favorites);
       } else {
         MB.ui.$pe.favorites_container
           .slideUp(1000, function () {

@@ -458,6 +458,7 @@ MB.ui = (function ($){
     updateStatus                   : updateStatus,
     getTag                         : getTag,
     getAttr                        : getAttr,
+    viewFavorites                  : viewFavorites,
     view_favorites_show            : view_favorites_show,
     view_favorites_button          : view_favorites_button,
     $pe                            : $pe,
