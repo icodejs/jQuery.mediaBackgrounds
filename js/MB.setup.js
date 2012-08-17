@@ -1,41 +1,46 @@
 
 var MB = MB || {};
 
-MB.options = {
-  domain        : 'http://localhost:5000',
-  scrape_path   : '/scrape/webPage/',
-  api_url       : 'http://icodejs.no.de/mb/',
-  covert        : true,
-  loading_image : 'img/loader.gif',
-  media_type    : 'img',
-  interval      : 10000,
-  user_id       : -1,
-  search_terms : [
-    'cityscape wallpaper',
-    'marvel comics',
-    'dc commics',
-    'space wallpaper',
-    'space stars wallpaper',
-    'space planets wallpaper',
-    'muscle cars',
-    'tokyo japan city',
-    'adult swim wallpaper',
-    'thepaperwall cityscape wallpapers',
-    'akira wallpaper',
-    'high res background textures',
-    'high res background wallpapers',
-    'architectural photography wallpapers',
-    'Street photography wallpapers',
-    'macro photography wallpapers',
-    'Aerial photography wallpapers',
-    'Black and White photography wallpapers',
-    'Night photography wallpapers',
-    'dream-wallpaper.com',
-    'flowers',
-    'graffiti',
-    'national geographic wallpaper'
-  ]
-};
+MB.options = (function () {
+  'use strict';
+
+  return {
+    domain        : 'http://localhost:5000',
+    scrape_path   : '/scrape/webPage/',
+    api_url       : 'http://icodejs.no.de/mb/',
+    covert        : true,
+    loading_image : 'img/loader.gif',
+    media_type    : 'img',
+    interval      : 10000,
+    user_id       : -1,
+    search_terms : [
+      'cityscape wallpaper',
+      'marvel comics',
+      'dc commics',
+      'space wallpaper',
+      'space stars wallpaper',
+      'space planets wallpaper',
+      'muscle cars',
+      'tokyo japan city',
+      'adult swim wallpaper',
+      'thepaperwall cityscape wallpapers',
+      'akira wallpaper',
+      'high res background textures',
+      'high res background wallpapers',
+      'architectural photography wallpapers',
+      'Street photography wallpapers',
+      'macro photography wallpapers',
+      'Aerial photography wallpapers',
+      'Black and White photography wallpapers',
+      'Night photography wallpapers',
+      'dream-wallpaper.com',
+      'flowers',
+      'graffiti',
+      'national geographic wallpaper'
+    ]
+  };
+}());
+
 
 MB.setup = (function ($) {
   'use strict';

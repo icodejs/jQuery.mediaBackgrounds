@@ -6,31 +6,6 @@ MB.ui = (function ($){
 
   var $pe = {};
 
-  var loadWallpaperSites = (function () {
-    return function (callback) {
-      $.ajax({
-        url:  MB.options.domain + '/load/webPages/',
-        dataType: 'jsonp',
-        error: function (jqXHR, textStatus, errorThrown) {
-          return callback({
-            func_name : 'loadWallpaperSites',
-            desc      : textStatus,
-            data      : jqXHR
-          });
-        }
-      }).done(function (data, status) {
-        var opts = '';
-        if (status === 'success') {
-          opts += getTag('[ websites ]', 'option', getAttr('value', ''));
-          $.each(data, function(i, obj) {
-            opts += getTag(obj.category, 'option', getAttr('value', obj.url));
-          });
-          callback(null, opts);
-        }
-      });
-    };
-  }());
-
   var resize_window = (function () {
     return function () {
       var
@@ -129,7 +104,7 @@ MB.ui = (function ($){
 
   function hardReset() {
     MB.ui.reset();
-    MB.data.cache.items = [];
+    MB.data.cache.clear();
     // remove current background image
     // remove loader swirley
     // remove all favorites
@@ -174,7 +149,7 @@ MB.ui = (function ($){
     return name + '="' + value + '"';
   }
 
-  function viewFavorites(event, elem, target_elem) {
+  function viewFavorites(event, elem, target_elem) { // many want to move this to MB.data
     var
     state      = elem.data('state'),
     $icon      = elem.find('i'),
@@ -197,7 +172,7 @@ MB.ui = (function ($){
     });
   }
 
-  function view_favorites_show(obj, callback) {
+  function view_favorites_show(obj, cb) {
     var easing = obj.state === 'open' ?  'easeOutQuad' : 'easeInQuad';
 
     obj.element.stop(true, true);
@@ -205,7 +180,7 @@ MB.ui = (function ($){
       height: obj.height
     }, obj.speed, easing, function() {
       $(this).css({overflow: obj.overflow});
-      callback();
+      cb();
     });
   }
 
@@ -216,7 +191,7 @@ MB.ui = (function ($){
     }
   }
 
-  function init(pageElements, callback) {
+  function init(pageElements, cb) {
     MB.ui.$pe = pageElements;
     $pe = MB.ui.$pe;
 
@@ -227,7 +202,7 @@ MB.ui = (function ($){
 
     // load wallpaper sites from server
     setTimeout(function () {
-      MB.ui.loadWallpaperSites(function (err, html) {
+      MB.data.getWallpaperSites(function (err, data) {
         if (err) {
           MB.errors.add(err);
           return MB.events.trigger('updateStatus', [{
@@ -238,9 +213,15 @@ MB.ui = (function ($){
             elem   : $pe.status
           }]);
         } else {
+          var html = '';
+          html += MB.ui.getTag('[ websites ]', 'option', MB.ui.getAttr('value', ''));
+          $.each(data, function(i, obj) {
+            html += MB.ui.getTag(obj.category, 'option', MB.ui.getAttr('value', obj.url));
+          });
           $pe.ws_dropdown.html(html).show(500);
         }
       });
+
     }, 2000);
 
     $pe.window
@@ -375,10 +356,10 @@ MB.ui = (function ($){
       }
     ]);
 
-    callback($pe);
+    cb($pe);
   }
 
-  function preloadImage(src_url, delay, callback) {
+  function preloadImage(src_url, delay, cb) {
     MB.common.vars.is_loading = true;
     // remove this for now but in future we might hide it
     MB.ui.$pe.body.find('img.preloaded').remove();
@@ -412,7 +393,7 @@ MB.ui = (function ($){
         // window size or that are smaller than the minimum
         // size specified by the user.
         if (img_w < w || img_h < h) {
-          return callback({
+          return cb({
             func_name : 'preloadImage',
             desc      : 'image returned is too small'
           });
@@ -425,11 +406,11 @@ MB.ui = (function ($){
             MB.ui.$pe.body.find('.loader').fadeOut(1000, function () {
               $(this).remove();
               MB.common.vars.is_loading = false;
-              callback(null, obj);
+              cb(null, obj);
             });
           } else {
             MB.common.vars.is_loading = false;
-            callback(null, obj);
+            cb(null, obj);
           }
           MB.utils.reset();
         }, delay);
@@ -439,7 +420,7 @@ MB.ui = (function ($){
       .attr('src', src_url)
       .prependTo('body')
       .error(function (e) {
-        return callback({
+        return cb({
           func_name   : 'preloadImage',
           description : '404 (Not Found)',
           error       : e
@@ -450,7 +431,6 @@ MB.ui = (function ($){
   // public API
   return {
     init                           : init,
-    loadWallpaperSites             : loadWallpaperSites,
     resize_window                  : resize_window,
     set_favorites_container_height : set_favorites_container_height,
     set_bg                         : set_bg,

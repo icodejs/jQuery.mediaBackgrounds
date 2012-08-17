@@ -6,16 +6,6 @@ MB.errors = (function () {
 
   var errors = [];
 
-  // public API
-  return {
-    clear    : clear,
-    add      : add,
-    log      : log,
-    len      : len,
-    toString : toString,
-    manage   : manage
-  };
-
   function clear() {
     errors = [];
   }
@@ -57,6 +47,16 @@ MB.errors = (function () {
     }
      return { pass: true };
   }
+
+  // public API
+  return {
+    clear    : clear,
+    add      : add,
+    log      : log,
+    len      : len,
+    toString : toString,
+    manage   : manage
+  };
 
 }());
 

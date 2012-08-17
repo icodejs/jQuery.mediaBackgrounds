@@ -51,76 +51,10 @@ MB.utils = (function ($) {
     return MB.utils.loading.start_time > 0;
   }
 
-  function getJson(is_url, input, callback) {
-    var url = '';
-
-    if (MB.options.domain.length && MB.options.scrape_path.length && is_url) {
-      url  = MB.options.domain + MB.options.scrape_path + '?url=' + input;
-    } else {
-      url  = 'http://ajax.googleapis.com/ajax/services/search/images?v=1.0&q=';
-      url += (input.length ? MB.utils.parseSearchTerm(input) : getRandomSearchTerm());
-      url += '&imgsz=xlarge|xxlarge|huge';                     // |huge (make this optional)
-      url += '&imgtype=photo';
-      url += '&rsz=8';                                         // max results per page
-      url += '&start=' + MB.utils.getRandomInt(1, 50);
-    }
-
-    // Abort all ajax requests if any
-    if ($.xhrPool.length) $.xhrPool.abortAll();
-
-    $.ajax({
-      url: url,
-      dataType: 'jsonp',
-      error: function (jqXHR, textStatus, errorThrown) {
-        return callback({
-          func_name : 'ajax getJson',
-          desc      : textStatus,
-          data      : errorThrown
-        });
-      }
-    }).done(function (data, status) {
-
-      if (status === 'success') {
-        try {
-          if (data.error) {
-            return callback({
-              func_name : 'done getJson',
-              desc      : data.error,
-              data      : data
-            });
-          }
-          // replace this logic with a custom function that can be passed in for each api
-
-          if (MB.options.domain.length && is_url) {
-            if (!MB.data.cache.items.contains(input, 'id')) {
-              MB.data.cache.items.push({id: input, images: data});
-            }
-            return callback(null, data);
-          } else {
-            var results = data.responseData.results;
-            if (results.length) {
-              return callback(null, results);
-            } else {
-              return callback({desc: 'no results'});
-            }
-          }
-
-        } catch (e) {
-          return callback({
-            func_name : 'getJson',
-            desc      : e.toString(),
-            data      : e
-          });
-        }
-      }
-    });
-  }
-
-  function getRandomSearchTerm() {
+  function getRandomSearchTerm(searchTerms) {
     var
-    index       = 0,
-    searchTerms = MB.options.search_terms,
-    term        = '';
+    index = 0,
+    term  = '';
 
     if (searchTerms.length === 1) {
       return MB.utils.parseSearchTerm(searchTerms[index]);
@@ -140,12 +74,12 @@ MB.utils = (function ($) {
 
   // public API
   return {
-    loading         : loading,
-    reset           : reset,
-    parseSearchTerm : parseSearchTerm,
-    getRandomInt    : getRandomInt,
-    active          : active,
-    getJson         : getJson
+    loading             : loading,
+    reset               : reset,
+    parseSearchTerm     : parseSearchTerm,
+    getRandomInt        : getRandomInt,
+    active              : active,
+    getRandomSearchTerm : getRandomSearchTerm
   };
 
 }(jQuery));

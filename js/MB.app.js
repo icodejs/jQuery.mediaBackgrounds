@@ -14,12 +14,6 @@ var MB = MB || {};
 MB.app = (function($, global, document, undefined) {
   'use strict';
 
-  // public API
-  return {
-    init          : init,
-    getWallpaper  : getWallpaper
-  };
-
   /**
    * Initialisation function that does most of the heavy lifting.
    */
@@ -94,10 +88,11 @@ MB.app = (function($, global, document, undefined) {
     MB.events.trigger('image_loading', [MB.ui.$pe.bg_container]);
 
     // Check cache. If callback returns cached item index? Do stuff!
-    MB.data.cache.checkCache(input, function (images) {
-      var cached = is_url && images && images.length;
+    MB.data.cache.get(input, function (obj) {
+      var images, cached = is_url && obj && obj.images.length;
 
       if (cached) {
+        images    = obj.images,
         index     = MB.utils.getRandomInt(0, images.length -1);
         wallpaper = { url: images[index].url };
         MB.ui.set_bg(wallpaper, elem);
@@ -105,7 +100,7 @@ MB.app = (function($, global, document, undefined) {
         // Clear error if accessing an uncached URL.
         MB.errors.clear();
 
-        MB.utils.getJson(is_url, input, function (err, imgs) {
+        MB.data.getJSON(is_url, input, function (err, imgs) {
           if (err) {
             MB.errors.add(err);
             //console.log(err);
@@ -128,6 +123,11 @@ MB.app = (function($, global, document, undefined) {
     });
   }
 
+  // public API
+  return {
+    init          : init,
+    getWallpaper  : getWallpaper
+  };
 
 } (jQuery, this, document));
 
