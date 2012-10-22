@@ -5,6 +5,17 @@ An experimental JavaScript web app that pull background images from a Google ima
 
 This is a work in progress and is currently undergoing a major overhaul, so 'Star' this Github repository if you'd like to receive notifications on future updates.
 
+## General Usage (Shortcut keys)
+
+Spacebar is always used to load new images, but the other shortcuts keys are optional and you can use the buttons provided.
+
+* Spacebar: Load
+* F: Favorites
+* S: Save
+* T: Tweet
+* E: Email
+* H: Help
+
 ## Basic Setup
 
 ```html
