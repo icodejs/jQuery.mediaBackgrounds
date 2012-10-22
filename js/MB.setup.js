@@ -5,10 +5,10 @@ MB.options = (function () {
   'use strict';
 
   return {
-    domain        : 'http://localhost:5000',
+    domain        : 'http://icodejs.no.de/mb',
     scrape_path   : '/scrape/webPage/',
     api_url       : 'http://icodejs.no.de/mb/',
-    covert        : true,
+    covert        : false,
     loading_image : 'img/loader.gif',
     media_type    : 'img',
     interval      : 10000,
